@@ -1,0 +1,10 @@
+<div *ngIf="isMobile" class="mobile-toggle">
+  <button mat-button (click)="toggleMenu()">☰ Menu</button>
+</div>
+
+<aside class="sidebar" [class.mobile]="isMobile" [class.open]="menuOpen || !isMobile">
+  <nav>
+    <a routerLink="/home" (click)="menuOpen = false">🏠 Home</a>
+    <a routerLink="/settings" (click)="menuOpen = false">⚙️ Settings</a>
+  </nav>
+</aside>
