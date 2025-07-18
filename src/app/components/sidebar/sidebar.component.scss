@@ -6,6 +6,9 @@
   padding: 1rem;
   box-sizing: border-box;
   z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
 
   nav {
     display: flex;
@@ -18,32 +21,40 @@
       font-weight: 500;
     }
   }
-
-  // DEFAULT: DESKTOP
-  position: fixed;
-  top: 0;
-  left: 0;
-
-  &.mobile {
-    position: absolute;
-    top: 3.5rem;
-    left: 0;
-    width: 100%;
-    height: auto;
-    background: #34495e;
-    transform: translateY(-150%);
-    transition: transform 0.3s ease;
-
-    &.open {
-      transform: translateY(0);
-    }
-  }
 }
 
-@media (max-width: 768px) {
-  .sidebar {
-    position: static !important;
-    height: auto !important;
-    width: 100% !important;
+.sidebar.mobile {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: 40vh;
+  background: rgba(52, 73, 94, 0.85);
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  padding: 1rem;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+.sidebar.mobile.open {
+  transform: translateY(0);
+}
+
+
+.mobile-toggle {
+  background: #2c3e50;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  z-index: 1001;
+
+  button {
+    color: white;
+    font-weight: bold;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
   }
 }
