@@ -5,4 +5,10 @@ import { Component } from '@angular/core';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {}
+export class AppComponent {
+  sidebarCollapsed = false;
+
+  onSidebarCollapseChange(collapsed: boolean) {
+    this.sidebarCollapsed = collapsed;
+  }
+}

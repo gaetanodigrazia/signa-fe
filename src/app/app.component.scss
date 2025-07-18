@@ -10,6 +10,7 @@
   overflow-y: auto;
   padding: 1rem;
   margin-top: 0;
+  transition: margin-left 0.3s ease;
 }
 
 @media (min-width: 769px) {
@@ -19,7 +20,10 @@
 
   .app-content {
     margin-left: 240px;
-    margin-top: 0;
+  }
+
+  .app-content.collapsed {
+    margin-left: 60px;
   }
 
   .mobile-toggle {

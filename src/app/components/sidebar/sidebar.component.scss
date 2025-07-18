@@ -58,3 +58,49 @@
     letter-spacing: 0.5px;
   }
 }
+
+.sidebar {
+  width: 240px;
+  transition: width 0.3s ease;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background: #2c3e50;
+  color: white;
+  padding: 1rem;
+  box-sizing: border-box;
+  z-index: 1000;
+
+  .collapse-toggle {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+  }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    text-decoration: none;
+    margin: 0.5rem 0;
+  }
+}
+
+.sidebar.collapsed {
+  width: 60px;
+
+  .collapse-toggle {
+    text-align: center;
+    margin: 0 auto 1rem;
+  }
+
+  .text {
+    display: none;
+  }
+}

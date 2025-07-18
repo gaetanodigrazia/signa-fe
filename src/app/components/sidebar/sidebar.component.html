@@ -4,12 +4,22 @@
 </div>
 
 <!-- SIDEBAR DESKTOP -->
-<aside *ngIf="!isMobile" class="sidebar">
+<aside *ngIf="!isMobile" class="sidebar" [class.collapsed]="isCollapsed">
+  <button class="collapse-toggle" (click)="toggleCollapse()">
+    {{ isCollapsed ? '→' : '←' }}
+  </button>
   <nav>
-    <a routerLink="/home">🏠 Home</a>
-    <a routerLink="/settings">⚙️ Settings</a>
+    <a routerLink="/home">
+      <span class="icon">🏠</span>
+      <span class="text" *ngIf="!isCollapsed">Home</span>
+    </a>
+    <a routerLink="/settings">
+      <span class="icon">⚙️</span>
+      <span class="text" *ngIf="!isCollapsed">Settings</span>
+    </a>
   </nav>
 </aside>
+
 
 <!-- SIDEBAR MOBILE -->
 <aside *ngIf="isMobile && menuOpen" class="sidebar mobile open">

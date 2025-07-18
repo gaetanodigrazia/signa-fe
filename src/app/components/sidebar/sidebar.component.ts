@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-sidebar',
@@ -8,6 +8,8 @@ import { Component, HostListener } from '@angular/core';
 export class SidebarComponent {
   isMobile = false;
   menuOpen = false;
+  isCollapsed = false;
+  @Output() collapseChanged = new EventEmitter<boolean>();
 
   @HostListener('window:resize', [])
   onResize() {
@@ -20,5 +22,10 @@ export class SidebarComponent {
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
+  }
+
+  toggleCollapse() {
+    this.isCollapsed = !this.isCollapsed;
+    this.collapseChanged.emit(this.isCollapsed);
   }
 }
