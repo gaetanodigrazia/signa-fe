@@ -1,0 +1,36 @@
+<div style="max-width: 1000px; margin: auto; padding: 16px;">
+  <!-- Selettore vista -->
+  <label for="view">Visualizzazione: </label>
+  <select id="view" [(ngModel)]="view">
+    <option [ngValue]="CalendarView.Month">Mese</option>
+    <option [ngValue]="CalendarView.Week">Settimana</option>
+    <option [ngValue]="CalendarView.Day">Giorno</option>
+  </select>
+
+  <!-- Calendario dinamico -->
+  <div style="margin-top: 20px;">
+    <mwl-calendar-month-view
+      *ngIf="view === CalendarView.Month"
+      [viewDate]="viewDate"
+      [events]="events"
+      [refresh]="refresh"
+      (dayClicked)="handleDayClick($event.day.date)">
+    </mwl-calendar-month-view>
+
+    <mwl-calendar-week-view
+      *ngIf="view === CalendarView.Week"
+      [viewDate]="viewDate"
+      [events]="events"
+      [refresh]="refresh"
+      (hourSegmentClicked)="handleHourClick($event.date)">
+    </mwl-calendar-week-view>
+
+    <mwl-calendar-day-view
+      *ngIf="view === CalendarView.Day"
+      [viewDate]="viewDate"
+      [events]="events"
+      [refresh]="refresh"
+      (hourSegmentClicked)="handleHourClick($event.date)">
+    </mwl-calendar-day-view>
+  </div>
+</div>
