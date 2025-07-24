@@ -1,14 +1,15 @@
 <div style="max-width: 1000px; margin: auto; padding: 16px;">
   <!-- Selettore vista -->
-  <label for="view">Visualizzazione: </label>
+  <label for="view">Visualizzazione:</label>
   <select id="view" [(ngModel)]="view">
     <option [ngValue]="CalendarView.Month">Mese</option>
     <option [ngValue]="CalendarView.Week">Settimana</option>
     <option [ngValue]="CalendarView.Day">Giorno</option>
   </select>
 
-  <!-- Calendario dinamico -->
+  <!-- Calendario -->
   <div style="margin-top: 20px;">
+    <!-- Vista Mese -->
     <mwl-calendar-month-view
       *ngIf="view === CalendarView.Month"
       [viewDate]="viewDate"
@@ -17,20 +18,46 @@
       (dayClicked)="handleDayClick($event.day.date)">
     </mwl-calendar-month-view>
 
+    <!-- Vista Settimana -->
     <mwl-calendar-week-view
       *ngIf="view === CalendarView.Week"
       [viewDate]="viewDate"
       [events]="events"
       [refresh]="refresh"
-      (hourSegmentClicked)="handleHourClick($event.date)">
+      (hourSegmentClicked)="onTimeSlotClick($event.date)">
     </mwl-calendar-week-view>
 
+    <!-- Vista Giorno -->
     <mwl-calendar-day-view
       *ngIf="view === CalendarView.Day"
       [viewDate]="viewDate"
       [events]="events"
       [refresh]="refresh"
-      (hourSegmentClicked)="handleHourClick($event.date)">
+      (hourSegmentClicked)="onTimeSlotClick($event.date)">
     </mwl-calendar-day-view>
+  </div>
+</div>
+
+<!-- MODALE EVENTO -->
+<div class="modal-overlay" *ngIf="modalVisible">
+  <div class="modal">
+    <h2>Nuovo appuntamento</h2>
+
+    <label for="title">Titolo</label>
+    <input id="title" [(ngModel)]="modalData.title" />
+
+    <label for="description">Descrizione</label>
+    <textarea id="description" [(ngModel)]="modalData.description"></textarea>
+
+    <label for="startTime">Ora inizio</label>
+    <input id="startTime" type="time" [(ngModel)]="modalData.startTime" />
+
+    <label for="endTime">Ora fine</label>
+    <input id="endTime" type="time" [(ngModel)]="modalData.endTime" />
+
+    <div class="modal-actions">
+      <button (click)="saveEvent()">Salva</button>
+      <button (click)="closeModal()">Annulla</button>
+    </div>
   </div>
 </div>

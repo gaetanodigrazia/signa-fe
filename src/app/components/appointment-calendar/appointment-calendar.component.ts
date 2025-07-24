@@ -11,48 +11,91 @@ import { Subject } from 'rxjs';
   styleUrls: ['./appointment-calendar.component.scss'],
 })
 export class AppointmentCalendarComponent {
-  view: CalendarView = CalendarView.Month; // default: mese
+  // 📅 Vista selezionata (mese/settimana/giorno)
+  view: CalendarView = CalendarView.Month;
+  CalendarView = CalendarView; // per usare l’enum in HTML
+
+  // 📆 Data attuale visibile
   viewDate: Date = new Date();
 
-  CalendarView = CalendarView; // 👈 necessario per il template
-
+  // 📌 Eventi del calendario
   events: CalendarEvent[] = [];
+
+  // 🔁 Trigger per aggiornare il calendario
   refresh: Subject<void> = new Subject();
 
-  // Per clic su giorno (nella vista mensile)
+  // 📦 Stato modale
+  modalVisible = false;
+  modalData = {
+    title: '',
+    description: '',
+    startTime: '',
+    endTime: '',
+    date: new Date(),
+  };
+
+  // 👉 Click su uno slot temporale (giorno o settimana)
+  onTimeSlotClick(date: Date): void {
+    this.modalData = {
+      title: '',
+      description: '',
+      startTime: this.formatTime(date),
+      endTime: this.formatTime(new Date(date.getTime() + 30 * 60000)),
+      date,
+    };
+    this.modalVisible = true;
+  }
+
+  // 👉 Click su un giorno nella vista mensile → cambia vista a Giorno
   handleDayClick(date: Date): void {
-    const title = prompt('Titolo appuntamento:');
-    if (title && date) {
-      const start = new Date(date);
-      start.setHours(0, 0, 0, 0); // Inizio giorno
-      const newEvent: CalendarEvent = {
-        title,
-        start,
-        allDay: true,
-      };
-      this.events = [...this.events, newEvent];
-      this.refresh.next();
-    }
+    this.viewDate = date;
+    this.view = CalendarView.Day;
   }
 
-  // Per clic su orario (nella vista giornaliera)
-  handleHourClick(date: Date): void {
-    const title = prompt('Titolo appuntamento:');
-    if (title && date) {
-      const start = new Date(date);
-      const end = new Date(start.getTime() + 30 * 60 * 1000); // 30 minuti dopo
-      const newEvent: CalendarEvent = {
-        title,
-        start,
-        end,
-      };
-      this.events = [...this.events, newEvent];
-      this.refresh.next();
-    }
+  // ⏱️ Formatta orario HH:MM da una Date
+  formatTime(date: Date): string {
+    return date.toTimeString().slice(0, 5); // "HH:MM"
   }
 
-  // Cambia vista dinamicamente
-  setView(view: CalendarView): void {
-    this.view = view;
+  // ❌ Chiude la modale
+  closeModal(): void {
+    this.modalVisible = false;
+  }
+
+  // ✅ Salva l’evento e aggiorna il calendario
+  saveEvent(): void {
+    const { title, description, startTime, endTime, date } = this.modalData;
+
+    if (!title || !startTime || !endTime) {
+      alert('Compila tutti i campi obbligatori.');
+      return;
+    }
+
+    const [startH, startM] = startTime.split(':').map(Number);
+    const [endH, endM] = endTime.split(':').map(Number);
+
+    const start = new Date(date);
+    start.setHours(startH, startM, 0, 0);
+
+    const end = new Date(date);
+    end.setHours(endH, endM, 0, 0);
+
+    if (start >= end) {
+      alert('L’ora di fine deve essere successiva a quella di inizio.');
+      return;
+    }
+
+    const newEvent: CalendarEvent = {
+      title,
+      start,
+      end,
+      meta: {
+        description,
+      },
+    };
+
+    this.events = [...this.events, newEvent];
+    this.refresh.next();
+    this.closeModal();
   }
 }
