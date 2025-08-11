@@ -11,12 +11,21 @@ import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { AppointmentCalendarComponent } from './components/appointment-calendar/appointment-calendar.component';
 import { FormsModule } from '@angular/forms';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { LockScreenComponent } from './components/shared/lock-screen/lock-screen.component';
+import { authGuard } from './auth/guard/authGuard.guard';
+import { LoginComponent } from './pages/login/login.component';
 
-const routes: Routes = [
-  { path: 'home', component: HomeComponent },
-  { path: 'settings', component: SettingsComponent },
-  { path: 'calendar', component: AppointmentCalendarComponent },
-  { path: '**', redirectTo: 'home' }
+export const routes: Routes = [
+  { path: 'login', component: LoginComponent },           // no guard
+  { path: 'lock', component: LockScreenComponent },       // no guard
+
+  { path: 'home', component: HomeComponent, canActivate: [authGuard] },
+  { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
+  { path: 'calendar', component: AppointmentCalendarComponent, canActivate: [authGuard] },
+
+  { path: '', pathMatch: 'full', redirectTo: 'home' },
+  { path: '**', redirectTo: 'home' },
 ];
 
 @NgModule({
@@ -25,14 +34,17 @@ const routes: Routes = [
     SidebarComponent,
     HomeComponent,
     SettingsComponent,
-    AppointmentCalendarComponent
+    AppointmentCalendarComponent,
+    LockScreenComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
     RouterModule.forRoot(routes),
     BrowserAnimationsModule,
+    MatTooltipModule,
     MatButtonModule,
-        CalendarModule.forRoot({
+    CalendarModule.forRoot({
       provide: DateAdapter,
       useFactory: adapterFactory,
     }),
@@ -40,4 +52,4 @@ const routes: Routes = [
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

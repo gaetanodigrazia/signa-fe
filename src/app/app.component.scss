@@ -30,3 +30,9 @@
     display: none;
   }
 }
+
+.app-content.fullscreen {
+  margin-left: 0 !important;
+  width: 100vw;
+  min-height: 100vh;
+}

@@ -1,5 +1,6 @@
-<app-sidebar (collapseChanged)="onSidebarCollapseChange($event)"></app-sidebar>
+<app-sidebar *ngIf="showShell" (collapseChanged)="onSidebarCollapseChange($event)">
+</app-sidebar>
 
-<div class="app-content" [class.collapsed]="sidebarCollapsed">
+<div class="app-content" [class.collapsed]="sidebarCollapsed" [class.fullscreen]="!showShell">
   <router-outlet></router-outlet>
 </div>
