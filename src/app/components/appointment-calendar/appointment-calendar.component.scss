@@ -161,3 +161,21 @@ mwl-calendar-month-view {
     padding: 8px 10px;
   }
 }
+
+/* 1) Bottone "Elimina" rosso nella modale DETTAGLI */
+.modal.details .modal-actions .danger {
+  background: #dc2626;
+  /* rosso */
+  color: #fff;
+  border: none;
+}
+
+.modal.details .modal-actions .danger:hover {
+  background: #b91c1c;
+}
+
+/* 2) Segmented control: quando è selezionato NON in grassetto */
+.segmented input[type="radio"]:checked+label {
+  font-weight: 500;
+  /* invece di 600 */
+}
