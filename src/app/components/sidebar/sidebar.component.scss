@@ -1,3 +1,4 @@
+/* ---------------- Base sidebar ---------------- */
 .sidebar {
   background: #2c3e50;
   color: white;
@@ -9,6 +10,8 @@
   position: fixed;
   top: 0;
   left: 0;
+  overflow: hidden;
+  transition: width 0.3s ease;
 
   nav {
     display: flex;
@@ -19,10 +22,71 @@
       color: white;
       text-decoration: none;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0.5rem 0;
+    }
+  }
+
+  .collapse-toggle {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+
+    /* dimensioni e centratura del bottone */
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    /* icona hamburger */
+    .hamburger-icon {
+      position: relative;
+      width: 22px;
+      height: 16px;
+      /* spazio verticale per le tre linee */
+      display: inline-block;
+
+      >span {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #fff;
+        /* colore linee */
+        border-radius: 2px;
+        transform-origin: center;
+        transition: transform .2s ease, opacity .2s ease, width .2s ease;
+      }
+
+      /* tre barrette */
+      >span:nth-child(1) {
+        top: 0;
+      }
+
+      >span:nth-child(2) {
+        top: 7px;
+      }
+
+      >span:nth-child(3) {
+        top: 14px;
+      }
+    }
+
+    /* feedback hover */
+    &:hover .hamburger-icon>span {
+      width: 100%;
     }
   }
 }
 
+/* ---------------- Mobile drawer ---------------- */
 .sidebar.mobile {
   position: absolute;
   top: 60px;
@@ -42,7 +106,7 @@
   transform: translateY(0);
 }
 
-
+/* ---------------- Toggle visibile su mobile ---------------- */
 .mobile-toggle {
   background: #2c3e50;
   height: 60px;
@@ -59,45 +123,25 @@
   }
 }
 
-.sidebar {
-  width: 240px;
-  transition: width 0.3s ease;
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  background: #2c3e50;
-  color: white;
-  padding: 1rem;
-  box-sizing: border-box;
-  z-index: 1000;
-
-  .collapse-toggle {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-    cursor: pointer;
-  }
-
-  nav a {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: white;
-    text-decoration: none;
-    margin: 0.5rem 0;
-  }
-}
-
+/* ---------------- Stato collassato ---------------- */
 .sidebar.collapsed {
   width: 60px;
 
   .collapse-toggle {
-    text-align: center;
-    margin: 0 auto 1rem;
+    display: flex;
+    /* per usare justify-content */
+    align-items: center;
+    justify-content: center;
+    /* centrato orizzontalmente */
+    width: 100%;
+    /* occupa tutta la larghezza */
+    padding: 0;
+    margin: 0 auto 12px;
+
+    /* distacco sotto */
+    .hamburger-icon {
+      margin: 0 auto;
+    }
   }
 
   .text {
@@ -105,7 +149,8 @@
   }
 }
 
-/* base: contenitore in basso con spaziatura */
+/* ---------------- Bottoni in basso ---------------- */
+/* Contenitore */
 .sidebar-bottom {
   position: absolute;
   bottom: 12px;
@@ -117,7 +162,7 @@
   padding: 0 12px;
 }
 
-/* stile dei bottoni (solo icona) */
+/* Bottoni solo-icona */
 .sidebar-bottom .block-btn,
 .sidebar-bottom .logout-btn {
   flex: 0 0 auto;
@@ -132,28 +177,34 @@
   transition: transform .2s ease, box-shadow .2s ease, background .2s ease, width .2s ease;
 }
 
-/* larghezza AUTO-ADATTIVA */
-/* sidebar aperta (non collapsed): bottoni rettangolari più larghi */
+/* Larghezza auto-adattiva: sidebar aperta → più larghi */
 .sidebar:not(.collapsed) .sidebar-bottom .block-btn,
 .sidebar:not(.collapsed) .sidebar-bottom .logout-btn {
   width: 84px;
-  /* rettangolo più “pieno” */
+  /* rettangolo più pieno */
 }
 
-/* sidebar collapsed: bottoni compatti e centrati */
+/* Collassata: bottoni in colonna e centrati */
 .sidebar.collapsed .sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  /* uno sopra l'altro */
+  align-items: center;
+  /* centrati */
+  justify-content: center;
+  gap: 10px;
   padding: 0 8px;
-  gap: 8px;
 }
 
 .sidebar.collapsed .sidebar-bottom .block-btn,
 .sidebar.collapsed .sidebar-bottom .logout-btn {
   width: 44px;
   /* compatti per colonna stretta */
+  height: 48px;
   border-radius: 10px;
 }
 
-/* mobile: sidebar a tutta larghezza → bottoni fluidi */
+/* Mobile: bottoni fluidi a tutta larghezza (ma con max) */
 .sidebar.mobile .sidebar-bottom {
   bottom: 12px;
   padding: 0 16px;
@@ -167,18 +218,16 @@
   width: auto;
   /* niente larghezza fissa */
   max-width: 140px;
-  /* limite per mantenere il look */
 }
 
-/* (opzionale) micro-feedback al click */
+/* Click feedback dolce */
 .sidebar-bottom .block-btn:active,
 .sidebar-bottom .logout-btn:active {
   transform: translateY(0);
-  /* niente “salto” durante il click */
   box-shadow: 0 2px 6px rgba(0, 0, 0, .18);
 }
 
-/* gradient + hover moderni (riuso i tuoi colori) */
+/* ---------------- Colori / hover moderni ---------------- */
 .block-btn {
   background: linear-gradient(135deg, #f0ad4e, #f7c46a);
   color: #fff;
@@ -199,4 +248,54 @@
   background: linear-gradient(135deg, #c9302c, #de5c5c);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, .25);
+}
+
+
+.sidebar.collapsed .sidebar-bottom {
+  left: 50%;
+  transform: translateX(-50%);
+  /* centra il contenitore rispetto alla sidebar */
+  width: 44px;
+  /* uguale alla larghezza del bottone */
+  padding: 0;
+  /* niente padding interno che sposta */
+  gap: 10px;
+  /* spazio tra i due bottoni */
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-bottom .block-btn,
+.sidebar.collapsed .sidebar-bottom .logout-btn {
+  width: 44px;
+  /* stessa misura del contenitore */
+  height: 48px;
+  margin: 0;
+  /* elimina eventuali margini che li spostano */
+}
+
+/* Sidebar collassata: contenitore bottoni centrato geometricamente */
+.sidebar.collapsed .sidebar-bottom {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44px;
+  /* match larghezza dei bottoni */
+  padding: 0;
+  /* niente padding che li sposta */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* centra i bottoni */
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Bottoni compatti e centrati */
+.sidebar.collapsed .sidebar-bottom .block-btn,
+.sidebar.collapsed .sidebar-bottom .logout-btn {
+  width: 44px;
+  height: 48px;
+  margin: 0;
+  border-radius: 10px;
 }

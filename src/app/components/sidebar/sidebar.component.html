@@ -5,9 +5,13 @@
 
 <!-- SIDEBAR DESKTOP -->
 <aside *ngIf="!isMobile" class="sidebar" [class.collapsed]="isCollapsed">
-  <button class="collapse-toggle" (click)="toggleCollapse()">
-    {{ isCollapsed ? '→' : '←' }}
+  <button class="collapse-toggle" (click)="toggleCollapse()" [attr.aria-expanded]="!isCollapsed"
+    [attr.title]="isCollapsed ? 'Apri sidebar' : 'Comprimi sidebar'">
+    <span class="hamburger-icon" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </span>
   </button>
+
   <nav>
     <a routerLink="/home">
       <span class="icon">🏠</span>
