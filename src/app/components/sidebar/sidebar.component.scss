@@ -403,3 +403,45 @@
 .sidebar.collapsed:not(.mobile) .sidebar-bottom {
   bottom: calc(var(--btn-diam) * 0.5 + var(--btn-gap) + var(--curve-clear) + env(safe-area-inset-bottom, 0));
 }
+
+/* --- FIX tablet/iOS: sidebar sempre fissa e senza scroll --- */
+
+/* Desktop/Tablet */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  /* top:0; left:0; bottom:0 */
+  height: 100dvh;
+  /* altezza reale area visibile */
+  overflow: hidden;
+  /* la sidebar non scrolla mai */
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
+  /* evita tagli su iPad/iPhone */
+}
+
+/* Drawer mobile: anche lui deve essere fisso e alto quanto lo spazio visibile */
+.sidebar.mobile {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  height: calc(100dvh - 60px);
+  overflow: hidden;
+  /* niente scroll del drawer */
+}
+
+/* Apertura drawer invariata */
+.sidebar.mobile.open {
+  transform: translateY(0);
+}
+
+/* (Fallback per iOS vecchi) */
+@supports (-webkit-touch-callout: none) {
+  .sidebar {
+    height: -webkit-fill-available;
+  }
+
+  .sidebar.mobile {
+    height: calc(-webkit-fill-available - 60px);
+  }
+}
