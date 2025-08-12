@@ -31,10 +31,32 @@ export class SidebarComponent implements OnInit {
       this.menuOpen = false;
     }
   }
+  private scrollY = 0;
+
+  private lockBodyScroll() {
+    this.scrollY = window.scrollY || window.pageYOffset;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${this.scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  }
+
+  private unlockBodyScroll() {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    window.scrollTo(0, this.scrollY);
+  }
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
+    if (this.menuOpen) this.lockBodyScroll();
+    else this.unlockBodyScroll();
   }
+
 
   toggleCollapse() {
     this.isCollapsed = !this.isCollapsed;
@@ -61,4 +83,8 @@ export class SidebarComponent implements OnInit {
     if (this.isMobile) this.menuOpen = false;
     this.router.navigateByUrl('/lock');
   }
+
+
+
 }
+

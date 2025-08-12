@@ -1,17 +1,21 @@
-/* ---------------- Base sidebar ---------------- */
+/* =================== SIDEBAR BASE =================== */
 .sidebar {
-  background: #2c3e50;
-  color: white;
-  width: 240px;
-  height: 100vh;
-  padding: 1rem;
-  box-sizing: border-box;
-  z-index: 1000;
+  /* colore ok (graphite moderno) */
+  background: linear-gradient(160deg, #1f2937 0%, #111827 100%);
+  color: #e5e7eb;
+
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0 auto 0 0;
+  /* top:0; left:0; bottom:0 */
+  width: 240px;
+  height: 100dvh;
+  /* più affidabile di 100vh su iOS */
+  z-index: 1000;
+  box-sizing: border-box;
   overflow: hidden;
-  transition: width 0.3s ease;
+  padding: 1rem;
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
+  transition: width .3s ease, border-radius .3s ease, box-shadow .3s ease;
 
   nav {
     display: flex;
@@ -19,25 +23,32 @@
     gap: 1rem;
 
     a {
-      color: white;
+      color: #e5e7eb;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      margin: 0.5rem 0;
+      gap: .5rem;
+      margin: .5rem 0;
+      padding: 8px 10px;
+      border-radius: 10px;
+      transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, .08);
+        color: #fff;
+      }
     }
   }
 
   .collapse-toggle {
     background: none;
     border: none;
-    color: white;
+    color: #e5e7eb;
     font-size: 1.2rem;
     margin-bottom: 1rem;
     cursor: pointer;
 
-    /* dimensioni e centratura del bottone */
     width: 40px;
     height: 40px;
     padding: 0;
@@ -50,7 +61,6 @@
       position: relative;
       width: 22px;
       height: 16px;
-      /* spazio verticale per le tre linee */
       display: inline-block;
 
       >span {
@@ -58,14 +68,12 @@
         left: 0;
         right: 0;
         height: 2px;
-        background: #fff;
-        /* colore linee */
+        background: currentColor;
         border-radius: 2px;
         transform-origin: center;
-        transition: transform .2s ease, opacity .2s ease, width .2s ease;
+        transition: transform .2s ease, opacity .2s ease, width .2s ease, background .2s ease;
       }
 
-      /* tre barrette */
       >span:nth-child(1) {
         top: 0;
       }
@@ -79,36 +87,54 @@
       }
     }
 
-    /* feedback hover */
     &:hover .hamburger-icon>span {
       width: 100%;
     }
   }
 }
 
-/* ---------------- Mobile drawer ---------------- */
+/* =================== MOBILE DRAWER (FULL-WIDTH + TRASPARENZA) =================== */
 .sidebar.mobile {
-  position: absolute;
-  top: 60px;
-  left: 0;
-  width: 100%;
-  height: 40vh;
-  background: rgba(52, 73, 94, 0.85);
+  position: fixed;
+  inset: 60px 0 auto 0;
+  /* top:60px; left:0; right:0 */
+  width: 100vw;
+  /* altezza base: comportati da desktop/tablet; sui telefoni la riduciamo sotto */
+  height: calc(100dvh - 60px);
+
+  background: rgba(17, 24, 39, 0.85);
+  /* (oppure: rgba(52,73,94,.85) se preferisci il vecchio) */
+  backdrop-filter: blur(8px);
   transform: translateY(-100%);
-  transition: transform 0.3s ease;
-  z-index: 1000;
-  padding: 1rem;
+  transition: transform .3s ease;
+
+  border: none;
+  box-shadow: none;
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
+
+  overflow: hidden;
+  padding: 1rem;
+  z-index: 1000;
 }
 
 .sidebar.mobile.open {
   transform: translateY(0);
 }
 
-/* ---------------- Toggle visibile su mobile ---------------- */
+/* Telefoni: altezza 40% schermo (come richiesto) */
+@media (max-width: 767px) {
+  .sidebar.mobile {
+    /* fallback vecchi browser */
+    height: 40vh;
+    /* unità moderne: 40% dell’area visibile, ma non oltre lo spazio utile */
+    height: min(40svh, calc(100dvh - 60px));
+  }
+}
+
+/* Barra toggle visibile su mobile */
 .mobile-toggle {
-  background: #2c3e50;
+  background: linear-gradient(160deg, #1f2937 0%, #111827 100%);
   height: 60px;
   display: flex;
   align-items: center;
@@ -116,45 +142,68 @@
   z-index: 1001;
 
   button {
-    color: white;
-    font-weight: bold;
-    font-size: 1.3rem;
-    letter-spacing: 0.5px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: .2px;
   }
 }
 
-/* ---------------- Stato collassato ---------------- */
+/* =================== STATO COLLASSATO =================== */
 .sidebar.collapsed {
   width: 60px;
 
   .collapse-toggle {
     display: flex;
-    /* per usare justify-content */
     align-items: center;
     justify-content: center;
-    /* centrato orizzontalmente */
     width: 100%;
-    /* occupa tutta la larghezza */
     padding: 0;
     margin: 0 auto 12px;
 
-    /* distacco sotto */
     .hamburger-icon {
       margin: 0 auto;
     }
   }
 
+  /* Nascondi il testo, centra le icone del menu */
   .text {
     display: none;
   }
+
+  nav a {
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+    text-align: center;
+
+    .icon {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 24px;
+      line-height: 1;
+      margin: 0 auto;
+    }
+  }
 }
 
-/* ---------------- Bottoni in basso ---------------- */
-/* Contenitore */
+/* Curva verticale destra SOLO quando è collassata (desktop) */
+.sidebar.collapsed:not(.mobile) {
+  border-top-right-radius: 100vh;
+  border-bottom-right-radius: 100vh;
+  box-shadow: 6px 0 20px rgba(0, 0, 0, .15);
+  overflow: hidden;
+}
+
+/* =================== BOTTONI IN BASSO =================== */
 .sidebar-bottom {
   position: absolute;
-  bottom: 12px;
   left: 0;
+  bottom: 12px;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -162,7 +211,7 @@
   padding: 0 12px;
 }
 
-/* Bottoni solo-icona */
+/* Base pulsanti */
 .sidebar-bottom .block-btn,
 .sidebar-bottom .logout-btn {
   flex: 0 0 auto;
@@ -172,52 +221,61 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.3rem;
+  font-size: 1.6rem;
+  /* icone più grandi di base */
+  line-height: 1;
   cursor: pointer;
   transition: transform .2s ease, box-shadow .2s ease, background .2s ease, width .2s ease;
+  color: #fff;
 }
 
-/* Larghezza auto-adattiva: sidebar aperta → più larghi */
+/* Larghezza in sidebar aperta */
 .sidebar:not(.collapsed) .sidebar-bottom .block-btn,
 .sidebar:not(.collapsed) .sidebar-bottom .logout-btn {
   width: 84px;
-  /* rettangolo più pieno */
 }
 
-/* Collassata: bottoni in colonna e centrati */
+/* Collassata: bottoni in colonna, centrati e rotondi */
+.sidebar.collapsed {
+  --btn-diam: 48px;
+  /* diametro bottoni in collapsed */
+  --btn-gap: 12px;
+  /* spazio tra i due */
+  --curve-clear: 10px;
+  /* distanza extra dalla curva */
+}
+
 .sidebar.collapsed .sidebar-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: var(--btn-diam);
+  padding: 0;
   display: flex;
   flex-direction: column;
-  /* uno sopra l'altro */
   align-items: center;
-  /* centrati */
   justify-content: center;
-  gap: 10px;
-  padding: 0 8px;
+  gap: var(--btn-gap);
+}
+
+.sidebar.collapsed:not(.mobile) .sidebar-bottom {
+  bottom: calc(var(--btn-diam) * 0.5 + var(--btn-gap) + var(--curve-clear) + env(safe-area-inset-bottom, 0));
 }
 
 .sidebar.collapsed .sidebar-bottom .block-btn,
 .sidebar.collapsed .sidebar-bottom .logout-btn {
-  width: 44px;
-  /* compatti per colonna stretta */
-  height: 48px;
-  border-radius: 10px;
-}
-
-/* Mobile: bottoni fluidi a tutta larghezza (ma con max) */
-.sidebar.mobile .sidebar-bottom {
-  bottom: 12px;
-  padding: 0 16px;
-  gap: 14px;
-}
-
-.sidebar.mobile .sidebar-bottom .block-btn,
-.sidebar.mobile .sidebar-bottom .logout-btn {
-  flex: 1 1 0;
-  /* si allargano in modo fluido */
-  width: auto;
-  /* niente larghezza fissa */
-  max-width: 140px;
+  width: var(--btn-diam);
+  height: var(--btn-diam);
+  border-radius: 50%;
+  padding: 0;
+  font-size: 1.8rem;
+  /* icone ancora un pelo più grandi in collapsed */
+  /* taglio anti-aloni (cerchi perfetti) */
+  overflow: hidden;
+  clip-path: circle(50% at 50% 50%);
+  -webkit-mask-image: radial-gradient(#000 99%, transparent 100%);
+  mask-image: radial-gradient(#000 99%, transparent 100%);
 }
 
 /* Click feedback dolce */
@@ -227,215 +285,28 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, .18);
 }
 
-/* ---------------- Colori / hover moderni ---------------- */
+/* =================== COLORI PULSANTI (moderni) =================== */
 .block-btn {
-  background: linear-gradient(135deg, #f0ad4e, #f7c46a);
-  color: #fff;
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
 }
 
 .block-btn:hover {
-  background: linear-gradient(135deg, #ec971f, #f5b942);
+  background: linear-gradient(135deg, #1e40af, #3b82f6);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, .25);
+  box-shadow: 0 4px 10px rgba(30, 64, 175, .28);
 }
 
 .logout-btn {
-  background: linear-gradient(135deg, #d9534f, #e67e7e);
-  color: #fff;
+  background: linear-gradient(135deg, #b91c1c, #dc2626);
 }
 
 .logout-btn:hover {
-  background: linear-gradient(135deg, #c9302c, #de5c5c);
+  background: linear-gradient(135deg, #991b1b, #ef4444);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, .25);
+  box-shadow: 0 4px 10px rgba(185, 28, 28, .28);
 }
 
-
-.sidebar.collapsed .sidebar-bottom {
-  left: 50%;
-  transform: translateX(-50%);
-  /* centra il contenitore rispetto alla sidebar */
-  width: 44px;
-  /* uguale alla larghezza del bottone */
-  padding: 0;
-  /* niente padding interno che sposta */
-  gap: 10px;
-  /* spazio tra i due bottoni */
-  align-items: center;
-  justify-content: center;
-}
-
-.sidebar.collapsed .sidebar-bottom .block-btn,
-.sidebar.collapsed .sidebar-bottom .logout-btn {
-  width: 44px;
-  /* stessa misura del contenitore */
-  height: 48px;
-  margin: 0;
-  /* elimina eventuali margini che li spostano */
-}
-
-/* Sidebar collassata: contenitore bottoni centrato geometricamente */
-.sidebar.collapsed .sidebar-bottom {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 44px;
-  /* match larghezza dei bottoni */
-  padding: 0;
-  /* niente padding che li sposta */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  /* centra i bottoni */
-  justify-content: center;
-  gap: 10px;
-}
-
-/* Bottoni compatti e centrati */
-.sidebar.collapsed .sidebar-bottom .block-btn,
-.sidebar.collapsed .sidebar-bottom .logout-btn {
-  width: 44px;
-  height: 48px;
-  margin: 0;
-  border-radius: 10px;
-}
-
-/* Curva verticale SOLO in stato collassato (desktop) */
-.sidebar.collapsed:not(.mobile) {
-  border-top-right-radius: 100vh;
-  border-bottom-right-radius: 100vh;
-  overflow: hidden;
-  /* ritaglia i contenuti lungo la curva */
-}
-
-/* transizione morbida del raggio quando apri/chiudi */
-.sidebar {
-  transition: width 0.3s ease, border-radius 0.3s ease;
-}
-
-/* (opzionale) ombra per evidenziare la curva */
-.sidebar.collapsed:not(.mobile) {
-  box-shadow: 6px 0 20px rgba(0, 0, 0, 0.15);
-}
-
-/* Centra davvero le voci di menu in stato collassato */
-.sidebar.collapsed nav a {
-  display: flex;
-  justify-content: center;
-  /* icona al centro */
-  align-items: center;
-  padding-left: 0;
-  padding-right: 0;
-  width: 100%;
-}
-
-/* Assicura che l'icona sia centrata e non “spinga” con margini */
-.sidebar.collapsed nav a .icon {
-  display: inline-block;
-  width: 24px;
-  /* larghezza fissa per centratura perfetta */
-  text-align: center;
-  margin: 0;
-  /* niente offset laterali */
-}
-
-/* Nasconde eventuale testo (se non già fatto) */
-.sidebar.collapsed .text {
-  display: none;
-}
-
-/* Centra le icone nelle voci quando la sidebar è collassata */
-.sidebar.collapsed nav a {
-  justify-content: center;
-  /* centra il contenuto */
-  align-items: center;
-  gap: 0;
-  /* niente spazio “fantasma” */
-  width: 100%;
-  padding-left: 0;
-  /* rimuove spinte laterali */
-  padding-right: 0;
-}
-
-/* L'emoji/icona occupa esattamente il centro */
-.sidebar.collapsed nav a .icon {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  width: 24px;
-  /* larghezza fissa = centratura stabile */
-  margin: 0 auto;
-  line-height: 1;
-}
-
-.sidebar.collapsed nav a {
-  text-align: center;
-}
-
-/* Bottoni rotondi in stato collassato */
-.sidebar.collapsed .sidebar-bottom .block-btn,
-.sidebar.collapsed .sidebar-bottom .logout-btn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  /* cerchio perfetto */
-  padding: 0;
-  /* niente padding che ovalizza */
-  transition: width .2s ease, height .2s ease, border-radius .2s ease;
-}
-
-/* (opzionale) micro-anello su hover per risalto */
-.sidebar.collapsed .sidebar-bottom .block-btn:hover,
-.sidebar.collapsed .sidebar-bottom .logout-btn:hover {
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, .12), 0 4px 10px rgba(0, 0, 0, .25);
-}
-
-/* Override: solleva i bottoni un po' meno in stato collapsed */
-.sidebar.collapsed:not(.mobile) {
-  --btn-diam: 48px;
-  /* diametro */
-  --btn-gap: 12px;
-  /* spazio tra i due */
-  --curve-clear: 10px;
-  /* prima 24px: meno distacco dalla curva */
-}
-
-.sidebar.collapsed:not(.mobile) .sidebar-bottom {
-  bottom: calc(var(--btn-diam) * 0.5 + var(--btn-gap) + var(--curve-clear) + env(safe-area-inset-bottom, 0));
-}
-
-/* --- FIX tablet/iOS: sidebar sempre fissa e senza scroll --- */
-
-/* Desktop/Tablet */
-.sidebar {
-  position: fixed;
-  inset: 0 auto 0 0;
-  /* top:0; left:0; bottom:0 */
-  height: 100dvh;
-  /* altezza reale area visibile */
-  overflow: hidden;
-  /* la sidebar non scrolla mai */
-  padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
-  /* evita tagli su iPad/iPhone */
-}
-
-/* Drawer mobile: anche lui deve essere fisso e alto quanto lo spazio visibile */
-.sidebar.mobile {
-  position: fixed;
-  top: 60px;
-  left: 0;
-  right: 0;
-  height: calc(100dvh - 60px);
-  overflow: hidden;
-  /* niente scroll del drawer */
-}
-
-/* Apertura drawer invariata */
-.sidebar.mobile.open {
-  transform: translateY(0);
-}
-
-/* (Fallback per iOS vecchi) */
+/* =================== iOS fallback (vecchie versioni) =================== */
 @supports (-webkit-touch-callout: none) {
   .sidebar {
     height: -webkit-fill-available;
