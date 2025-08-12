@@ -1,0 +1,155 @@
+/* Topbar fissa, reagisce al collapse della sidebar */
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 240px;
+    /* sidebar aperta */
+    right: 0;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 1002;
+
+    /* look “glass” chiaro, coerente col tema grigio */
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(17, 24, 39, .10);
+
+    transition: left .25s ease;
+}
+
+.app-header.collapsed {
+    left: 60px;
+}
+
+/* sidebar chiusa */
+
+/* Mobile: header a tutta larghezza (la sidebar è drawer) */
+@media (max-width: 767px) {
+    .app-header {
+        left: 0;
+    }
+}
+
+.app-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    color: #111827;
+}
+
+.right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Bottoni icona */
+.icon-btn,
+.avatar {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    width: 36px;
+    border-radius: 999px;
+    border: 1px solid rgba(17, 24, 39, .10);
+    background: #fff;
+    cursor: pointer;
+    transition: box-shadow .2s, transform .1s, background .2s;
+}
+
+.icon-btn:hover,
+.avatar:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .08);
+}
+
+.i {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.avatar span {
+    font-weight: 700;
+    color: #111827;
+}
+
+/* Badge notifiche */
+.badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #dc2626;
+    color: #fff;
+    font-size: 10px;
+    line-height: 16px;
+    text-align: center;
+}
+
+/* Dropdown */
+.tb-menu {
+    position: relative;
+}
+
+.tb-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 240px;
+    background: #ffffff;
+    border: 1px solid rgba(17, 24, 39, .10);
+    border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .12);
+    padding: 10px;
+    z-index: 1003;
+}
+
+.tb-dropdown.right-align {
+    left: auto;
+    right: 0;
+}
+
+.dd-header {
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #111827;
+}
+
+.tb-dropdown ul {
+    list-style: none;
+    margin: 0 0 8px 0;
+    padding: 0;
+}
+
+.tb-dropdown li {
+    padding: 6px 0;
+    color: #1f2937;
+    border-bottom: 1px dashed rgba(17, 24, 39, .08);
+}
+
+.tb-dropdown li:last-child {
+    border-bottom: 0;
+}
+
+.link {
+    width: 100%;
+    border: none;
+    background: #f3f4f6;
+    color: #111827;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+}
+
+.link:hover {
+    background: #e5e7eb;
+}

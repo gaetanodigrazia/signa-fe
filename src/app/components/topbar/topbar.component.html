@@ -1,0 +1,36 @@
+<header class="app-header" [class.collapsed]="collapsed">
+    <div class="left">
+        <h1 class="app-title">Dashboard</h1>
+    </div>
+
+    <div class="right">
+        <!-- Notifiche -->
+        <div class="tb-menu">
+            <button class="icon-btn" aria-label="Notifiche" (click)="toggleNotif($event)">
+                <span class="i">🔔</span>
+                <span class="badge" *ngIf="notifCount">{{ notifCount }}</span>
+            </button>
+            <div class="tb-dropdown" *ngIf="notifOpen">
+                <div class="dd-header">Notifiche</div>
+                <ul>
+                    <li>Promemoria alle 15:00</li>
+                    <li>Evento spostato a domani</li>
+                    <li>Nuova richiesta</li>
+                </ul>
+                <button class="link">Vedi tutte</button>
+            </div>
+        </div>
+
+        <!-- Profilo -->
+        <div class="tb-menu">
+            <button class="avatar" (click)="toggleProfile($event)" aria-label="Profilo">
+                <span>MR</span>
+            </button>
+            <div class="tb-dropdown right-align" *ngIf="profileOpen">
+                <div class="dd-header">Mario Rossi</div>
+                <button class="link" routerLink="/profile">Profilo</button>
+                <button class="link" routerLink="/settings">Impostazioni</button>
+            </div>
+        </div>
+    </div>
+</header>

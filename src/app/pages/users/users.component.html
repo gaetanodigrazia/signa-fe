@@ -1,1 +1,127 @@
-<p>users works!</p>
+<div class="users-page">
+    <div class="toolbar surface">
+        <div class="left">
+            <h2>Utenti</h2>
+        </div>
+        <div class="right">
+            <input class="search" type="search" placeholder="Cerca utente…" [(ngModel)]="search"
+                (ngModelChange)="applyFilter()" />
+            <button class="btn primary" (click)="openNew()">＋ Nuovo utente</button>
+        </div>
+    </div>
+
+    <div class="table-wrap surface">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Ruolo</th>
+                    <th>Stato</th>
+                    <th>Creato</th>
+                    <th class="actions">Azioni</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let u of filtered; trackBy: trackById">
+                    <td><button class="linklike" (click)="view(u)">{{ u.name }}</button></td>
+                    <td>{{ u.email }}</td>
+                    <td>
+                        <span class="role" [class.admin]="u.role === 'Admin'" [class.editor]="u.role === 'Editor'">
+                            {{ u.role }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge" [class.ok]="u.active" [class.off]="!u.active">
+                            {{ u.active ? 'Attivo' : 'Sospeso' }}
+                        </span>
+                    </td>
+                    <td>{{ u.createdAt | date: 'd MMM y' }}</td>
+                    <td class="actions">
+                        <button class="icon" title="Vedi" (click)="view(u)">👁️</button>
+                        <button class="icon" title="Modifica" (click)="edit(u)">✏️</button>
+                        <button class="icon danger" title="Elimina" (click)="askDelete(u)">🗑️</button>
+                    </td>
+                </tr>
+
+                <tr *ngIf="filtered.length === 0">
+                    <td colspan="6" class="empty">Nessun utente trovato.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- MODALE CREA/MODIFICA -->
+<div class="modal-overlay" *ngIf="modalVisible" (click)="cancelModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+        <h3>{{ editing ? 'Modifica utente' : 'Nuovo utente' }}</h3>
+
+        <label>
+            <span>Nome</span>
+            <input [(ngModel)]="form.name" required />
+        </label>
+
+        <label>
+            <span>Email</span>
+            <input type="email" [(ngModel)]="form.email" required />
+        </label>
+
+        <label>
+            <span>Ruolo</span>
+            <select [(ngModel)]="form.role">
+                <option *ngFor="let r of roles" [ngValue]="r">{{ r }}</option>
+            </select>
+        </label>
+
+        <label class="row">
+            <input type="checkbox" [(ngModel)]="form.active" />
+            <span>Attivo</span>
+        </label>
+
+        <div class="modal-actions">
+            <button class="btn primary" (click)="save()">Salva</button>
+            <button class="btn" (click)="cancelModal()">Annulla</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODALE DETTAGLI -->
+<div class="modal-overlay" *ngIf="detailsVisible" (click)="closeDetails()">
+    <div class="modal" (click)="$event.stopPropagation()">
+        <h3>Dettagli utente</h3>
+
+        <div class="details" *ngIf="viewing as v">
+            <div><strong>Nome:</strong> {{ v.name }}</div>
+            <div><strong>Email:</strong> {{ v.email }}</div>
+            <div><strong>Ruolo:</strong> {{ v.role }}</div>
+            <div>
+                <strong>Stato:</strong>
+                <span class="badge" [class.ok]="v.active" [class.off]="!v.active">
+                    {{ v.active ? 'Attivo' : 'Sospeso' }}
+                </span>
+            </div>
+            <div><strong>Creato:</strong> {{ v.createdAt | date: 'EEE d MMM y, HH:mm' }}</div>
+            <div *ngIf="v.updatedAt"><strong>Aggiornato:</strong> {{ v.updatedAt | date: 'EEE d MMM y, HH:mm' }}</div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn" (click)="edit(v)">Modifica</button>
+            <button class="btn danger" (click)="askDelete(v)">Elimina</button>
+            <button class="btn" (click)="closeDetails()">Chiudi</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODALE CONFERMA DELETE -->
+<div class="modal-overlay" *ngIf="confirmVisible" (click)="confirmVisible = false">
+    <div class="modal small" (click)="$event.stopPropagation()">
+        <h3>Eliminare questo utente?</h3>
+        <p *ngIf="toDelete as d">Questa azione non è reversibile. <strong>{{ d.name }}</strong></p>
+        <div class="modal-actions">
+            <button class="btn danger" (click)="confirmDelete()">Elimina</button>
+            <button class="btn" (click)="confirmVisible = false">Annulla</button>
+        </div>
+    </div>
+</div>
