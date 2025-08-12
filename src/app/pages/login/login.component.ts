@@ -1,28 +1,44 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
+const LS_TOKEN = 'app_token';
 const LS_LOCKED = 'app_locked';
 const LS_RETURN_URL = 'app_locked_return_url';
-const LS_TOKEN = 'app_token';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
-  email = 'a';
-  password = 'a';
+export class LoginComponent implements OnInit, OnDestroy {
+  email = '';
+  password = '';
   loading = false;
   error = '';
+
+  private blockPopState = () => {
+    // Rimani sul login finché non sei autenticato
+    history.pushState(null, document.title, location.href);
+  };
 
   constructor(private router: Router) { }
 
   ngOnInit(): void {
-    // se sei già loggato, vai a home
-    if (localStorage.getItem(LS_TOKEN)) {
-      this.router.navigateByUrl('/home');
+    // Se già autenticato e non bloccato, vai a home
+    const isAuth = !!localStorage.getItem(LS_TOKEN);
+    const locked = localStorage.getItem(LS_LOCKED) === 'true';
+    if (isAuth && !locked) {
+      this.router.navigateByUrl('/home', { replaceUrl: true });
+      return;
     }
+
+    // Blocca back/forward mentre sei sul login
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', this.blockPopState);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('popstate', this.blockPopState);
   }
 
   async submit() {
@@ -34,20 +50,21 @@ export class LoginComponent implements OnInit {
 
     this.loading = true;
     try {
-      // 🔐 TODO: qui collegherai la tua API.
-      // Per ora simuliamo un login riuscito:
-      await new Promise(r => setTimeout(r, 400));
+      // TODO: sostituisci con la tua API reale
+      await new Promise(r => setTimeout(r, 300));
       localStorage.setItem(LS_TOKEN, 'dummy-token');
 
-      // Se l’app era bloccata, sblocca e torna dove eri
-      const wasLocked = localStorage.getItem(LS_LOCKED) === 'true';
-      const returnUrl = localStorage.getItem(LS_RETURN_URL) || '/home';
+      // Sblocca se era bloccato
+      if (localStorage.getItem(LS_LOCKED) === 'true') {
+        localStorage.removeItem(LS_LOCKED);
+      }
 
-      if (wasLocked) localStorage.removeItem(LS_LOCKED);
+      const returnUrl = localStorage.getItem(LS_RETURN_URL) || '/home';
       localStorage.removeItem(LS_RETURN_URL);
 
-      this.router.navigateByUrl(returnUrl);
-    } catch (e) {
+      // Vai alla pagina prevista e sostituisci la history (niente back)
+      this.router.navigateByUrl(returnUrl, { replaceUrl: true });
+    } catch {
       this.error = 'Credenziali non valide.';
     } finally {
       this.loading = false;

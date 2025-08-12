@@ -1,19 +1,40 @@
-.login-wrap {
-    min-height: 100vh;
-    display: grid;
-    place-items: center;
+/* Pagina di login a schermo intero, senza bordi bianchi */
+.login-page {
+    position: fixed;
+    inset: 0;
+    /* top/right/bottom/left: 0 */
+    width: 100vw;
+    height: 100svh;
+    /* viewport visibile (mobile moderno) */
     background: #22313f;
     color: #fff;
+
+    /* Safe-area per notch */
+    box-sizing: border-box;
+    padding:
+        max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+
+    /* Centraggio hard della card (a prova di overflow/padding) */
+    position: fixed;
 }
 
-.card {
+/* Card centrata davvero al centro dello schermo */
+.login-page .card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+
     width: 360px;
+    max-width: min(100%, 420px);
     background: #2c3e50;
     border-radius: 14px;
     padding: 24px;
     box-shadow: 0 12px 28px rgba(0, 0, 0, .35);
     display: grid;
     gap: 14px;
+    text-align: left;
 }
 
 .logo {
@@ -43,6 +64,7 @@ input {
     background: #34495e;
     color: #fff;
     padding: 0 12px;
+    width: 100%;
 }
 
 button {
@@ -72,4 +94,40 @@ button:disabled {
 .error {
     color: #ffb3b3;
     text-align: center;
+}
+
+/* Miglior supporto su device recenti */
+@supports (height: 100dvh) {
+    .login-page {
+        height: 100dvh;
+    }
+}
+
+/* Centra orizzontalmente i figli del form */
+.login-page .card form {
+    display: grid;
+    /* se non già grid */
+    gap: 12px;
+    justify-items: center;
+    /* centra orizzontalmente */
+}
+
+/* Centra il contenuto di ogni label */
+.login-page .card form label {
+    width: 100%;
+    display: grid;
+    gap: 8px;
+    justify-items: center;
+    /* centra span + input */
+    text-align: center;
+    /* testo dell'etichetta centrato */
+}
+
+/* Campi e bottone con larghezza “comoda” e centrati */
+.login-page .card input,
+.login-page .card button {
+    width: min(100%, 320px);
+    /* scegli 280–360px a gusto */
+    margin: 0 auto;
+    /* centrati */
 }
