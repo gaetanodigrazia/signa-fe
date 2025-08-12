@@ -36,3 +36,109 @@
   width: 100vw;
   min-height: 100vh;
 }
+
+/* ===== Tema GRIGIO per l'area contenuto (non–sidebar) ===== */
+:host {
+  --g1: #f0f2f5;
+  /* grigio chiaro */
+  --g2: #e2e5ea;
+  /* grigio medio-chiaro */
+  --text: #1f2937;
+  /* gray-800 */
+  --text-strong: #111827;
+  /* gray-900 */
+  --muted: #6b7280;
+  /* gray-500/600 */
+  --border: rgba(17, 24, 39, .10);
+  --border-strong: rgba(17, 24, 39, .16);
+  --surface: #ffffff;
+  /* card/pannelli */
+}
+
+/* Sfondo e testo area contenuto */
+.app-content {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--g1), var(--g2));
+  color: var(--text);
+}
+
+/* Titoli e testo */
+.app-content h1,
+.app-content h2,
+.app-content h3,
+.app-content h4,
+.app-content h5,
+.app-content h6 {
+  color: var(--text-strong);
+}
+
+.app-content p,
+.app-content li,
+.app-content span {
+  color: var(--text);
+}
+
+.app-content .muted {
+  color: var(--muted);
+}
+
+/* Link */
+.app-content a {
+  color: var(--text-strong);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color .2s, border-color .2s, background .2s;
+}
+
+.app-content a:hover {
+  background: rgba(17, 24, 39, .06);
+  border-color: var(--border);
+  border-radius: 6px;
+}
+
+/* Card / pannelli riutilizzabili */
+.app-content .surface,
+.app-content .card,
+.app-content .panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+/* Input base */
+.app-content input,
+.app-content select,
+.app-content textarea {
+  background: #f9fafb;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.app-content input:focus,
+.app-content select:focus,
+.app-content textarea:focus {
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 4px rgba(17, 24, 39, .08);
+}
+
+/* Bottoni neutri */
+.app-content .btn {
+  background: #f3f4f6;
+  color: var(--text-strong);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, box-shadow .2s, transform .1s;
+}
+
+.app-content .btn:hover {
+  background: #e5e7eb;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}

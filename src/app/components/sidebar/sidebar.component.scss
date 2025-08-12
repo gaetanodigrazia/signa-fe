@@ -299,3 +299,107 @@
   margin: 0;
   border-radius: 10px;
 }
+
+/* Curva verticale SOLO in stato collassato (desktop) */
+.sidebar.collapsed:not(.mobile) {
+  border-top-right-radius: 100vh;
+  border-bottom-right-radius: 100vh;
+  overflow: hidden;
+  /* ritaglia i contenuti lungo la curva */
+}
+
+/* transizione morbida del raggio quando apri/chiudi */
+.sidebar {
+  transition: width 0.3s ease, border-radius 0.3s ease;
+}
+
+/* (opzionale) ombra per evidenziare la curva */
+.sidebar.collapsed:not(.mobile) {
+  box-shadow: 6px 0 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Centra davvero le voci di menu in stato collassato */
+.sidebar.collapsed nav a {
+  display: flex;
+  justify-content: center;
+  /* icona al centro */
+  align-items: center;
+  padding-left: 0;
+  padding-right: 0;
+  width: 100%;
+}
+
+/* Assicura che l'icona sia centrata e non “spinga” con margini */
+.sidebar.collapsed nav a .icon {
+  display: inline-block;
+  width: 24px;
+  /* larghezza fissa per centratura perfetta */
+  text-align: center;
+  margin: 0;
+  /* niente offset laterali */
+}
+
+/* Nasconde eventuale testo (se non già fatto) */
+.sidebar.collapsed .text {
+  display: none;
+}
+
+/* Centra le icone nelle voci quando la sidebar è collassata */
+.sidebar.collapsed nav a {
+  justify-content: center;
+  /* centra il contenuto */
+  align-items: center;
+  gap: 0;
+  /* niente spazio “fantasma” */
+  width: 100%;
+  padding-left: 0;
+  /* rimuove spinte laterali */
+  padding-right: 0;
+}
+
+/* L'emoji/icona occupa esattamente il centro */
+.sidebar.collapsed nav a .icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  /* larghezza fissa = centratura stabile */
+  margin: 0 auto;
+  line-height: 1;
+}
+
+.sidebar.collapsed nav a {
+  text-align: center;
+}
+
+/* Bottoni rotondi in stato collassato */
+.sidebar.collapsed .sidebar-bottom .block-btn,
+.sidebar.collapsed .sidebar-bottom .logout-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  /* cerchio perfetto */
+  padding: 0;
+  /* niente padding che ovalizza */
+  transition: width .2s ease, height .2s ease, border-radius .2s ease;
+}
+
+/* (opzionale) micro-anello su hover per risalto */
+.sidebar.collapsed .sidebar-bottom .block-btn:hover,
+.sidebar.collapsed .sidebar-bottom .logout-btn:hover {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .12), 0 4px 10px rgba(0, 0, 0, .25);
+}
+
+/* Override: solleva i bottoni un po' meno in stato collapsed */
+.sidebar.collapsed:not(.mobile) {
+  --btn-diam: 48px;
+  /* diametro */
+  --btn-gap: 12px;
+  /* spazio tra i due */
+  --curve-clear: 10px;
+  /* prima 24px: meno distacco dalla curva */
+}
+
+.sidebar.collapsed:not(.mobile) .sidebar-bottom {
+  bottom: calc(var(--btn-diam) * 0.5 + var(--btn-gap) + var(--curve-clear) + env(safe-area-inset-bottom, 0));
+}

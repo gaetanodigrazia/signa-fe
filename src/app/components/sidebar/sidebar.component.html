@@ -17,6 +17,10 @@
       <span class="icon">🏠</span>
       <span class="text" *ngIf="!isCollapsed">Home</span>
     </a>
+    <a routerLink="/users">
+      <span class="icon">👥​</span>
+      <span class="text" *ngIf="!isCollapsed">Utenti</span>
+    </a>
     <a routerLink="/calendar">
       <span class="icon">📆</span>
       <span class="text" *ngIf="!isCollapsed">Calendar</span>
@@ -43,6 +47,7 @@
 <aside *ngIf="isMobile && menuOpen" class="sidebar mobile open">
   <nav>
     <a routerLink="/home" (click)="menuOpen = false">🏠 Home</a>
+    <a routerLink="/users" (click)="menuOpen = false">👥​ Utenti</a>
     <a routerLink="/calendar" (click)="menuOpen = false">📆 Calendar</a>
     <a routerLink="/settings" (click)="menuOpen = false">⚙️ Settings</a>
   </nav>

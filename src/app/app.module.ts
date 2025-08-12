@@ -15,14 +15,20 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { LockScreenComponent } from './components/shared/lock-screen/lock-screen.component';
 import { authGuard } from './auth/guard/authGuard.guard';
 import { LoginComponent } from './pages/login/login.component';
+import { UsersComponent } from './pages/users/users.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },           // no guard
   { path: 'lock', component: LockScreenComponent },       // no guard
 
   { path: 'home', component: HomeComponent, canActivate: [authGuard] },
-  { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
+
+  { path: 'users', component: UsersComponent, canActivate: [authGuard] },
+
   { path: 'calendar', component: AppointmentCalendarComponent, canActivate: [authGuard] },
+
+  { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
+
 
   { path: '', pathMatch: 'full', redirectTo: 'home' },
   { path: '**', redirectTo: 'home' },
@@ -36,8 +42,7 @@ export const routes: Routes = [
     SettingsComponent,
     AppointmentCalendarComponent,
     LockScreenComponent,
-    LoginComponent
-  ],
+    LoginComponent],
   imports: [
     BrowserModule,
     RouterModule.forRoot(routes),
