@@ -1,3 +1,4 @@
+/* ================= Base layout ================= */
 :host {
   display: block;
   padding: 20px;
@@ -6,13 +7,12 @@
 mwl-calendar-month-view {
   border: 1px solid #ccc;
 }
+
+/* ================= Overlay / Modali ================= */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, .5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,12 +20,12 @@ mwl-calendar-month-view {
 }
 
 .modal {
-  background: white;
+  background: #fff;
   padding: 2rem;
   border-radius: 8px;
   width: 400px;
   max-width: 90%;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 20px rgba(0, 0, 0, .3);
 }
 
 .modal h2 {
@@ -40,8 +40,8 @@ mwl-calendar-month-view {
 .modal input,
 .modal textarea {
   width: 100%;
-  padding: 0.5rem;
-  margin-top: 0.3rem;
+  padding: .5rem;
+  margin-top: .3rem;
 }
 
 .modal-actions {
@@ -57,12 +57,13 @@ mwl-calendar-month-view {
   border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color .2s ease-in-out;
 }
 
 .modal-actions button:first-child {
-  background-color: #1976d2; /* blu */
-  color: white;
+  background-color: #1976d2;
+  /* blu */
+  color: #fff;
 }
 
 .modal-actions button:first-child:hover {
@@ -76,4 +77,87 @@ mwl-calendar-month-view {
 
 .modal-actions button:last-child:hover {
   background-color: #d5d5d5;
+}
+
+/* ================= Segmented Control Vista ================= */
+/* Accessibilità: etichetta solo-visiva */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Contenitore switch vista */
+.view-switch {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+/* Pill group */
+.segmented {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  /* grigio chiaro */
+  border: 1px solid rgba(17, 24, 39, .10);
+  /* gray-900 @10% */
+  backdrop-filter: blur(6px);
+}
+
+/* Nascondi i radio nativi */
+.segmented input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Opzioni */
+.segmented label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  color: #1f2937;
+  /* gray-800 */
+  transition: background .2s ease, color .2s ease, box-shadow .2s ease, transform .1s ease;
+}
+
+.segmented label:hover {
+  background: #edeff2;
+}
+
+/* Stato attivo (checked) */
+.segmented input[type="radio"]:checked+label {
+  color: #fff;
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  /* blu coerente */
+  box-shadow: 0 6px 16px rgba(37, 99, 235, .25);
+}
+
+/* Focus visibile tastiera */
+.segmented input[type="radio"]:focus-visible+label {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+/* Mobile tweak */
+@media (max-width: 480px) {
+  .segmented label {
+    padding: 8px 10px;
+  }
 }

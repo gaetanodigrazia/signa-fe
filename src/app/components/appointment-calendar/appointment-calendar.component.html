@@ -1,49 +1,51 @@
 <div style="max-width: 1000px; margin: auto; padding: 16px;">
-  <!-- Selettore vista -->
   <!-- Selettore vista moderno -->
   <div class="view-switch">
+    <span class="sr-only" id="view-label">Visualizzazione</span>
+
     <div class="segmented" role="radiogroup" aria-labelledby="view-label">
-      <input type="radio" id="view-month" name="calendarView" [value]="CalendarView.Month" [(ngModel)]="view">
+      <input type="radio" id="view-month" name="calendarView" [value]="CalendarView.Month" [(ngModel)]="view" />
       <label for="view-month">🗓️ <span>Mese</span></label>
 
-      <input type="radio" id="view-week" name="calendarView" [value]="CalendarView.Week" [(ngModel)]="view">
+      <input type="radio" id="view-week" name="calendarView" [value]="CalendarView.Week" [(ngModel)]="view" />
       <label for="view-week">📅 <span>Settimana</span></label>
 
-      <input type="radio" id="view-day" name="calendarView" [value]="CalendarView.Day" [(ngModel)]="view">
+      <input type="radio" id="view-day" name="calendarView" [value]="CalendarView.Day" [(ngModel)]="view" />
       <label for="view-day">🕘 <span>Giorno</span></label>
     </div>
   </div>
-
 
   <!-- Calendario -->
   <div style="margin-top: 20px;">
     <!-- Vista Mese -->
     <mwl-calendar-month-view *ngIf="view === CalendarView.Month" [viewDate]="viewDate" [events]="events"
-      [refresh]="refresh" (dayClicked)="handleDayClick($event.day.date)">
+      [refresh]="refresh" (dayClicked)="handleDayClick($event.day.date)"
+      (eventClicked)="openEventDetails($event.event)">
     </mwl-calendar-month-view>
 
     <!-- Vista Settimana -->
     <mwl-calendar-week-view *ngIf="view === CalendarView.Week" [viewDate]="viewDate" [events]="events"
-      [refresh]="refresh" (hourSegmentClicked)="onTimeSlotClick($event.date)">
+      [refresh]="refresh" (hourSegmentClicked)="onTimeSlotClick($event.date)"
+      (eventClicked)="openEventDetails($event.event)">
     </mwl-calendar-week-view>
 
     <!-- Vista Giorno -->
     <mwl-calendar-day-view *ngIf="view === CalendarView.Day" [viewDate]="viewDate" [events]="events" [refresh]="refresh"
-      (hourSegmentClicked)="onTimeSlotClick($event.date)">
+      (hourSegmentClicked)="onTimeSlotClick($event.date)" (eventClicked)="openEventDetails($event.event)">
     </mwl-calendar-day-view>
   </div>
 </div>
 
-<!-- MODALE EVENTO -->
-<div class="modal-overlay" *ngIf="modalVisible">
-  <div class="modal">
-    <h2>Nuovo appuntamento</h2>
+<!-- MODALE CREAZIONE / MODIFICA EVENTO -->
+<div class="modal-overlay" *ngIf="modalVisible" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h2>{{ editingRef ? 'Modifica appuntamento' : 'Nuovo appuntamento' }}</h2>
 
     <label for="title">Titolo</label>
     <input id="title" [(ngModel)]="modalData.title" />
 
     <label for="description">Descrizione</label>
-    <textarea id="description" [(ngModel)]="modalData.description"></textarea>
+    <textarea id="description" rows="3" [(ngModel)]="modalData.description"></textarea>
 
     <label for="startTime">Ora inizio</label>
     <input id="startTime" type="time" [(ngModel)]="modalData.startTime" />
@@ -54,6 +56,28 @@
     <div class="modal-actions">
       <button (click)="saveEvent()">Salva</button>
       <button (click)="closeModal()">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE DETTAGLI EVENTO -->
+<div class="modal-overlay" *ngIf="detailsVisible" (click)="closeDetails()">
+  <div class="modal details" (click)="$event.stopPropagation()">
+    <h2>{{ selectedEvent?.title }}</h2>
+
+    <div class="when">
+      {{ selectedEvent?.start | date:'EEE d MMM yyyy, HH:mm' }}
+      <ng-container *ngIf="selectedEvent?.end">
+        – {{ selectedEvent?.end | date:'HH:mm' }}
+      </ng-container>
+    </div>
+
+    <p class="desc" *ngIf="selectedEvent?.meta?.description as d">{{ d }}</p>
+
+    <div class="modal-actions">
+      <button (click)="editSelected()">Modifica</button>
+      <button class="danger" (click)="deleteSelected()">Elimina</button>
+      <button (click)="closeDetails()">Chiudi</button>
     </div>
   </div>
 </div>
