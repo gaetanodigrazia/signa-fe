@@ -1,38 +1,34 @@
 <div style="max-width: 1000px; margin: auto; padding: 16px;">
   <!-- Selettore vista -->
-  <label for="view">Visualizzazione:</label>
-  <select id="view" [(ngModel)]="view">
-    <option [ngValue]="CalendarView.Month">Mese</option>
-    <option [ngValue]="CalendarView.Week">Settimana</option>
-    <option [ngValue]="CalendarView.Day">Giorno</option>
-  </select>
+  <!-- Selettore vista moderno -->
+  <div class="view-switch">
+    <div class="segmented" role="radiogroup" aria-labelledby="view-label">
+      <input type="radio" id="view-month" name="calendarView" [value]="CalendarView.Month" [(ngModel)]="view">
+      <label for="view-month">🗓️ <span>Mese</span></label>
+
+      <input type="radio" id="view-week" name="calendarView" [value]="CalendarView.Week" [(ngModel)]="view">
+      <label for="view-week">📅 <span>Settimana</span></label>
+
+      <input type="radio" id="view-day" name="calendarView" [value]="CalendarView.Day" [(ngModel)]="view">
+      <label for="view-day">🕘 <span>Giorno</span></label>
+    </div>
+  </div>
+
 
   <!-- Calendario -->
   <div style="margin-top: 20px;">
     <!-- Vista Mese -->
-    <mwl-calendar-month-view
-      *ngIf="view === CalendarView.Month"
-      [viewDate]="viewDate"
-      [events]="events"
-      [refresh]="refresh"
-      (dayClicked)="handleDayClick($event.day.date)">
+    <mwl-calendar-month-view *ngIf="view === CalendarView.Month" [viewDate]="viewDate" [events]="events"
+      [refresh]="refresh" (dayClicked)="handleDayClick($event.day.date)">
     </mwl-calendar-month-view>
 
     <!-- Vista Settimana -->
-    <mwl-calendar-week-view
-      *ngIf="view === CalendarView.Week"
-      [viewDate]="viewDate"
-      [events]="events"
-      [refresh]="refresh"
-      (hourSegmentClicked)="onTimeSlotClick($event.date)">
+    <mwl-calendar-week-view *ngIf="view === CalendarView.Week" [viewDate]="viewDate" [events]="events"
+      [refresh]="refresh" (hourSegmentClicked)="onTimeSlotClick($event.date)">
     </mwl-calendar-week-view>
 
     <!-- Vista Giorno -->
-    <mwl-calendar-day-view
-      *ngIf="view === CalendarView.Day"
-      [viewDate]="viewDate"
-      [events]="events"
-      [refresh]="refresh"
+    <mwl-calendar-day-view *ngIf="view === CalendarView.Day" [viewDate]="viewDate" [events]="events" [refresh]="refresh"
       (hourSegmentClicked)="onTimeSlotClick($event.date)">
     </mwl-calendar-day-view>
   </div>
