@@ -1,8 +1,7 @@
-<div style="max-width: 1000px; margin: auto; padding: 16px;">
-  <!-- Selettore vista moderno -->
+<div class="page-wrap">
+  <!-- Switch vista -->
   <div class="view-switch">
     <span class="sr-only" id="view-label">Visualizzazione</span>
-
     <div class="segmented" role="radiogroup" aria-labelledby="view-label">
       <input type="radio" id="view-month" name="calendarView" [value]="CalendarView.Month" [(ngModel)]="view" />
       <label for="view-month">🗓️ <span>Mese</span></label>
@@ -16,27 +15,24 @@
   </div>
 
   <!-- Calendario -->
-  <div style="margin-top: 20px;">
-    <!-- Vista Mese -->
+  <div class="calendar-wrap">
     <mwl-calendar-month-view *ngIf="view === CalendarView.Month" [viewDate]="viewDate" [events]="events"
       [refresh]="refresh" (dayClicked)="handleDayClick($event.day.date)"
       (eventClicked)="openEventDetails($event.event)">
     </mwl-calendar-month-view>
 
-    <!-- Vista Settimana -->
     <mwl-calendar-week-view *ngIf="view === CalendarView.Week" [viewDate]="viewDate" [events]="events"
       [refresh]="refresh" (hourSegmentClicked)="onTimeSlotClick($event.date)"
       (eventClicked)="openEventDetails($event.event)">
     </mwl-calendar-week-view>
 
-    <!-- Vista Giorno -->
     <mwl-calendar-day-view *ngIf="view === CalendarView.Day" [viewDate]="viewDate" [events]="events" [refresh]="refresh"
       (hourSegmentClicked)="onTimeSlotClick($event.date)" (eventClicked)="openEventDetails($event.event)">
     </mwl-calendar-day-view>
   </div>
 </div>
 
-<!-- MODALE CREAZIONE / MODIFICA EVENTO -->
+<!-- === MODALE EVENTO (CREA / MODIFICA) === -->
 <div class="modal-overlay" *ngIf="modalVisible" (click)="closeModal()">
   <div class="modal" (click)="$event.stopPropagation()">
     <h2>{{ editingRef ? 'Modifica appuntamento' : 'Nuovo appuntamento' }}</h2>
@@ -47,11 +43,46 @@
     <label for="description">Descrizione</label>
     <textarea id="description" rows="3" [(ngModel)]="modalData.description"></textarea>
 
-    <label for="startTime">Ora inizio</label>
-    <input id="startTime" type="time" [(ngModel)]="modalData.startTime" />
+    <div class="row-2">
+      <div>
+        <label for="startTime">Ora inizio</label>
+        <input id="startTime" type="time" [(ngModel)]="modalData.startTime" />
+      </div>
+      <div>
+        <label for="endTime">Ora fine</label>
+        <input id="endTime" type="time" [(ngModel)]="modalData.endTime" />
+      </div>
+    </div>
 
-    <label for="endTime">Ora fine</label>
-    <input id="endTime" type="time" [(ngModel)]="modalData.endTime" />
+    <!-- Utente -->
+    <label for="userSearch">Utente</label>
+    <div class="user-picker">
+      <div #userInputWrap class="user-input-wrap">
+        <input id="userSearch" type="text" placeholder="Cerca nome o email…" [(ngModel)]="userSearch"
+          (focus)="openUserList()" (input)="onUserSearchChange(userSearch)" (keydown)="onUserInputKeydown($event)"
+          (blur)="closeUserListSoon()" autocomplete="off" />
+
+        <!-- Dropdown risultati -->
+        <div class="user-results" *ngIf="userListOpen" [class.open-up]="userListOpenUp"
+          [ngStyle]="{ 'max-height.px': userListMaxHeight }">
+          <button *ngFor="let u of userResults; let i = index" class="user-option" [class.active]="i === highlightIndex"
+            (mousedown)="$event.preventDefault()" (click)="selectUser(u)">
+            <span class="avatar">{{ u.name | slice:0:1 }}</span>
+            <span class="meta">
+              <strong>{{ u.name }}</strong>
+              <small>{{ u.email }}</small>
+            </span>
+            <span class="role" [class.admin]="u.role==='Admin'" [class.editor]="u.role==='Editor'">{{ u.role }}</span>
+            <span class="status" [class.ok]="u.active" [class.off]="!u.active"></span>
+          </button>
+
+          <div class="empty" *ngIf="userResults.length === 0">Nessun risultato</div>
+        </div>
+      </div>
+
+      <!-- Pulsante + per nuovo utente -->
+      <button type="button" class="btn-inline" (click)="openNewUserModal()" title="Crea nuovo utente">＋</button>
+    </div>
 
     <div class="modal-actions">
       <button (click)="saveEvent()">Salva</button>
@@ -60,24 +91,67 @@
   </div>
 </div>
 
-<!-- MODALE DETTAGLI EVENTO -->
+<!-- === MODALE DETTAGLI EVENTO === -->
 <div class="modal-overlay" *ngIf="detailsVisible" (click)="closeDetails()">
   <div class="modal details" (click)="$event.stopPropagation()">
     <h2>{{ selectedEvent?.title }}</h2>
 
     <div class="when">
       {{ selectedEvent?.start | date:'EEE d MMM yyyy, HH:mm' }}
-      <ng-container *ngIf="selectedEvent?.end">
-        – {{ selectedEvent?.end | date:'HH:mm' }}
-      </ng-container>
+      <ng-container *ngIf="selectedEvent?.end">– {{ selectedEvent?.end | date:'HH:mm' }}</ng-container>
     </div>
 
     <p class="desc" *ngIf="selectedEvent?.meta?.description as d">{{ d }}</p>
+
+    <div class="assigned" *ngIf="selectedEvent?.meta?.userId as uid">
+      👤 <strong>{{ getUserLabel(uid) }}</strong>
+    </div>
 
     <div class="modal-actions">
       <button (click)="editSelected()">Modifica</button>
       <button class="danger" (click)="deleteSelected()">Elimina</button>
       <button (click)="closeDetails()">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- === SECONDA MODALE: NUOVO UTENTE === -->
+<div class="modal-overlay modal-overlay--nested" *ngIf="newUserModalVisible" (click)="cancelNewUser()">
+  <div class="modal modal--nested" (click)="$event.stopPropagation()">
+    <h3>Nuovo utente</h3>
+
+    <div class="inline-new-user">
+      <div class="grid">
+        <label>
+          <span>Nome</span>
+          <input [(ngModel)]="newUser.name" placeholder="Mario Rossi" />
+        </label>
+        <label>
+          <span>Email</span>
+          <input type="email" [(ngModel)]="newUser.email" placeholder="mario.rossi@example.com" />
+        </label>
+      </div>
+
+      <div class="grid">
+        <label>
+          <span>Ruolo</span>
+          <select [(ngModel)]="newUser.role">
+            <option [ngValue]="'Admin'">Admin</option>
+            <option [ngValue]="'Editor'">Editor</option>
+            <option [ngValue]="'Viewer'">Viewer</option>
+          </select>
+        </label>
+
+        <label class="row">
+          <input type="checkbox" [(ngModel)]="newUser.active" />
+          <span>Attivo</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button (click)="saveNewUser()">Crea utente</button>
+      <button (click)="cancelNewUser()">Annulla</button>
     </div>
   </div>
 </div>
