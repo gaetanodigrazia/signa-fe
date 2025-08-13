@@ -58,14 +58,14 @@ mwl-calendar-day-view {
 .modal h2,
 .modal h3 {
   margin: 0 0 6px;
-  font-weight: 800;
+  font-weight: 400;
 }
 
 .modal label {
   display: grid;
   gap: 6px;
   color: #475569;
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .modal input,
@@ -115,7 +115,7 @@ mwl-calendar-day-view {
   border: 0;
   border-radius: 12px;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 400;
   transition: transform .08s ease, box-shadow .2s ease, filter .2s ease, background .2s ease;
 }
 
@@ -188,7 +188,7 @@ mwl-calendar-day-view {
   gap: 8px;
   padding: 8px 14px;
   border-radius: 999px;
-  font-weight: 600;
+  font-weight: 400;
   cursor: pointer;
   color: #1f2937;
   transition: background .2s ease, color .2s ease, box-shadow .2s ease, transform .08s ease;
@@ -199,7 +199,7 @@ mwl-calendar-day-view {
 }
 
 .segmented input[type="radio"]:checked+label {
-  font-weight: 500;
+  font-weight: 400;
   /* non bold quando attivo */
   color: #fff;
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
@@ -294,7 +294,7 @@ mwl-calendar-day-view {
   justify-content: center;
   background: #e2e8f0;
   color: #0f172a;
-  font-weight: 800;
+  font-weight: 400;
 }
 
 .meta {
@@ -308,7 +308,7 @@ mwl-calendar-day-view {
 
 .role {
   color: #0f766e;
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .role.admin {
@@ -350,17 +350,13 @@ mwl-calendar-day-view {
   border: 1px solid rgba(17, 24, 39, 0.10);
   background: #fff;
   color: #111827;
-  font-weight: 800;
+  font-weight: 400;
   cursor: pointer;
   transition: background .2s ease, box-shadow .2s ease;
   z-index: 1;
   /* evita che il dropdown lo copra */
 }
 
-.btn-inline:hover {
-  background: #f3f4f6;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-}
 
 /* ===== Blocco “Nuovo utente” nella seconda modale ===== */
 .inline-new-user {
@@ -383,7 +379,7 @@ mwl-calendar-day-view {
 
 .inline-new-user label {
   color: #475569;
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .inline-new-user input,
@@ -409,7 +405,7 @@ mwl-calendar-day-view {
   align-items: center;
   gap: 10px;
   color: #0f172a;
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .inline-new-user label.row input[type="checkbox"] {
@@ -509,17 +505,12 @@ mwl-calendar-day-view {
   /* suo raggio, non “incastrato” nell’input */
   background: #fff;
   color: #111827;
-  font-weight: 800;
+  font-weight: 400;
   cursor: pointer;
   transition: background .2s, box-shadow .2s;
   box-shadow: 0 8px 22px rgba(0, 0, 0, .06);
   z-index: 0;
   /* sotto al menu risultati */
-}
-
-.btn-inline:hover {
-  background: #f3f4f6;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, .06);
 }
 
 /* dropdown risultati: sempre scrollabile, sopra tutto e con flip up */
@@ -578,7 +569,7 @@ mwl-calendar-day-view {
   justify-content: center;
   background: #e2e8f0;
   color: #0f172a;
-  font-weight: 800;
+  font-weight: 400;
 }
 
 .meta {
@@ -592,7 +583,7 @@ mwl-calendar-day-view {
 
 .role {
   color: #0f766e;
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .role.admin {
@@ -680,7 +671,7 @@ mwl-calendar-day-view {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   /* blu */
   color: #fff;
-  font-weight: 800;
+  font-weight: 400;
   cursor: pointer;
   box-shadow: 0 10px 20px rgba(37, 99, 235, .18);
   transition: filter .15s ease, transform .06s ease, box-shadow .2s ease;
@@ -688,6 +679,138 @@ mwl-calendar-day-view {
 
 .btn-inline:hover {
   filter: brightness(1.04);
-  transform: translateY(-1px);
   box-shadow: 0 14px 28px rgba(37, 99, 235, .22);
+  background: #3d00a0;
+}
+
+/* 1) Più respiro alla modale */
+.modal {
+  padding: 24px 28px;
+  /* evita che i campi tocchino il bordo */
+  border-radius: 14px;
+}
+
+.modal h2,
+.modal h3 {
+  margin-top: 0;
+}
+
+.modal label {
+  display: block;
+  font-weight: 400;
+  margin: 14px 0 6px;
+}
+
+.modal input,
+.modal textarea,
+.modal select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dcdfe4;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  box-sizing: border-box;
+  /* niente overflow orizzontale */
+  background: #fff;
+}
+
+.modal textarea {
+  resize: vertical;
+}
+
+.modal input:focus,
+.modal textarea:focus,
+.modal select:focus {
+  border-color: #7aa7ff;
+  box-shadow: 0 0 0 3px rgba(122, 167, 255, .2);
+}
+
+/* spaziatura tra i due time input */
+.row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* 2) Input-group per “Utente” con addon + */
+.user-picker.input-group {
+  position: relative;
+  /* per il dropdown */
+  display: grid;
+  grid-template-columns: 1fr auto;
+  /* input | bottone */
+  align-items: stretch;
+}
+
+.user-picker.input-group>input {
+  min-width: 0;
+  border-top-right-radius: 0;
+  /* unisce i bordi con il bottone */
+  border-bottom-right-radius: 0;
+}
+
+.user-picker .addon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border: 1px solid #dcdfe4;
+  border-left: 0;
+  /* condividi il bordo con l’input */
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  background: #eef4ff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s ease, box-shadow .2s ease, transform .05s ease;
+}
+
+.user-picker .addon-btn:hover {
+  background: #80a8ff;
+}
+
+.user-picker .addon-btn:active {
+  transform: translateY(1px);
+}
+
+/* 3) Dropdown risultati: allineato alla larghezza del gruppo */
+.user-picker .user-results {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* copre input + addon */
+  top: calc(100% + 6px);
+  z-index: 10;
+  background: #fff;
+  border: 1px solid #dcdfe4;
+  border-radius: 12px;
+  overflow: auto;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .08);
+}
+
+.user-picker .user-results.open-up {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+/* opzionale: bottone “Salva/Annulla” più distanziati */
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+.modal-actions button:last-child {
+  background: #f59e0b;
+  /* giallo warning */
+  color: #fff;
+}
+
+.modal-actions button:last-child:hover {
+  background: #d97706;
+  /* giallo più scuro in hover */
 }
