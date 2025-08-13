@@ -7,9 +7,8 @@ import {
 } from '@angular/core';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { Subject } from 'rxjs';
-
-// ⬇️ Adatta il path se diverso nel tuo progetto
-import { UsersService, User } from 'src/app/service/user.service';
+import { UsersService } from 'src/app/service/user.service';
+import { User } from 'src/app/model/user.model';
 
 @Component({
   selector: 'app-appointment-calendar',

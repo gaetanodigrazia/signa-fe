@@ -1,14 +1,6 @@
 import { Injectable } from '@angular/core';
+import { User } from '../model/user.model';
 
-export interface User {
-    id: number;
-    name: string;
-    email: string;
-    role: 'Admin' | 'Editor' | 'Viewer';
-    active: boolean;
-    createdAt: string;   // ISO
-    updatedAt?: string;  // ISO
-}
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {

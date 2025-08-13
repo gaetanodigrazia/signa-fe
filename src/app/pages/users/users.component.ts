@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UsersService, User } from 'src/app/service/user.service';
+import { UsersService } from 'src/app/service/user.service';
+import { User } from 'src/app/model/user.model';
 
 type Role = User['role'];
 
