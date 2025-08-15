@@ -6,7 +6,7 @@ import { API_BASE_URL } from '../api.config';
 
 @Injectable({ providedIn: 'root' })
 export class PatientService {
-    private readonly baseUrl = `${API_BASE_URL}/patient`;
+    private readonly baseUrl = `${API_BASE_URL}/patients`;
 
     constructor(private http: HttpClient) { }
 
