@@ -76,7 +76,6 @@ export class AppointmentCalendarComponent implements OnInit {
   loadPatients(): void {
     this.patientsSvc.findAll().subscribe({
       next: (items) => {
-        console.log("ITEMS: ", items);
         (this.patients = items ?? [])
       },
       error: (err) => {

@@ -1,0 +1,252 @@
+/* layout */
+.users-page {
+    display: grid;
+    gap: 12px;
+}
+
+/* box di superficie */
+.surface {
+    background: #fff;
+    border: 1px solid rgba(17, 24, 39, .10);
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+}
+
+/* toolbar */
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+}
+
+.toolbar h2 {
+    margin: 0;
+    color: #111827;
+}
+
+.toolbar .right {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.search {
+    background: #f9fafb;
+    border: 1px solid rgba(17, 24, 39, .10);
+    border-radius: 10px;
+    padding: 10px 12px;
+    min-width: 220px;
+    outline: none;
+}
+
+.search:focus {
+    border-color: rgba(17, 24, 39, .16);
+    box-shadow: 0 0 0 4px rgba(17, 24, 39, .08);
+}
+
+.btn {
+    background: #f3f4f6;
+    color: #111827;
+    border: 1px solid rgba(17, 24, 39, .10);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, box-shadow .2s, transform .1s;
+}
+
+.btn:hover {
+    background: #e5e7eb;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .06);
+}
+
+.btn.primary {
+    background: #2563eb;
+    color: #fff;
+    border-color: transparent;
+}
+
+.btn.primary:hover {
+    background: #1d4ed8;
+}
+
+.btn.danger {
+    background: #dc2626;
+    color: #fff;
+    border-color: transparent;
+}
+
+.btn.danger:hover {
+    background: #b91c1c;
+}
+
+/* tabella */
+.table-wrap {
+    padding: 6px;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.users-table thead th {
+    text-align: left;
+    font-weight: 700;
+    color: #111827;
+    background: #f3f4f6;
+    border-bottom: 1px solid rgba(17, 24, 39, .10);
+    padding: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 0;
+}
+
+.users-table tbody td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(17, 24, 39, .06);
+    color: #1f2937;
+}
+
+.users-table tbody tr:hover {
+    background: rgba(17, 24, 39, .02);
+}
+
+.users-table .actions {
+    width: 120px;
+    text-align: right;
+}
+
+.users-table .icon {
+    background: #fff;
+    border: 1px solid rgba(17, 24, 39, .10);
+    border-radius: 8px;
+    padding: 6px 8px;
+    cursor: pointer;
+    margin-left: 6px;
+}
+
+.users-table .icon:hover {
+    background: #f3f4f6;
+}
+
+.users-table .icon.danger:hover {
+    background: #fee2e2;
+}
+
+.linklike {
+    background: none;
+    border: none;
+    color: #2563eb;
+    cursor: pointer;
+    padding: 0;
+}
+
+.linklike:hover {
+    text-decoration: underline;
+}
+
+/* badge & role */
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: .85rem;
+}
+
+.badge.ok {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge.off {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.role {
+    font-weight: 600;
+}
+
+.role.admin {
+    color: #1d4ed8;
+}
+
+.role.editor {
+    color: #0f766e;
+}
+
+/* empty state */
+.empty {
+    text-align: center;
+    color: #6b7280;
+    padding: 18px 0;
+}
+
+/* modali */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .5);
+    display: grid;
+    place-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    width: 420px;
+    max-width: calc(100% - 32px);
+    background: #fff;
+    color: #111827;
+    border: 1px solid rgba(17, 24, 39, .10);
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .18);
+    display: grid;
+    gap: 10px;
+}
+
+.modal.small {
+    width: 360px;
+}
+
+.modal h3 {
+    margin: 0 0 6px;
+}
+
+.modal label {
+    display: grid;
+    gap: 6px;
+}
+
+.modal label.row {
+    grid-auto-flow: column;
+    grid-template-columns: 24px 1fr;
+    align-items: center;
+}
+
+.modal input,
+.modal select,
+.modal textarea {
+    background: #f9fafb;
+    border: 1px solid rgba(17, 24, 39, .10);
+    border-radius: 10px;
+    padding: 10px 12px;
+    outline: none;
+}
+
+.modal input:focus,
+.modal select:focus,
+.modal textarea:focus {
+    border-color: rgba(17, 24, 39, .16);
+    box-shadow: 0 0 0 4px rgba(17, 24, 39, .08);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}

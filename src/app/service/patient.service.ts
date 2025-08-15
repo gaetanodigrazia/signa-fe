@@ -4,11 +4,6 @@ import { Observable } from 'rxjs';
 import { CreatePatientDto, PatientDto } from '../model/patient.model';
 import { API_BASE_URL } from '../api.config';
 
-
-
-
-
-
 @Injectable({ providedIn: 'root' })
 export class PatientService {
     private readonly baseUrl = `${API_BASE_URL}/patient`;
@@ -21,5 +16,13 @@ export class PatientService {
 
     create(dto: CreatePatientDto): Observable<PatientDto> {
         return this.http.post<PatientDto>(this.baseUrl, dto);
+    }
+
+    update(uuid: string, dto: CreatePatientDto): Observable<PatientDto> {
+        return this.http.put<PatientDto>(`${this.baseUrl}/${uuid}`, dto);
+    }
+
+    remove(uuid: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${uuid}`);
     }
 }

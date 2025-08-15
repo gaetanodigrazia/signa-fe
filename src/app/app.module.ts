@@ -16,7 +16,10 @@ import { LockScreenComponent } from './components/shared/lock-screen/lock-screen
 import { authGuard } from './auth/guard/authGuard.guard';
 import { LoginComponent } from './pages/login/login.component';
 import { UsersComponent } from './pages/users/users.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { AuthInterceptor } from './auth/auth.interceptor';
+import { PatientsComponent } from './pages/patients/patients.component';
+import { ArchivioComponent } from './pages/archivio/archivio.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },           // no guard
@@ -24,7 +27,11 @@ export const routes: Routes = [
 
   { path: 'home', component: HomeComponent, canActivate: [authGuard] },
 
+  { path: 'patients', component: PatientsComponent, canActivate: [authGuard] },
+
   { path: 'users', component: UsersComponent, canActivate: [authGuard] },
+
+  { path: 'archive', component: ArchivioComponent, canActivate: [authGuard] },
 
   { path: 'calendar', component: AppointmentCalendarComponent, canActivate: [authGuard] },
 
@@ -57,6 +64,9 @@ export const routes: Routes = [
     FormsModule,
     HttpClientModule
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  ]
 })
 export class AppModule { }

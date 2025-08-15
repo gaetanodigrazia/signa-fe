@@ -1,0 +1,87 @@
+<div class="users-page">
+    <div class="toolbar surface">
+        <div class="left">
+            <h2>Archivio pazienti</h2>
+        </div>
+        <div class="right">
+            <input class="search" type="search" placeholder="Cerca paziente…" [(ngModel)]="search"
+                (ngModelChange)="applyFilter()" />
+            <button class="btn" (click)="load()" [disabled]="loading">Ricarica</button>
+        </div>
+    </div>
+
+    <div class="table-wrap surface">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>CF</th>
+                    <th>Data di nascita</th>
+                    <th>Indirizzo</th>
+                    <th class="actions">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let p of filtered; trackBy: trackByUuid">
+                    <td><button class="linklike" (click)="view(p)">{{ p.firstname }} {{ p.lastname }}</button></td>
+                    <td>{{ p.email }}</td>
+                    <td>{{ p.SSN }}</td>
+                    <td>{{ p.dateOfBirth | date:'d MMM y' }}</td>
+                    <td>{{ p.address }}</td>
+                    <td class="actions">
+                        <button class="icon" title="Visualizza storico" (click)="view(p)">👁️</button>
+                    </td>
+                </tr>
+                <tr *ngIf="filtered.length === 0 && !loading">
+                    <td colspan="6" class="empty">Nessun paziente trovato.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div *ngIf="loading" style="padding:12px;">Caricamento…</div>
+        <div *ngIf="error" class="error" style="padding:12px;">{{ error }}</div>
+    </div>
+</div>
+
+<!-- MODALE DETTAGLI + HISTORY -->
+<div class="modal-overlay" *ngIf="detailsVisible" (click)="closeDetails()">
+    <div class="modal" (click)="$event.stopPropagation()">
+        <h3>Storico paziente</h3>
+
+        <div class="details" *ngIf="viewing as v">
+            <div><strong>Nome:</strong> {{ v.firstname }} {{ v.lastname }}</div>
+            <div><strong>Email:</strong> {{ v.email }}</div>
+            <div><strong>CF:</strong> {{ v.SSN || 'n/d' }}</div>
+            <div><strong>Nascita:</strong> {{ v.dateOfBirth | date:'EEE d MMM y' }}</div>
+            <div><strong>Indirizzo:</strong> {{ v.address || '—' }}</div>
+        </div>
+
+        <hr />
+
+        <h4>Storico</h4>
+        <div *ngIf="historyLoading" style="padding:8px;">Caricamento storico…</div>
+        <div *ngIf="historyError" class="error" style="padding:8px;">{{ historyError }}</div>
+
+        <ul *ngIf="!historyLoading && !historyError && history.length > 0" class="history-list">
+            <li *ngFor="let h of history">
+                <div class="row">
+                    <div class="date">{{ h.date | date:'EEE d MMM y, HH:mm' }}</div>
+                    <div class="desc">{{ h.description }}</div>
+                </div>
+                <div class="meta" *ngIf="h.studioName || h.doctorName">
+                    <small *ngIf="h.studioName"><strong>Studio:</strong> {{ h.studioName }}</small>
+                    <small *ngIf="h.doctorName"><strong>Medico:</strong> {{ h.doctorName }}</small>
+                </div>
+            </li>
+        </ul>
+
+        <div *ngIf="!historyLoading && !historyError && history.length === 0" class="empty" style="padding:8px;">
+            Nessun evento storico disponibile.
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn" (click)="closeDetails()">Chiudi</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,95 @@
+<div class="users-page">
+    <div class="toolbar surface">
+        <div class="left">
+            <h2>Pazienti</h2>
+        </div>
+        <div class="right">
+            <input class="search" type="search" placeholder="Cerca paziente…" [(ngModel)]="search"
+                (ngModelChange)="applyFilter()" />
+            <button class="btn primary" (click)="openNew()">＋ Nuovo paziente</button>
+        </div>
+    </div>
+
+    <div class="table-wrap surface">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>CF</th>
+                    <th>Data di nascita</th>
+                    <th>Indirizzo</th>
+                    <th class="actions">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let p of filtered; trackBy: trackByUuid">
+                    <td><button class="linklike" (click)="view(p)">{{ p.firstname }} {{ p.lastname }}</button></td>
+                    <td>{{ p.email }}</td>
+                    <td>{{ p.SSN }}</td>
+                    <td>{{ p.dateOfBirth | date: 'd MMM y' }}</td>
+                    <td>{{ p.address }}</td>
+                    <td class="actions">
+                        <button class="icon" title="Vedi" (click)="view(p)">👁️</button>
+                        <button class="icon" title="Modifica" (click)="edit(p)">✏️</button>
+                        <button class="icon danger" title="Elimina" (click)="askDelete(p)">🗑️</button>
+                    </td>
+                </tr>
+                <tr *ngIf="filtered.length === 0 && !loading">
+                    <td colspan="6" class="empty">Nessun paziente trovato.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div *ngIf="loading" style="padding:12px;">Caricamento…</div>
+        <div *ngIf="error" class="error" style="padding:12px;">{{ error }}</div>
+    </div>
+</div>
+
+<!-- MODALE CREA / MODIFICA -->
+<div class="modal-overlay" *ngIf="modalVisible" (click)="cancelModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+        <h3>{{ editing ? 'Modifica paziente' : 'Nuovo paziente' }}</h3>
+
+        <label><span>Nome</span><input [(ngModel)]="form.firstname" required /></label>
+        <label><span>Cognome</span><input [(ngModel)]="form.lastname" required /></label>
+        <label><span>Email</span><input type="email" [(ngModel)]="form.email" required /></label>
+        <label><span>Codice Fiscale</span><input [(ngModel)]="form.SSN" /></label>
+        <label><span>Data di nascita</span><input type="date" [(ngModel)]="form.dateOfBirth" /></label>
+        <label><span>Indirizzo</span><input [(ngModel)]="form.address" /></label>
+
+        <div class="modal-actions">
+            <button class="btn primary" (click)="save()">{{ editing ? 'Salva modifiche' : 'Crea paziente' }}</button>
+            <button class="btn" (click)="cancelModal()">Annulla</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODALE DETTAGLI -->
+<div class="modal-overlay" *ngIf="detailsVisible" (click)="closeDetails()">
+    <div class="modal" (click)="$event.stopPropagation()">
+        <h3>Dettagli paziente</h3>
+        <div class="details" *ngIf="viewing as v">
+            <div><strong>Nome:</strong> {{ v.firstname }} {{ v.lastname }}</div>
+            <div><strong>Email:</strong> {{ v.email }}</div>
+            <div><strong>CF:</strong> {{ v.SSN || 'n/d' }}</div>
+            <div><strong>Nascita:</strong> {{ v.dateOfBirth | date:'EEE d MMM y' }}</div>
+            <div><strong>Indirizzo:</strong> {{ v.address || '—' }}</div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn" (click)="closeDetails()">Chiudi</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODALE CONFERMA ELIMINA -->
+<div class="modal-overlay" *ngIf="confirmVisible" (click)="confirmVisible=false">
+    <div class="modal" (click)="$event.stopPropagation()">
+        <h3>Elimina paziente</h3>
+        <p>Sei sicuro di voler eliminare <strong>{{ toDelete?.firstname }} {{ toDelete?.lastname }}</strong>?</p>
+        <div class="modal-actions">
+            <button class="btn danger" (click)="confirmDelete()">Elimina</button>
+            <button class="btn" (click)="confirmVisible=false; toDelete=null">Annulla</button>
+        </div>
+    </div>
+</div>

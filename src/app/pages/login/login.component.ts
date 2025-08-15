@@ -1,73 +1,36 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+// src/app/pages/login/login.component.ts
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-
-const LS_TOKEN = 'app_token';
-const LS_LOCKED = 'app_locked';
-const LS_RETURN_URL = 'app_locked_return_url';
+import { AuthService } from 'src/app/auth/service/auth.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class LoginComponent {
   email = '';
   password = '';
   loading = false;
-  error = '';
+  error: string | null = null;
 
-  private blockPopState = () => {
-    // Rimani sul login finché non sei autenticato
-    history.pushState(null, document.title, location.href);
-  };
+  constructor(private auth: AuthService, private router: Router) { }
 
-  constructor(private router: Router) { }
-
-  ngOnInit(): void {
-    // Se già autenticato e non bloccato, vai a home
-    const isAuth = !!localStorage.getItem(LS_TOKEN);
-    const locked = localStorage.getItem(LS_LOCKED) === 'true';
-    if (isAuth && !locked) {
-      this.router.navigateByUrl('/home', { replaceUrl: true });
-      return;
-    }
-
-    // Blocca back/forward mentre sei sul login
-    history.pushState(null, document.title, location.href);
-    window.addEventListener('popstate', this.blockPopState);
-  }
-
-  ngOnDestroy(): void {
-    window.removeEventListener('popstate', this.blockPopState);
-  }
-
-  async submit() {
-    this.error = '';
-    if (!this.email || !this.password) {
-      this.error = 'Inserisci email e password.';
-      return;
-    }
-
+  submit(): void {
+    if (this.loading) return;
+    this.error = null;
     this.loading = true;
-    try {
-      // TODO: sostituisci con la tua API reale
-      await new Promise(r => setTimeout(r, 300));
-      localStorage.setItem(LS_TOKEN, 'dummy-token');
 
-      // Sblocca se era bloccato
-      if (localStorage.getItem(LS_LOCKED) === 'true') {
-        localStorage.removeItem(LS_LOCKED);
-      }
-
-      const returnUrl = localStorage.getItem(LS_RETURN_URL) || '/home';
-      localStorage.removeItem(LS_RETURN_URL);
-
-      // Vai alla pagina prevista e sostituisci la history (niente back)
-      this.router.navigateByUrl(returnUrl, { replaceUrl: true });
-    } catch {
-      this.error = 'Credenziali non valide.';
-    } finally {
-      this.loading = false;
-    }
+    this.auth.login(this.email, this.password).subscribe({
+      next: (userId) => {
+        this.loading = false;
+        // naviga dove preferisci dopo il login
+        this.router.navigateByUrl('/dashboard');
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error = err?.status === 401 ? 'Credenziali non valide' : 'Errore di connessione';
+      },
+    });
   }
 }
