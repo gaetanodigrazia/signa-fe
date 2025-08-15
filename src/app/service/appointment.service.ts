@@ -2,11 +2,14 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Appointment } from '../model/appointment.model';
 import { v4 as uuidv4 } from 'uuid';
+import { API_BASE_URL } from '../api.config';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AppointmentService {
+    private baseUrl = `${API_BASE_URL}/appointment`;
+
     private appointmentsSubject = new BehaviorSubject<Appointment[]>([]);
     public appointments$: Observable<Appointment[]> = this.appointmentsSubject.asObservable();
 

@@ -16,6 +16,7 @@ import { LockScreenComponent } from './components/shared/lock-screen/lock-screen
 import { authGuard } from './auth/guard/authGuard.guard';
 import { LoginComponent } from './pages/login/login.component';
 import { UsersComponent } from './pages/users/users.component';
+import { HttpClientModule } from '@angular/common/http';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },           // no guard
@@ -53,7 +54,8 @@ export const routes: Routes = [
       provide: DateAdapter,
       useFactory: adapterFactory,
     }),
-    FormsModule
+    FormsModule,
+    HttpClientModule
   ],
   bootstrap: [AppComponent]
 })

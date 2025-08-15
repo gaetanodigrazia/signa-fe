@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
 import { User } from '../model/user.model';
+import { API_BASE_URL } from '../api.config';
 
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
+    private baseUrl = `${API_BASE_URL}/user`;
+
     private KEY = 'app_users';
 
     private read(): User[] {

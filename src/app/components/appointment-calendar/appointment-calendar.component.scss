@@ -814,3 +814,129 @@ mwl-calendar-day-view {
   background: #d97706;
   /* giallo più scuro in hover */
 }
+
+/* === FIX dropdown pazienti: mostra nome + email accanto alle iniziali === */
+.user-option {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  /* annulla layout a griglia eventualmente impostato prima */
+  grid-template-columns: unset !important;
+}
+
+.user-option .avatar {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef2ff;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.user-option .meta {
+  flex: 1 1 auto;
+  margin-left: 8px;
+  min-width: 0;
+  /* fondamentale per non “tagliare” il testo nei flex item */
+  display: block !important;
+  overflow: hidden;
+}
+
+.user-option .meta strong,
+.user-option .meta small {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-option:hover,
+.user-option.active {
+  background: linear-gradient(180deg, #f8fafc, #eef2f7);
+}
+
+/* === FIX definitivo: forza layout testo nel dropdown pazienti === */
+:host ::ng-deep .user-results .user-option {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  grid-template-columns: unset !important;
+  /* annulla layout a griglia precedente */
+}
+
+:host ::ng-deep .user-results .user-option .avatar {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef2ff;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+:host ::ng-deep .user-results .user-option .meta {
+  flex: 1 1 auto !important;
+  margin-left: 8px;
+  min-width: 0 !important;
+  /* fondamentale nei flex per non “stringere” a 0 */
+  display: block !important;
+  overflow: hidden;
+}
+
+:host ::ng-deep .user-results .user-option .meta strong,
+:host ::ng-deep .user-results .user-option .meta small {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Rendiamo la griglia a 2 colonne reali (avatar + contenuto) */
+.user-option {
+  grid-template-columns: 32px 1fr;
+  /* prima avevi 32px 1fr auto auto */
+  color: #0f172a;
+  /* forza il colore testo */
+}
+
+/* Il blocco meta dev’essere un contenitore verticale, non tagliare il contenuto */
+.user-option .meta {
+  display: flex !important;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  /* evita tagli in griglia */
+  overflow: visible;
+  /* niente clipping del testo */
+}
+
+/* Tipografia */
+.user-option .meta strong {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.user-option .meta small {
+  display: block;
+  line-height: 1.15;
+  color: #64748b;
+  /* già presente nel tuo file, va bene così */
+}

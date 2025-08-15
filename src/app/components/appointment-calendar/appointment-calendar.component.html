@@ -54,34 +54,40 @@
       </div>
     </div>
 
-    <!-- Utente -->
-    <label for="userSearch">Utente</label>
+    <!-- Paziente -->
+    <label for="patientSearch">Paziente</label>
     <div class="user-picker">
       <div #userInputWrap class="user-input-wrap">
-        <input id="userSearch" type="text" placeholder="Cerca nome o email…" [(ngModel)]="userSearch"
+        <input id="patientSearch" type="text" placeholder="Cerca nome o email…" [(ngModel)]="userSearch"
           (focus)="openUserList()" (input)="onUserSearchChange(userSearch)" (keydown)="onUserInputKeydown($event)"
           (blur)="closeUserListSoon()" autocomplete="off" />
 
         <!-- Dropdown risultati -->
         <div class="user-results" *ngIf="userListOpen" [class.open-up]="userListOpenUp"
           [ngStyle]="{ 'max-height.px': userListMaxHeight }">
-          <button *ngFor="let u of userResults; let i = index" class="user-option" [class.active]="i === highlightIndex"
-            (mousedown)="$event.preventDefault()" (click)="selectUser(u)">
-            <span class="avatar">{{ u.name | slice:0:1 }}</span>
-            <span class="meta">
-              <strong>{{ u.name }}</strong>
-              <small>{{ u.email }}</small>
+
+          <button *ngFor="let p of userResults; let i = index" class="user-option" [class.active]="i === highlightIndex"
+            (mousedown)="$event.preventDefault()" (click)="selectPatient(p)">
+
+            <span class="avatar">
+              {{ (p.firstname?.[0] || '') + (p.lastname?.[0] || '') || (p.email?.[0] || '?') }}
             </span>
-            <span class="role" [class.admin]="u.role==='Admin'" [class.editor]="u.role==='Editor'">{{ u.role }}</span>
-            <span class="status" [class.ok]="u.active" [class.off]="!u.active"></span>
+
+            <span class="meta" style="display:inline-block; padding:2px;">
+              <strong>{{ p.firstname || '?' }} {{ p.lastname || '?' }}</strong>
+              <small>{{ p.email || 'n/d' }}</small>
+              <small>{{ p.SSN || 'CF n/d' }}</small>
+            </span>
+
           </button>
+
 
           <div class="empty" *ngIf="userResults.length === 0">Nessun risultato</div>
         </div>
       </div>
 
-      <!-- Pulsante + per nuovo utente -->
-      <button type="button" class="btn-inline" (click)="openNewUserModal()" title="Crea nuovo utente">＋</button>
+      <!-- Pulsante + per nuovo paziente -->
+      <button type="button" class="btn-inline" (click)="openNewPatientModal()" title="Crea nuovo paziente">＋</button>
     </div>
 
     <div class="modal-actions">
@@ -103,8 +109,8 @@
 
     <p class="desc" *ngIf="selectedEvent?.meta?.description as d">{{ d }}</p>
 
-    <div class="assigned" *ngIf="selectedEvent?.meta?.userId as uid">
-      👤 <strong>{{ getUserLabel(uid) }}</strong>
+    <div class="assigned" *ngIf="selectedEvent?.meta?.patientId as pid">
+      👤 <strong>{{ getPatientLabel(pid) }}</strong>
     </div>
 
     <div class="modal-actions">
@@ -115,43 +121,49 @@
   </div>
 </div>
 
-<!-- === SECONDA MODALE: NUOVO UTENTE === -->
-<div class="modal-overlay modal-overlay--nested" *ngIf="newUserModalVisible" (click)="cancelNewUser()">
+<!-- === SECONDA MODALE: NUOVO PAZIENTE === -->
+<div class="modal-overlay modal-overlay--nested" *ngIf="newPatientModalVisible" (click)="cancelNewPatient()">
   <div class="modal modal--nested" (click)="$event.stopPropagation()">
-    <h3>Nuovo utente</h3>
+    <h3>Nuovo paziente</h3>
 
     <div class="inline-new-user">
       <div class="grid">
         <label>
           <span>Nome</span>
-          <input [(ngModel)]="newUser.name" placeholder="Mario Rossi" />
+          <input [(ngModel)]="newPatient.firstname" placeholder="Mario" />
         </label>
         <label>
-          <span>Email</span>
-          <input type="email" [(ngModel)]="newUser.email" placeholder="mario.rossi@example.com" />
+          <span>Cognome</span>
+          <input [(ngModel)]="newPatient.lastname" placeholder="Rossi" />
         </label>
       </div>
 
       <div class="grid">
         <label>
-          <span>Ruolo</span>
-          <select [(ngModel)]="newUser.role">
-            <option [ngValue]="'Admin'">Admin</option>
-            <option [ngValue]="'Editor'">Editor</option>
-            <option [ngValue]="'Viewer'">Viewer</option>
-          </select>
+          <span>Email</span>
+          <input type="email" [(ngModel)]="newPatient.email" placeholder="mario.rossi@example.com" />
         </label>
+        <label>
+          <span>Data di nascita</span>
+          <input type="date" [(ngModel)]="newPatient.dateOfBirth" />
+        </label>
+      </div>
 
-        <label class="row">
-          <input type="checkbox" [(ngModel)]="newUser.active" />
-          <span>Attivo</span>
+      <div class="grid">
+        <label>
+          <span>Indirizzo</span>
+          <input [(ngModel)]="newPatient.address" placeholder="Via Roma 123, Milano" />
+        </label>
+        <label>
+          <span>SSN</span>
+          <input [(ngModel)]="newPatient.ssn" placeholder="RSSMRA80A01F205X" />
         </label>
       </div>
     </div>
 
     <div class="modal-actions">
-      <button (click)="saveNewUser()">Crea utente</button>
-      <button (click)="cancelNewUser()">Annulla</button>
+      <button (click)="saveNewPatient()">Crea paziente</button>
+      <button (click)="cancelNewPatient()">Annulla</button>
     </div>
   </div>
 </div>

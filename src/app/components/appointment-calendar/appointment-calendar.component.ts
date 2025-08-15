@@ -7,8 +7,8 @@ import {
 } from '@angular/core';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { Subject } from 'rxjs';
-import { UsersService } from 'src/app/service/user.service';
-import { User } from 'src/app/model/user.model';
+import { CreatePatientDto, PatientDto } from 'src/app/model/patient.model';
+import { PatientService } from 'src/app/service/patient.service';
 
 @Component({
   selector: 'app-appointment-calendar',
@@ -34,80 +34,109 @@ export class AppointmentCalendarComponent implements OnInit {
     startTime: '',
     endTime: '',
     date: new Date(),
-    userId: null as number | null,
+    patientId: null as string | null, // UUID string
   };
 
   /* ------- Modale dettagli ------- */
   detailsVisible = false;
   selectedEvent: CalendarEvent | null = null;
 
-  /* ------- Utenti / servizio ------- */
-  users: User[] = [];
+  /* ------- Pazienti / servizio ------- */
+  patients: PatientDto[] = [];
 
-  /* ------- Modale “Nuovo utente” ------- */
-  newUserModalVisible = false;
-  newUser: { name: string; email: string; role: User['role']; active: boolean } =
-    { name: '', email: '', role: 'Viewer', active: true };
+  /* ------- Modale “Nuovo paziente” ------- */
+  newPatientModalVisible = false;
+  newPatient: CreatePatientDto = {
+    firstname: '',
+    lastname: '',
+    email: '',
+    address: '',
+    SSN: '',
+    dateOfBirth: '' // ISO 'YYYY-MM-DD'
+  };
 
-  /* ------- User picker (input + dropdown) ------- */
+  /* ------- Patient picker (input + dropdown) ------- */
   @ViewChild('userInputWrap', { static: false })
   userInputWrapRef!: ElementRef<HTMLDivElement>;
 
   userSearch = '';
   userListOpen = false;
-  userResults: User[] = [];
+  userResults: PatientDto[] = [];
   highlightIndex = -1;
   userListOpenUp = false;   // true = apre verso l'alto
   userListMaxHeight = 240;  // impostata dinamicamente
 
-  constructor(private usersSvc: UsersService) { }
+  constructor(private patientsSvc: PatientService) { }
 
   ngOnInit(): void {
-    this.loadUsers();
+    this.loadPatients();
   }
 
-  /* ---------- Users ---------- */
-  loadUsers(): void {
-    this.users = this.usersSvc.list();
+  /* ---------- Patients ---------- */
+  loadPatients(): void {
+    this.patientsSvc.findAll().subscribe({
+      next: (items) => {
+        console.log("ITEMS: ", items);
+        (this.patients = items ?? [])
+      },
+      error: (err) => {
+        console.error('Errore nel recupero pazienti', err);
+        this.patients = [];
+      },
+    });
   }
 
-  getUserLabel(id: number | null): string {
-    if (id == null) return '—';
-    const u = this.users.find(x => x.id === id);
-    return u ? `${u.name} — ${u.email}` : '—';
+  getPatientLabel(id: string | null): string {
+    if (!id) return '—';
+    const p = this.patients.find(x => x.uuid === id);
+    if (!p) return '—';
+    const fullName = [p.firstname, p.lastname].filter(Boolean).join(' ');
+    return `${fullName || 'Senza nome'} — ${p.email || 'n/d'}`;
   }
 
-  openNewUserModal(): void {
-    this.newUser = { name: '', email: '', role: 'Viewer', active: true };
-    this.newUserModalVisible = true;
+  /* ---------- Nuovo paziente (modale) ---------- */
+  openNewPatientModal(): void {
+    this.newPatient = { firstname: '', lastname: '', email: '', address: '', SSN: '', dateOfBirth: '' };
+    this.newPatientModalVisible = true;
   }
-  cancelNewUser(): void {
-    this.newUserModalVisible = false;
+  cancelNewPatient(): void {
+    this.newPatientModalVisible = false;
   }
-  saveNewUser(): void {
-    const n = this.newUser;
-    if (!n.name.trim() || !n.email.trim()) {
-      alert('Inserisci nome ed email.');
+  saveNewPatient(): void {
+    const p = this.newPatient;
+    if (!p.firstname.trim() || !p.email.trim()) {
+      alert('Inserisci almeno nome ed email.');
       return;
     }
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(n.email);
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email);
     if (!emailOk) {
       alert('Email non valida.');
       return;
     }
-    const created = this.usersSvc.add({
-      name: n.name.trim(),
-      email: n.email.trim(),
-      role: n.role,
-      active: n.active,
+
+    this.patientsSvc.create({
+      firstname: p.firstname.trim(),
+      lastname: p.lastname.trim(),
+      email: p.email.trim(),
+      address: p.address?.trim() ?? '',
+      SSN: p.SSN?.trim() ?? '',
+      dateOfBirth: p.dateOfBirth?.trim() ?? ''
+    }).subscribe({
+      next: (created) => {
+        // aggiorna lista e seleziona nel picker
+        this.loadPatients();
+        this.modalData.patientId = created.uuid;
+        this.userSearch = this.getPatientLabel(created.uuid);
+        this.newPatientModalVisible = false;
+      },
+      error: (err) => {
+        console.error('Errore nella creazione paziente', err);
+        alert('Errore nella creazione del paziente.');
+      }
     });
-    this.loadUsers();
-    this.modalData.userId = created.id;
-    this.userSearch = this.getUserLabel(created.id);
-    this.newUserModalVisible = false;
   }
 
-  /* ---------- User picker logic ---------- */
+  /* ---------- Patient picker logic ---------- */
   openUserList(): void {
     this.userListOpen = true;
     this.onUserSearchChange(this.userSearch);
@@ -118,12 +147,13 @@ export class AppointmentCalendarComponent implements OnInit {
   }
   onUserSearchChange(q: string): void {
     const s = (q || '').trim().toLowerCase();
-    const base = this.users;
+    const base = this.patients;
     this.userResults = s
       ? base.filter(
-        u =>
-          u.name.toLowerCase().includes(s) ||
-          u.email.toLowerCase().includes(s)
+        p =>
+          (p.firstname && p.firstname.toLowerCase().includes(s)) ||
+          (p.lastname && p.lastname.toLowerCase().includes(s)) ||
+          (p.email && p.email.toLowerCase().includes(s))
       )
       : [...base];
     this.userResults = this.userResults.slice(0, 20);
@@ -143,16 +173,17 @@ export class AppointmentCalendarComponent implements OnInit {
       ev.preventDefault();
     } else if (ev.key === 'Enter') {
       if (this.highlightIndex > -1) {
-        this.selectUser(this.userResults[this.highlightIndex]);
+        this.selectPatient(this.userResults[this.highlightIndex]);
         ev.preventDefault();
       }
     } else if (ev.key === 'Escape') {
       this.userListOpen = false;
     }
   }
-  selectUser(u: User): void {
-    this.modalData.userId = u.id;
-    this.userSearch = `${u.name} — ${u.email}`;
+  selectPatient(p: PatientDto): void {
+    this.modalData.patientId = p.uuid;
+    const fullName = [p.firstname, p.lastname].filter(Boolean).join(' ');
+    this.userSearch = `${fullName || 'Senza nome'} — ${p.email || 'n/d'}`;
     this.userListOpen = false;
   }
   private recomputeUserListPosition(): void {
@@ -186,7 +217,7 @@ export class AppointmentCalendarComponent implements OnInit {
       startTime: this.formatTime(date),
       endTime: this.formatTime(new Date(date.getTime() + 30 * 60000)),
       date,
-      userId: null,
+      patientId: null,
     };
     this.userSearch = '';
     this.modalVisible = true;
@@ -218,7 +249,7 @@ export class AppointmentCalendarComponent implements OnInit {
     if (!this.selectedEvent) return;
     const ev = this.selectedEvent;
     const date = ev.start ? new Date(ev.start) : new Date();
-    const uid = (ev.meta as any)?.userId ?? null;
+    const pid = (ev.meta as any)?.patientId ?? null;
 
     this.editingRef = ev;
     this.modalData = {
@@ -229,9 +260,9 @@ export class AppointmentCalendarComponent implements OnInit {
         ev.end ? new Date(ev.end) : new Date(date.getTime() + 30 * 60000)
       ),
       date,
-      userId: uid,
+      patientId: pid,
     };
-    this.userSearch = uid ? this.getUserLabel(uid) : '';
+    this.userSearch = pid ? this.getPatientLabel(pid) : '';
     this.detailsVisible = false;
     this.modalVisible = true;
   }
@@ -249,7 +280,7 @@ export class AppointmentCalendarComponent implements OnInit {
   }
 
   saveEvent(): void {
-    const { title, description, startTime, endTime, date, userId } =
+    const { title, description, startTime, endTime, date, patientId } =
       this.modalData;
 
     if (!title || !startTime || !endTime) {
@@ -275,7 +306,7 @@ export class AppointmentCalendarComponent implements OnInit {
         title,
         start,
         end,
-        meta: { ...(this.editingRef.meta || {}), description, userId },
+        meta: { ...(this.editingRef.meta || {}), description, patientId },
       };
       this.events = this.events.map(e => (e === this.editingRef ? updated : e));
       this.editingRef = null;
@@ -284,7 +315,7 @@ export class AppointmentCalendarComponent implements OnInit {
         title,
         start,
         end,
-        meta: { description, userId },
+        meta: { description, patientId },
       };
       this.events = [...this.events, newEvent];
     }
