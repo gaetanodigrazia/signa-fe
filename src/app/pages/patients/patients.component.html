@@ -51,19 +51,74 @@
     <div class="modal" (click)="$event.stopPropagation()">
         <h3>{{ editing ? 'Modifica paziente' : 'Nuovo paziente' }}</h3>
 
-        <label><span>Nome</span><input [(ngModel)]="form.firstname" required /></label>
-        <label><span>Cognome</span><input [(ngModel)]="form.lastname" required /></label>
-        <label><span>Email</span><input type="email" [(ngModel)]="form.email" required /></label>
-        <label><span>Codice Fiscale</span><input [(ngModel)]="form.SSN" /></label>
-        <label><span>Data di nascita</span><input type="date" [(ngModel)]="form.dateOfBirth" /></label>
-        <label><span>Indirizzo</span><input [(ngModel)]="form.address" /></label>
+        <form #patientForm="ngForm" (ngSubmit)="save()" novalidate>
+            <!-- Nome -->
+            <label>
+                <span>Nome</span>
+                <input name="firstname" [(ngModel)]="form.firstname" required #firstname="ngModel" />
+                <div class="error" *ngIf="(submitted || firstname.touched) && firstname.invalid">
+                    Il nome è obbligatorio.
+                </div>
+            </label>
 
-        <div class="modal-actions">
-            <button class="btn primary" (click)="save()">{{ editing ? 'Salva modifiche' : 'Crea paziente' }}</button>
-            <button class="btn" (click)="cancelModal()">Annulla</button>
-        </div>
+            <!-- Cognome -->
+            <label>
+                <span>Cognome</span>
+                <input name="lastname" [(ngModel)]="form.lastname" required #lastname="ngModel" />
+                <div class="error" *ngIf="(submitted || lastname.touched) && lastname.invalid">
+                    Il cognome è obbligatorio.
+                </div>
+            </label>
+
+            <!-- Email -->
+            <label>
+                <span>Email</span>
+                <input name="email" type="email" [(ngModel)]="form.email" required email #email="ngModel" />
+                <div class="error" *ngIf="(submitted || email.touched) && email.errors?.['required']">
+                    L'email è obbligatoria.
+                </div>
+                <div class="error" *ngIf="(submitted || email.touched) && email.errors?.['email']">
+                    Inserisci un'email valida.
+                </div>
+            </label>
+
+            <!-- Codice Fiscale (opzionale con pattern) -->
+            <label>
+                <span>Codice Fiscale</span>
+                <input name="ssn" [(ngModel)]="form.SSN" pattern="[A-Za-z0-9]{11,16}" #ssn="ngModel"
+                    autocomplete="off" />
+                <div class="error" *ngIf="(submitted || ssn.touched) && ssn.errors?.['pattern']">
+                    Formato codice fiscale non valido.
+                </div>
+            </label>
+
+            <!-- Data di nascita (obbligatoria) -->
+            <label>
+                <span>Data di nascita</span>
+                <input name="dob" type="date" [(ngModel)]="form.dateOfBirth" required [attr.max]="today"
+                    #dob="ngModel" />
+                <div class="error" *ngIf="(submitted || dob.touched) && dob.invalid">
+                    La data di nascita è obbligatoria.
+                </div>
+            </label>
+
+            <!-- Indirizzo -->
+            <label>
+                <span>Indirizzo</span>
+                <input name="address" [(ngModel)]="form.address" />
+            </label>
+
+            <div class="modal-actions">
+                <button class="btn primary" type="submit" [disabled]="submitted && patientForm.invalid">
+                    {{ editing ? 'Salva modifiche' : 'Crea paziente' }}
+                </button>
+                <button class="btn" type="button" (click)="cancelModal()">Annulla</button>
+            </div>
+        </form>
     </div>
 </div>
+
+
 
 <!-- MODALE DETTAGLI -->
 <div class="modal-overlay" *ngIf="detailsVisible" (click)="closeDetails()">

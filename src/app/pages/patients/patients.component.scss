@@ -250,3 +250,36 @@
     gap: 8px;
     margin-top: 8px;
 }
+
+/* Error message style */
+.error {
+    color: #d93025;
+    /* rosso Google-style */
+    font-size: 0.85rem;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Per dare un bordo rosso agli input invalidi */
+input.ng-invalid.ng-touched {
+    border: 1px solid #d93025;
+    background-color: #fff6f6;
+}
+
+/* Label + error spacing */
+label {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+
+    span {
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+}
+
+/* Pulsanti disabilitati */
+button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
