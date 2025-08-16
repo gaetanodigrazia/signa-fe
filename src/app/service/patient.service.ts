@@ -38,10 +38,19 @@ export class PatientService {
     create(dto: CreatePatientDto): Observable<PatientDto> {
         return this.http.post<PatientDto>(this.baseUrl, dto);
     }
-
     update(patientId: string, dto: CreatePatientDto): Observable<PatientDto> {
-        return this.http.put<PatientDto>(`${this.baseUrl}/${patientId}`, dto);
+        // Adattiamo le chiavi al PatientInputDTO del backend
+        const body = {
+            firstname: dto.firstname,
+            lastname: dto.lastname,
+            email: dto.email,
+            address: dto.address,
+            ssn: dto.SSN,          // <-- ssn minuscolo per il backend
+            dateOfBirth: dto.dateOfBirth   // formato ISO yyyy-MM-dd va bene
+        };
+        return this.http.put<PatientDto>(`${this.baseUrl}/${patientId}`, body);
     }
+
 
     remove(patientId: string): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/${patientId}`);

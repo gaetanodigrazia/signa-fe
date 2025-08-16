@@ -137,7 +137,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
       lastname: p.lastname ?? '',
       email: p.email ?? '',
       address: p.address ?? '',
-      SSN: p.SSN ?? '',
+      SSN: (p as any).SSN ?? (p as any).ssn ?? '',
       dateOfBirth: p.dateOfBirth ?? ''
     };
     this.submitted = false;
