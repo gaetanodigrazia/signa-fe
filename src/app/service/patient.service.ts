@@ -18,11 +18,11 @@ export class PatientService {
         return this.http.post<PatientDto>(this.baseUrl, dto);
     }
 
-    update(uuid: string, dto: CreatePatientDto): Observable<PatientDto> {
-        return this.http.put<PatientDto>(`${this.baseUrl}/${uuid}`, dto);
+    update(patientId: string, dto: CreatePatientDto): Observable<PatientDto> {
+        return this.http.put<PatientDto>(`${this.baseUrl}/${patientId}`, dto);
     }
 
-    remove(uuid: string): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}/${uuid}`);
+    remove(patientId: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${patientId}`);
     }
 }

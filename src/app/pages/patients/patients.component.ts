@@ -1,4 +1,3 @@
-// src/app/pages/patients/patients.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -158,8 +157,8 @@ export class PatientsComponent implements OnInit {
     };
 
     const req$ = this.editing
-      ? this.patientSvc.update(this.editing.uuid, payload)
-      : this.patientSvc.create(payload);
+      ? this.patientSvc.update(this.editing.uuid, payload)   // <-- UPDATE
+      : this.patientSvc.create(payload);                     // <-- CREATE
 
     req$.subscribe({
       next: () => {
@@ -189,6 +188,7 @@ export class PatientsComponent implements OnInit {
     this.viewing = null;
   }
 
+  /* Validation helpers */
   private isFormValid(): boolean {
     const f = this.form;
 
@@ -209,7 +209,6 @@ export class PatientsComponent implements OnInit {
 
     return true;
   }
-
 
   private readError(err: any, fallback: string): string {
     return err?.error?.message || err?.message || fallback;
