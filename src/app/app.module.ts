@@ -20,27 +20,9 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { PatientsComponent } from './pages/patients/patients.component';
 import { ArchivioComponent } from './pages/archivio/archivio.component';
-
-export const routes: Routes = [
-  { path: 'login', component: LoginComponent },           // no guard
-  { path: 'lock', component: LockScreenComponent },       // no guard
-
-  { path: 'home', component: HomeComponent, canActivate: [authGuard] },
-
-  { path: 'patients', component: PatientsComponent, canActivate: [authGuard] },
-
-  { path: 'users', component: UsersComponent, canActivate: [authGuard] },
-
-  { path: 'archive', component: ArchivioComponent, canActivate: [authGuard] },
-
-  { path: 'calendar', component: AppointmentCalendarComponent, canActivate: [authGuard] },
-
-  { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
+import { AppRoutingModule } from './config/app-routing.module';
 
 
-  { path: '', pathMatch: 'full', redirectTo: 'home' },
-  { path: '**', redirectTo: 'home' },
-];
 
 @NgModule({
   declarations: [
@@ -53,7 +35,7 @@ export const routes: Routes = [
     LoginComponent],
   imports: [
     BrowserModule,
-    RouterModule.forRoot(routes),
+    AppRoutingModule,
     BrowserAnimationsModule,
     MatTooltipModule,
     MatButtonModule,
