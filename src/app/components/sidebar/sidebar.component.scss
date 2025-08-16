@@ -122,13 +122,13 @@
   transform: translateY(0);
 }
 
-/* Telefoni: altezza 40% schermo (come richiesto) */
+/* Telefoni: altezza 60% schermo (come richiesto) */
 @media (max-width: 767px) {
   .sidebar.mobile {
     /* fallback vecchi browser */
     height: 40vh;
-    /* unità moderne: 40% dell’area visibile, ma non oltre lo spazio utile */
-    height: min(40svh, calc(100dvh - 60px));
+    /* unità moderne: 60% dell’area visibile, ma non oltre lo spazio utile */
+    height: min(60svh, calc(100dvh - 40px));
   }
 }
 

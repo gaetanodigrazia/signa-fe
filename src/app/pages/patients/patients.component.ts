@@ -88,7 +88,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
 
-    this.patientSvc.findAll(this.status).subscribe({
+    this.patientSvc.findAllWithStatus(this.status).subscribe({
       next: (list) => {
         this.patients = list ?? [];
         this.applyFilter();

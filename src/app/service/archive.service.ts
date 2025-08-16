@@ -2,8 +2,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { API_BASE_URL } from '../api.config';
+import { API_BASE_URL } from '../config/api.config';
 import { PatientDto } from '../model/patient.model';
+import { PatientService } from './patient.service';
 
 export interface PatientHistoryItem {
     date: string;          // ISO
@@ -17,10 +18,10 @@ export class ArchiveService {
     private readonly patientsUrl = `${API_BASE_URL}/patient`;
     private readonly historyUrl = `${API_BASE_URL}/patients/history`;
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient, private patientSvc: PatientService) { }
 
     listPatients(): Observable<PatientDto[]> {
-        return this.http.get<PatientDto[]>(this.patientsUrl);
+        return this.patientSvc.findAll();
     }
 
     getHistory(patientId: string): Observable<PatientHistoryItem[]> {

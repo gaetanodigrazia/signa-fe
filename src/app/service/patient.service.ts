@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CreatePatientDto, PatientDto, PatientStatus } from '../model/patient.model';
-import { API_BASE_URL } from '../api.config';
+import { API_BASE_URL } from '../config/api.config';
 
 @Injectable({ providedIn: 'root' })
 export class PatientService {
@@ -10,13 +10,18 @@ export class PatientService {
 
     constructor(private http: HttpClient) { }
 
+
+    findAll(): Observable<PatientDto[]> {
+        return this.http.get<PatientDto[]>(this.baseUrl);
+    }
+
     /**
      * Restituisce i pazienti filtrati per stato.
      * - 'active'   -> ?active=true
      * - 'inactive' -> ?active=false
      * - 'all'      -> nessun parametro 'active'
      */
-    findAll(status: PatientStatus = 'active', q = ''): Observable<PatientDto[]> {
+    findAllWithStatus(status: PatientStatus = 'active', q = ''): Observable<PatientDto[]> {
         let params = new HttpParams();
 
         if (status === 'active') {
@@ -28,7 +33,7 @@ export class PatientService {
             params = params.set('q', q.trim());
         }
 
-        return this.http.get<PatientDto[]>(this.baseUrl, { params });
+        return this.http.get<PatientDto[]>(this.baseUrl + "/status", { params });
     }
     create(dto: CreatePatientDto): Observable<PatientDto> {
         return this.http.post<PatientDto>(this.baseUrl, dto);
