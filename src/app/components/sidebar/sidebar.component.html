@@ -36,7 +36,11 @@
 
     </div>
 
-
+    <a routerLink="/calendar">
+      <span class="icon">📆</span>
+      <span class="text" *ngIf="!isCollapsed">Calendar</span>
+    </a>
+    <!--
     <a routerLink="/users">
       <span class="icon">👥​</span>
       <span class="text" *ngIf="!isCollapsed">Utenti</span>
@@ -45,14 +49,11 @@
       <span class="icon">🗃️​</span>
       <span class="text" *ngIf="!isCollapsed">​Archivio</span>
     </a>
-    <a routerLink="/calendar">
-      <span class="icon">📆</span>
-      <span class="text" *ngIf="!isCollapsed">Calendar</span>
-    </a>
+
     <a routerLink="/settings">
       <span class="icon">⚙️</span>
       <span class="text" *ngIf="!isCollapsed">Settings</span>
-    </a>
+    </a>-->
   </nav>
   <!-- Bottoni in basso (DESKTOP) -->
   <div class="sidebar-bottom">
@@ -86,10 +87,12 @@
       </div>
 
     </div>
+    <a routerLink="/calendar" (click)="menuOpen = false">📆 Calendar</a>
+    <!--
     <a routerLink="/users" (click)="menuOpen = false">👥​ Utenti</a>
     <a routerLink="/archive" (click)="menuOpen = false">🗃️​ Archivio</a>
-    <a routerLink="/calendar" (click)="menuOpen = false">📆 Calendar</a>
-    <a routerLink="/settings" (click)="menuOpen = false">⚙️ Settings</a>
+
+    <a routerLink="/settings" (click)="menuOpen = false">⚙️ Settings</a>-->
   </nav>
   <!-- Bottoni in basso (MOBILE) -->
   <div class="sidebar-bottom">

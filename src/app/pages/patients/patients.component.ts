@@ -93,6 +93,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
         this.patients = list ?? [];
         this.applyFilter();
         this.loading = false;
+        console.log("Result ", list);
       },
       error: (err) => {
         console.error('findAll patients error', err);
