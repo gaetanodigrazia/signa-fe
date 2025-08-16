@@ -15,3 +15,4 @@ export interface CreatePatientDto {
     SSN: string;
     dateOfBirth: string; // ISO (opzionale se il backend lo consente)
 }
+export type PatientStatus = 'active' | 'inactive' | 'all';

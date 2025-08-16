@@ -1,5 +1,6 @@
 import { Component, HostListener, Output, EventEmitter, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { map, distinctUntilChanged } from 'rxjs/operators';
 
 const LS_LOCKED = 'app_locked';
 const LS_RETURN_URL = 'app_locked_return_url';
@@ -16,8 +17,14 @@ export class SidebarComponent implements OnInit {
   isCollapsed = false;
   @Output() collapseChanged = new EventEmitter<boolean>();
 
-  constructor(private router: Router) { }
+  // stato selezionato dai query params (default 'active')
+  status$ = this.route.queryParamMap.pipe(
+    map(q => (q.get('status') ?? 'active')),
+    distinctUntilChanged()
+  );
 
+  // costruttore (aggiungi ActivatedRoute)
+  constructor(private router: Router, private route: ActivatedRoute) { }
   ngOnInit() {
     this.onResize();
   }
@@ -83,7 +90,27 @@ export class SidebarComponent implements OnInit {
     if (this.isMobile) this.menuOpen = false;
     this.router.navigateByUrl('/lock');
   }
+  // stato submenu
+  patientsOpen = false;
+  patientsOpenMobile = false;
 
+  togglePatients() {
+    if (this.isCollapsed) {
+      // con sidebar collassata, vai direttamente alla lista
+      this.router.navigate(['/patients']);
+      return;
+    }
+    this.patientsOpen = !this.patientsOpen;
+  }
+
+  closeSubmenus() {
+    this.patientsOpen = false;
+  }
+
+  closeMobileMenu() {
+    this.patientsOpenMobile = false;
+    this.menuOpen = false; // già presente nel tuo componente
+  }
 
 
 }

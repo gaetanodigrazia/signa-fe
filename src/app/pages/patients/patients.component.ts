@@ -1,8 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PatientService } from 'src/app/service/patient.service';
 import { PatientDto, CreatePatientDto } from 'src/app/model/patient.model';
+import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { map, distinctUntilChanged } from 'rxjs/operators';
+
+/** Stato filtro pazienti da query param */
+type PatientStatus = 'active' | 'inactive' | 'all';
 
 @Component({
   selector: 'app-patients',
@@ -11,7 +17,7 @@ import { PatientDto, CreatePatientDto } from 'src/app/model/patient.model';
   templateUrl: './patients.component.html',
   styleUrls: ['./patients.component.scss']
 })
-export class PatientsComponent implements OnInit {
+export class PatientsComponent implements OnInit, OnDestroy {
   /* Data */
   patients: PatientDto[] = [];
   filtered: PatientDto[] = [];
@@ -44,10 +50,34 @@ export class PatientsComponent implements OnInit {
   };
   submitted = false; // mostra gli errori solo dopo il primo submit
 
-  constructor(private patientSvc: PatientService) { }
+  /** Stato corrente preso dall'URL (?status=...) */
+  status: PatientStatus = 'active';
+  /** Subscription ai query param per aggiornare lo stato */
+  private sub?: Subscription;
+
+  constructor(
+    private patientSvc: PatientService,
+    private route: ActivatedRoute
+  ) { }
 
   ngOnInit(): void {
+    // Caricamento iniziale (fallback)
     this.load();
+
+    // Ascolta i query params e ricarica quando cambia ?status=
+    this.sub = this.route.queryParamMap
+      .pipe(
+        map(q => (q.get('status') as PatientStatus) || 'active'),
+        distinctUntilChanged()
+      )
+      .subscribe(st => {
+        this.status = st;
+        this.load();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
   }
 
   /* Utils */
@@ -58,7 +88,7 @@ export class PatientsComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.patientSvc.findAll().subscribe({
+    this.patientSvc.findAll(this.status).subscribe({
       next: (list) => {
         this.patients = list ?? [];
         this.applyFilter();

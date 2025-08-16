@@ -17,10 +17,27 @@
       <span class="icon">🏠</span>
       <span class="text" *ngIf="!isCollapsed">Home</span>
     </a>
-    <a routerLink="/patients">
-      <span class="icon">👥​</span>
-      <span class="text" *ngIf="!isCollapsed">Pazienti</span>
-    </a><a routerLink="/users">
+    <div class="menu-group" [class.open]="patientsOpen">
+      <button class="menu-parent" (click)="togglePatients()" [attr.aria-expanded]="patientsOpen"
+        aria-controls="patients-submenu">
+        <span class="icon">👥</span>
+        <span class="text" *ngIf="!isCollapsed">Pazienti</span>
+        <span class="chevron" *ngIf="!isCollapsed" [class.rot]="patientsOpen">▾</span>
+      </button>
+
+      <!-- Submenu visibile solo quando la sidebar non è collassata -->
+      <div id="patients-submenu" class="submenu" *ngIf="patientsOpen && !isCollapsed">
+        <a [routerLink]="['/patients']" [queryParams]="{ status: 'active' }" queryParamsHandling="merge"
+          [class.active]="(status$ | async) === 'active'" (click)="closeSubmenus()">Attivi</a>
+
+        <a [routerLink]="['/patients']" [queryParams]="{ status: 'inactive' }" queryParamsHandling="merge"
+          [class.active]="(status$ | async) === 'inactive'" (click)="closeSubmenus()">Disattivi</a>
+      </div>
+
+    </div>
+
+
+    <a routerLink="/users">
       <span class="icon">👥​</span>
       <span class="text" *ngIf="!isCollapsed">Utenti</span>
     </a>
@@ -54,7 +71,21 @@
 <aside *ngIf="isMobile && menuOpen" class="sidebar mobile open">
   <nav>
     <a routerLink="/home" (click)="menuOpen = false">🏠 Home</a>
-    <a routerLink="/patients" (click)="menuOpen = false">👥​ Pazienti</a>
+    <div class="menu-group" [class.open]="patientsOpenMobile">
+      <button class="menu-parent" (click)="patientsOpenMobile = !patientsOpenMobile"
+        [attr.aria-expanded]="patientsOpenMobile" aria-controls="patients-submenu-m">
+        👥 Pazienti <span class="chevron" [class.rot]="patientsOpenMobile">▾</span>
+      </button>
+
+      <div id="patients-submenu-m" class="submenu" *ngIf="patientsOpenMobile">
+        <a [routerLink]="['/patients']" [queryParams]="{ status: 'active' }" queryParamsHandling="merge"
+          [class.active]="(status$ | async) === 'active'" (click)="closeMobileMenu()">Attivi</a>
+
+        <a [routerLink]="['/patients']" [queryParams]="{ status: 'inactive' }" queryParamsHandling="merge"
+          [class.active]="(status$ | async) === 'inactive'" (click)="closeMobileMenu()">Disattivi</a>
+      </div>
+
+    </div>
     <a routerLink="/users" (click)="menuOpen = false">👥​ Utenti</a>
     <a routerLink="/archive" (click)="menuOpen = false">🗃️​ Archivio</a>
     <a routerLink="/calendar" (click)="menuOpen = false">📆 Calendar</a>

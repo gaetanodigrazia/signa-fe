@@ -316,3 +316,194 @@
     height: calc(-webkit-fill-available - 60px);
   }
 }
+
+.sidebar nav {
+  .menu-group {
+    display: block;
+
+    .menu-parent {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      background: transparent;
+      border: 0;
+      padding: .6rem .8rem;
+      cursor: pointer;
+      text-align: left;
+
+      .icon {
+        width: 1.4rem;
+        display: inline-flex;
+        justify-content: center;
+      }
+
+      .text {
+        flex: 1;
+      }
+
+      .chevron {
+        transition: transform .15s ease;
+      }
+
+      .chevron.rot {
+        transform: rotate(180deg);
+      }
+    }
+
+    .submenu {
+      display: flex;
+      flex-direction: column;
+      margin-left: 2.2rem; // indent rispetto all’icona
+      padding-left: .4rem;
+      border-left: 1px solid rgba(0, 0, 0, .08);
+
+      a {
+        padding: .35rem .4rem;
+        text-decoration: none;
+      }
+
+      a.active {
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+/* Mobile sidebar può condividere le stesse classi,
+   eventualmente riduci i margini se necessario */
+.sidebar.mobile nav .menu-group .submenu {
+  margin-left: .8rem;
+  border-left: none;
+}
+
+/* === SOTTOMENU PAZIENTI (stile identico agli altri item) === */
+.sidebar nav {
+  .menu-group {
+    display: block;
+
+    /* Il "genitore" si comporta come un link della sidebar */
+    .menu-parent {
+      color: #e5e7eb;
+      text-decoration: none;
+      font-weight: 400;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin: .5rem 0;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      text-align: left;
+      transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+      /* aggiunte per allineare allo stile dei link */
+      appearance: none;
+      -webkit-appearance: none;
+      font: inherit;
+      /* eredita family, size, weight, line-height */
+      color: inherit;
+      font-weight: 400;
+      /* uguale a nav a { font-weight: 400 } */
+      line-height: inherit;
+      /* evita differenze verticali */
+
+      .icon {
+        width: 24px;
+        display: inline-flex;
+        justify-content: center;
+        line-height: 1;
+      }
+
+      .text {
+        flex: 1;
+      }
+
+      .chevron {
+        margin-left: auto;
+        transition: transform .15s ease;
+      }
+
+      .chevron.rot {
+        transform: rotate(180deg);
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, .08);
+        color: #fff;
+      }
+    }
+
+    /* Stato "aperto" = stesso highlight dell'active/hover */
+    &.open .menu-parent {
+      background: rgba(255, 255, 255, .08);
+      color: #fff;
+    }
+
+    /* Voci del sottomenu con stile link coerente ma più compatto */
+    .submenu {
+      display: flex;
+      flex-direction: column;
+      margin-left: 2.2rem;
+      /* indent rispetto all’icona */
+      padding-left: .4rem;
+      border-left: 1px solid rgba(255, 255, 255, .08);
+
+      a {
+        color: #e5e7eb;
+        text-decoration: none;
+        font-weight: 400;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin: .25rem 0;
+        padding: 6px 10px;
+        border-radius: 8px;
+        transition: background .2s ease, color .2s ease;
+
+        &:hover,
+        &.active {
+          background: rgba(255, 255, 255, .08);
+          color: #fff;
+        }
+      }
+    }
+  }
+}
+
+/* Collassata: mantieni allineamento/icone come gli altri item */
+.sidebar.collapsed {
+  nav {
+    .menu-group {
+      .menu-parent {
+        justify-content: center;
+        gap: 0;
+        padding-left: 0;
+        padding-right: 0;
+
+        .icon {
+          width: 24px;
+          margin: 0 auto;
+        }
+
+        .text,
+        .chevron {
+          display: none;
+        }
+      }
+
+      /* Nessun sottomenu visibile in collapsed */
+      .submenu {
+        display: none !important;
+      }
+    }
+  }
+}
+
+/* Mobile: margini più stretti e niente bordo sinistro */
+.sidebar.mobile nav .menu-group .submenu {
+  margin-left: .8rem;
+  border-left: none;
+}
