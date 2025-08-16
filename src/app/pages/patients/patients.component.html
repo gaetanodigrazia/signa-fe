@@ -26,7 +26,7 @@
                 <tr *ngFor="let p of filtered; trackBy: trackByUuid">
                     <td><button class="linklike" (click)="view(p)">{{ p.firstname }} {{ p.lastname }}</button></td>
                     <td>{{ p.email }}</td>
-                    <td>{{ p.SSN }}</td>
+                    <td>{{ p.SSN || p.ssn }}</td>
                     <td>{{ p.dateOfBirth | date: 'd MMM y' }}</td>
                     <td>{{ p.address }}</td>
                     <td class="actions">
@@ -142,7 +142,7 @@
         <div class="details" *ngIf="viewing as v">
             <div><strong>Nome:</strong> {{ v.firstname }} {{ v.lastname }}</div>
             <div><strong>Email:</strong> {{ v.email }}</div>
-            <div><strong>CF:</strong> {{ v.SSN || 'n/d' }}</div>
+            <div><strong>CF:</strong> {{ v.SSN || v.ssn || 'n/d' }}</div>
             <div><strong>Nascita:</strong> {{ v.dateOfBirth | date:'EEE d MMM y' }}</div>
             <div><strong>Indirizzo:</strong> {{ v.address || '—' }}</div>
         </div>
