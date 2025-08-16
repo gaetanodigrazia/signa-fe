@@ -55,4 +55,10 @@ export class PatientService {
     remove(patientId: string): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/${patientId}`);
     }
+
+    setActive(id: string, status: boolean) {
+        const active = status ? 'true' : 'false';
+        return this.http.patch<void>(`${this.baseUrl}/${id}/${active}`, null);
+    }
+
 }

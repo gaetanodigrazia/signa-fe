@@ -243,4 +243,43 @@ export class PatientsComponent implements OnInit, OnDestroy {
   private readError(err: any, fallback: string): string {
     return err?.error?.message || err?.message || fallback;
   }
+
+  changingStatus = false;
+
+  activate(p: PatientDto): void {
+    if (this.changingStatus) return;
+    this.changingStatus = true;
+    this.error = null;
+
+    this.patientSvc.setActive(p.uuid, true).subscribe({
+      next: () => {
+        this.changingStatus = false;
+        this.load(); // ricarica la lista con lo status corrente
+      },
+      error: (err) => {
+        console.error('activate patient error', err);
+        this.error = this.readError(err, 'Errore durante l’attivazione del paziente');
+        this.changingStatus = false;
+      }
+    });
+  }
+
+  deactivate(p: PatientDto): void {
+    if (this.changingStatus) return;
+    this.changingStatus = true;
+    this.error = null;
+
+    this.patientSvc.setActive(p.uuid, false).subscribe({
+      next: () => {
+        this.changingStatus = false;
+        this.load();
+      },
+      error: (err) => {
+        console.error('deactivate patient error', err);
+        this.error = this.readError(err, 'Errore durante la disattivazione del paziente');
+        this.changingStatus = false;
+      }
+    });
+  }
+
 }
