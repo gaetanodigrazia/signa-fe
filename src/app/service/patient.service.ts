@@ -36,9 +36,8 @@ export class PatientService {
 
         return this.http.get<PatientDto[]>(this.baseUrl + "/status", { params });
     }
-    /** CREATE: prende il form/DTO dal component e lo mappa nel body per l'API */
     create(dto: CreatePatientDto): Observable<PatientDto> {
-        const body = this.toApi(dto, { includeSSN: true });  // in create lo mandiamo sempre
+        const body = this.toApi(dto, { includeSSN: true });
         return this.http.post<PatientDto>(this.baseUrl, body);
     }
 

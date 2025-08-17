@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PatientService } from 'src/app/service/patient.service';
 import { PatientDto, CreatePatientDto, PatientForm, PatientStatus } from 'src/app/model/patient.model';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { map, distinctUntilChanged } from 'rxjs/operators';
 
@@ -62,8 +62,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
 
   constructor(
     private patientSvc: PatientService,
-    private route: ActivatedRoute
-  ) { }
+    private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
     // Caricamento iniziale
@@ -223,7 +222,6 @@ export class PatientsComponent implements OnInit, OnDestroy {
       active: f.active !== false
     };
 
-    console.log("SSN ON CREATE: ", f.ssn);
     const req$ = this.editing
       ? this.patientSvc.update(this.editing.id, payload)
       : this.patientSvc.create(payload);
@@ -233,7 +231,17 @@ export class PatientsComponent implements OnInit, OnDestroy {
         this.saving = false;
         this.modalVisible = false;
         this.editing = null;
-        this.load();
+
+        if (this.status !== 'active') {
+          // cambia solo il query param status; il tuo subscribe ai query params farà il load()
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { status: 'active' },
+            queryParamsHandling: 'merge'
+          });
+        } else {
+          this.load();
+        }
       },
       error: (err) => {
         console.error('save patient error', err);
