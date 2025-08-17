@@ -2,13 +2,10 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PatientService } from 'src/app/service/patient.service';
-import { PatientDto, CreatePatientDto } from 'src/app/model/patient.model';
+import { PatientDto, CreatePatientDto, PatientForm, PatientStatus } from 'src/app/model/patient.model';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { map, distinctUntilChanged } from 'rxjs/operators';
-
-/** Stato filtro pazienti da query param */
-type PatientStatus = 'active' | 'inactive' | 'all';
 
 @Component({
   selector: 'app-patients',
@@ -18,42 +15,48 @@ type PatientStatus = 'active' | 'inactive' | 'all';
   styleUrls: ['./patients.component.scss']
 })
 export class PatientsComponent implements OnInit, OnDestroy {
-  /* Data */
-  patients: PatientDto[] = [];
-  filtered: PatientDto[] = [];
 
   /* UI state */
   loading = false;
   saving = false;
   deleting = false;
+  changingStatus = false;
   error: string | null = null;
+
+  /* Search & filter */
   search = '';
+  status: PatientStatus = 'active';
+
+  /* Today for max date */
+  today = new Date().toISOString().slice(0, 10);
+
+  /* Data */
+  patients: PatientDto[] = [];
+  filtered: PatientDto[] = [];
 
   /* Modals */
-  modalVisible = false;     // create/edit
-  detailsVisible = false;   // view
-  confirmVisible = false;   // delete confirm
+  modalVisible = false;   // create/edit
+  detailsVisible = false; // view
+  confirmVisible = false; // delete confirm
 
   /* Current selection */
   viewing: PatientDto | null = null;
   editing: PatientDto | null = null;
   toDelete: PatientDto | null = null;
 
-  /* Form model */
-  form: CreatePatientDto = {
+  /* Form model (UI) */
+  form: PatientForm = {
     firstname: '',
     lastname: '',
     email: '',
     address: '',
-    SSN: '',
-    dateOfBirth: '', // ISO yyyy-MM-dd
+    phone: '',
+    ssn: '',
+    dateOfBirth: '',
     active: true
-
   };
-  submitted = false; // mostra gli errori solo dopo il primo submit
+  submitted = false;
 
-  /** Stato corrente preso dall'URL (?status=...) */
-  status: PatientStatus = 'active';
   /** Subscription ai query param per aggiornare lo stato */
   private sub?: Subscription;
 
@@ -63,10 +66,10 @@ export class PatientsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    // Caricamento iniziale (fallback)
+    // Caricamento iniziale
     this.load();
 
-    // Ascolta i query params e ricarica quando cambia ?status=
+    // Ricarica quando cambia ?status=
     this.sub = this.route.queryParamMap
       .pipe(
         map(q => (q.get('status') as PatientStatus) || 'active'),
@@ -82,68 +85,83 @@ export class PatientsComponent implements OnInit, OnDestroy {
     this.sub?.unsubscribe();
   }
 
-  /* Utils */
-  trackByUuid(_i: number, p: PatientDto): string { return p.id; }
-
-  /* Load + filter */
+  /** Carica lista pazienti (server) e normalizza */
   load(): void {
     this.loading = true;
     this.error = null;
 
     this.patientSvc.findAllWithStatus(this.status).subscribe({
-      next: (list) => {
-        // Normalizza active anche se arriva come string/number
-        this.patients = (list ?? []).map(p => ({
-          ...p,
-          active: typeof p.active === 'boolean'
-            ? p.active
-            : String((p as any).active).toLowerCase() === 'true'
-        }));
+      next: (list: any[]) => {
+        const arr = Array.isArray(list) ? list : [];
+        this.patients = arr.map(raw => this.normalize(raw));
         this.applyFilter();
         this.loading = false;
-        console.log('Result', list);
       },
       error: (err) => {
-        this.error = this.readError(err, 'Errore durante il caricamento dei pazienti');
+        console.error('findAll patients error', err);
+        this.error = this.readError(err, 'Errore nel caricamento pazienti');
         this.loading = false;
       }
     });
   }
 
+  /** Normalizza proprietà provenienti dal backend */
+  private normalize(raw: any): PatientDto {
+    const active =
+      typeof raw.active === 'boolean' ? raw.active :
+        typeof raw.Active === 'boolean' ? raw.Active :
+          String(raw.active ?? raw.Active ?? 'true').toLowerCase() === 'true';
+
+    return {
+      id: raw.id,
+      firstname: raw.firstname ?? raw.first_name ?? '',
+      lastname: raw.lastname ?? raw.last_name ?? '',
+      email: raw.email ?? '',
+      address: raw.address ?? '',
+      phone: raw.phone ?? null,
+      SSN: raw.SSN ?? raw.ssn ?? '',
+      dateOfBirth: raw.dateOfBirth ?? raw.date_of_birth ?? '',
+      active
+    };
+  }
+
+  /** Applica filtro per stato e ricerca */
   applyFilter(): void {
-    const q = (this.search ?? '').trim().toLowerCase();
+    const q = (this.search || '').trim().toLowerCase();
 
-    // 1) filtro per stato
-    const filteredByStatus =
-      this.status === 'all'
-        ? this.patients
-        : this.patients.filter(p => p.active === (this.status === 'active'));
+    const byStatus = this.status === 'all'
+      ? this.patients
+      : this.patients.filter(p => p.active === (this.status === 'active'));
 
-    // 2) filtro per ricerca
     if (!q) {
-      this.filtered = [...filteredByStatus];
+      this.filtered = [...byStatus];
       return;
     }
 
-    this.filtered = filteredByStatus.filter(p => {
-      const name = `${p.firstname ?? ''} ${p.lastname ?? ''}`.trim();
-      return [
-        name, p.firstname ?? '', p.lastname ?? '', p.email ?? '',
-        p.address ?? '', (p as any).SSN ?? '', p.dateOfBirth ?? ''
-      ].join(' ').toLowerCase().includes(q);
+    this.filtered = byStatus.filter(p => {
+      const hay = [
+        p.firstname, p.lastname, p.email, p.address, p.phone ?? '',
+        (p as any).SSN ?? (p as any).ssn ?? '',
+        p.dateOfBirth ?? ''
+      ].join(' ').toLowerCase();
+      return hay.includes(q);
     });
   }
 
-
-  /* Table actions */
-  view(p: PatientDto): void {
-    this.viewing = p;
-    this.detailsVisible = true;
-  }
+  /* ===== Modali ===== */
 
   openNew(): void {
     this.editing = null;
-    this.form = { firstname: '', lastname: '', email: '', address: '', SSN: '', dateOfBirth: '', active: true };
+    this.form = {
+      firstname: '',
+      lastname: '',
+      email: '',
+      address: '',
+      phone: '',
+      ssn: '',
+      dateOfBirth: '',
+      active: true
+    };
     this.submitted = false;
     this.modalVisible = true;
   }
@@ -151,17 +169,81 @@ export class PatientsComponent implements OnInit, OnDestroy {
   edit(p: PatientDto): void {
     this.editing = p;
     this.form = {
+      id: p.id,
       firstname: p.firstname ?? '',
       lastname: p.lastname ?? '',
       email: p.email ?? '',
       address: p.address ?? '',
-      SSN: (p as any).SSN ?? (p as any).ssn ?? '',
+      phone: p.phone ?? '',
+      ssn: (p as any).ssn ?? (p as any).SSN ?? '',
       dateOfBirth: p.dateOfBirth ?? '',
-      active: true
+      active: p.active !== false
     };
     this.submitted = false;
     this.modalVisible = true;
   }
+
+  view(p: PatientDto): void {
+    this.viewing = p;
+    this.detailsVisible = true;
+  }
+
+  closeDetails(): void {
+    this.viewing = null;
+    this.detailsVisible = false;
+  }
+
+  cancelModal(): void {
+    if (this.saving) return;
+    this.modalVisible = false;
+    this.editing = null;
+  }
+
+  isFormValid(): boolean {
+    const f = this.form;
+    return !!(f.firstname && f.lastname && f.email && f.dateOfBirth);
+  }
+
+  save(): void {
+    this.submitted = true;
+    if (!this.isFormValid()) return;
+    if (this.saving) return;
+
+    this.saving = true;
+    const f = this.form;
+
+    const payload: CreatePatientDto = {
+      firstname: f.firstname.trim(),
+      lastname: f.lastname.trim(),
+      email: f.email.trim(),
+      address: f.address?.trim() || null,
+      phone: f.phone?.trim() || null,
+      SSN: f.ssn ? f.ssn.toUpperCase().trim() : null,
+      dateOfBirth: f.dateOfBirth || '',
+      active: f.active !== false
+    };
+
+    console.log("SSN ON CREATE: ", f.ssn);
+    const req$ = this.editing
+      ? this.patientSvc.update(this.editing.id, payload)
+      : this.patientSvc.create(payload);
+
+    req$.subscribe({
+      next: () => {
+        this.saving = false;
+        this.modalVisible = false;
+        this.editing = null;
+        this.load();
+      },
+      error: (err) => {
+        console.error('save patient error', err);
+        this.error = this.readError(err, 'Errore durante il salvataggio del paziente');
+        this.saving = false;
+      }
+    });
+  }
+
+  /* ===== Delete ===== */
 
   askDelete(p: PatientDto): void {
     this.toDelete = p;
@@ -187,94 +269,16 @@ export class PatientsComponent implements OnInit, OnDestroy {
     });
   }
 
-  /* Create / Update */
-  save(): void {
-    this.submitted = true;
-    if (!this.isFormValid()) return;
-    if (this.saving) return;
-
-    this.saving = true;
-    const f = this.form;
-
-    const payload: CreatePatientDto = {
-      firstname: f.firstname.trim(),
-      lastname: f.lastname.trim(),
-      email: f.email.trim(),
-      address: f.address?.trim() || '',
-      SSN: f.SSN?.trim() || '',
-      dateOfBirth: f.dateOfBirth || '',
-      active: true
-    };
-
-    const req$ = this.editing
-      ? this.patientSvc.update(this.editing.id, payload)   // <-- UPDATE
-      : this.patientSvc.create(payload);                     // <-- CREATE
-
-    req$.subscribe({
-      next: () => {
-        this.saving = false;
-        this.modalVisible = false;
-        this.editing = null;
-        this.submitted = false;
-        this.load();
-      },
-      error: (err) => {
-        console.error('save patient error', err);
-        this.error = this.readError(err, 'Errore nel salvataggio del paziente');
-        this.saving = false;
-      }
-    });
-  }
-
-  /* Modal controls */
-  cancelModal(): void {
-    this.modalVisible = false;
-    this.editing = null;
-    this.submitted = false;
-  }
-
-  closeDetails(): void {
-    this.detailsVisible = false;
-    this.viewing = null;
-  }
-
-  /* Validation helpers */
-  private isFormValid(): boolean {
-    const f = this.form;
-
-    // Nome, cognome, email obbligatori
-    if (!f.firstname?.trim() || !f.lastname?.trim() || !f.email?.trim()) return false;
-
-    // Email valida
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email);
-    if (!emailOk) return false;
-
-    // Data di nascita obbligatoria e in formato valido
-    if (!f.dateOfBirth?.trim()) return false;
-    const dateOk = /^\d{4}-\d{2}-\d{2}$/.test(f.dateOfBirth);
-    if (!dateOk) return false;
-
-    // CF opzionale, ma se presente deve essere 11–16 alfanumerici
-    if (f.SSN && !/^[A-Za-z0-9]{11,16}$/.test(f.SSN)) return false;
-
-    return true;
-  }
-
-  private readError(err: any, fallback: string): string {
-    return err?.error?.message || err?.message || fallback;
-  }
-
-  changingStatus = false;
+  /* ===== Attiva/Disattiva ===== */
 
   activate(p: PatientDto): void {
     if (this.changingStatus) return;
     this.changingStatus = true;
-    this.error = null;
 
     this.patientSvc.setActive(p.id, true).subscribe({
       next: () => {
         this.changingStatus = false;
-        this.load(); // ricarica la lista con lo status corrente
+        this.load();
       },
       error: (err) => {
         console.error('activate patient error', err);
@@ -287,7 +291,6 @@ export class PatientsComponent implements OnInit, OnDestroy {
   deactivate(p: PatientDto): void {
     if (this.changingStatus) return;
     this.changingStatus = true;
-    this.error = null;
 
     this.patientSvc.setActive(p.id, false).subscribe({
       next: () => {
@@ -302,4 +305,12 @@ export class PatientsComponent implements OnInit, OnDestroy {
     });
   }
 
+  /* ===== Utils ===== */
+
+  trackByUuid(_idx: number, item: PatientDto): string { return item.id; }
+
+  private readError(err: any, fallback: string): string {
+    const msg = err?.error?.message || err?.message || fallback;
+    return String(msg);
+  }
 }

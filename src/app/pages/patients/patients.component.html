@@ -16,6 +16,7 @@
                 <tr>
                     <th>Nome</th>
                     <th>Email</th>
+                    <th>Telefono</th>
                     <th>CF</th>
                     <th>Data di nascita</th>
                     <th>Indirizzo</th>
@@ -26,6 +27,7 @@
                 <tr *ngFor="let p of filtered; trackBy: trackByUuid">
                     <td><button class="linklike" (click)="view(p)">{{ p.firstname }} {{ p.lastname }}</button></td>
                     <td>{{ p.email }}</td>
+                    <td>{{ p.phone || '—' }}</td>
                     <td>{{ p.SSN || p.ssn }}</td>
                     <td>{{ p.dateOfBirth | date: 'd MMM y' }}</td>
                     <td>{{ p.address }}</td>
@@ -97,10 +99,21 @@
                 </div>
             </label>
 
+
+            <!-- Telefono (opzionale con pattern) -->
+            <label>
+                <span>Telefono</span>
+                <input name="phone" [(ngModel)]="form.phone" pattern="^[+0-9 ().-]{6,20}$" #phone="ngModel"
+                    autocomplete="tel" />
+                <div class="error" *ngIf="(submitted || phone.touched) && phone.errors?.['pattern']">
+                    Inserisci un numero valido.
+                </div>
+            </label>
+
             <!-- Codice Fiscale (opzionale con pattern) -->
             <label>
                 <span>Codice Fiscale</span>
-                <input name="ssn" [(ngModel)]="form.SSN" pattern="[A-Za-z0-9]{11,16}" #ssn="ngModel"
+                <input name="ssn" [(ngModel)]="form.ssn" pattern="[A-Za-z0-9]{11,16}" #ssn="ngModel"
                     autocomplete="off" />
                 <div class="error" *ngIf="(submitted || ssn.touched) && ssn.errors?.['pattern']">
                     Formato codice fiscale non valido.
@@ -142,6 +155,7 @@
         <div class="details" *ngIf="viewing as v">
             <div><strong>Nome:</strong> {{ v.firstname }} {{ v.lastname }}</div>
             <div><strong>Email:</strong> {{ v.email }}</div>
+            <div><strong>Telefono:</strong> {{ v.phone || '—' }}</div>
             <div><strong>CF:</strong> {{ v.SSN || v.ssn || 'n/d' }}</div>
             <div><strong>Nascita:</strong> {{ v.dateOfBirth | date:'EEE d MMM y' }}</div>
             <div><strong>Indirizzo:</strong> {{ v.address || '—' }}</div>
