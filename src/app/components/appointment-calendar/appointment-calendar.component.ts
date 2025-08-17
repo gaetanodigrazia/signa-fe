@@ -52,7 +52,8 @@ export class AppointmentCalendarComponent implements OnInit {
     email: '',
     address: '',
     SSN: '',
-    dateOfBirth: '' // ISO 'YYYY-MM-DD'
+    dateOfBirth: '', // ISO 'YYYY-MM-DD',
+    active: true
   };
 
   /* ------- Patient picker (input + dropdown) ------- */
@@ -87,7 +88,7 @@ export class AppointmentCalendarComponent implements OnInit {
 
   getPatientLabel(id: string | null): string {
     if (!id) return '—';
-    const p = this.patients.find(x => x.uuid === id);
+    const p = this.patients.find(x => x.id === id);
     if (!p) return '—';
     const fullName = [p.firstname, p.lastname].filter(Boolean).join(' ');
     return `${fullName || 'Senza nome'} — ${p.email || 'n/d'}`;
@@ -95,7 +96,7 @@ export class AppointmentCalendarComponent implements OnInit {
 
   /* ---------- Nuovo paziente (modale) ---------- */
   openNewPatientModal(): void {
-    this.newPatient = { firstname: '', lastname: '', email: '', address: '', SSN: '', dateOfBirth: '' };
+    this.newPatient = { firstname: '', lastname: '', email: '', address: '', SSN: '', dateOfBirth: '', active: true };
     this.newPatientModalVisible = true;
   }
   cancelNewPatient(): void {
@@ -119,13 +120,14 @@ export class AppointmentCalendarComponent implements OnInit {
       email: p.email.trim(),
       address: p.address?.trim() ?? '',
       SSN: p.SSN?.trim() ?? '',
-      dateOfBirth: p.dateOfBirth?.trim() ?? ''
+      dateOfBirth: p.dateOfBirth?.trim() ?? '',
+      active: true
     }).subscribe({
       next: (created) => {
         // aggiorna lista e seleziona nel picker
         this.loadPatients();
-        this.modalData.patientId = created.uuid;
-        this.userSearch = this.getPatientLabel(created.uuid);
+        this.modalData.patientId = created.id;
+        this.userSearch = this.getPatientLabel(created.id);
         this.newPatientModalVisible = false;
       },
       error: (err) => {
@@ -180,7 +182,7 @@ export class AppointmentCalendarComponent implements OnInit {
     }
   }
   selectPatient(p: PatientDto): void {
-    this.modalData.patientId = p.uuid;
+    this.modalData.patientId = p.id;
     const fullName = [p.firstname, p.lastname].filter(Boolean).join(' ');
     this.userSearch = `${fullName || 'Senza nome'} — ${p.email || 'n/d'}`;
     this.userListOpen = false;

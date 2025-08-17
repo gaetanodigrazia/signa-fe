@@ -31,7 +31,7 @@ export class ArchivioComponent implements OnInit {
 
   ngOnInit(): void { this.load(); }
 
-  trackByUuid(_i: number, p: PatientDto): string { return p.uuid; }
+  trackByUuid(_i: number, p: PatientDto): string { return p.id; }
 
   load(): void {
     this.loading = true;
@@ -70,7 +70,7 @@ export class ArchivioComponent implements OnInit {
     this.historyLoading = true;
     this.historyError = null;
 
-    this.archiveSvc.getHistory(p.uuid).subscribe({
+    this.archiveSvc.getHistory(p.id).subscribe({
       next: (items) => {
         this.history = items ?? [];
         this.historyLoading = false;

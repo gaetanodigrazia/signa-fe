@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule, Routes } from '@angular/router';
 import { AppComponent } from './app.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { HomeComponent } from './pages/home/home.component';
@@ -13,14 +12,12 @@ import { AppointmentCalendarComponent } from './components/appointment-calendar/
 import { FormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { LockScreenComponent } from './components/shared/lock-screen/lock-screen.component';
-import { authGuard } from './auth/guard/authGuard.guard';
 import { LoginComponent } from './pages/login/login.component';
-import { UsersComponent } from './pages/users/users.component';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthInterceptor } from './auth/auth.interceptor';
-import { PatientsComponent } from './pages/patients/patients.component';
-import { ArchivioComponent } from './pages/archivio/archivio.component';
 import { AppRoutingModule } from './config/app-routing.module';
+import { ErrorModalComponent } from './components/shared/error-modal/error-modal.component';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 
 
@@ -34,6 +31,7 @@ import { AppRoutingModule } from './config/app-routing.module';
     LockScreenComponent,
     LoginComponent],
   imports: [
+    ErrorModalComponent,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
@@ -48,6 +46,7 @@ import { AppRoutingModule } from './config/app-routing.module';
   ],
   bootstrap: [AppComponent],
   providers: [
+    provideHttpClient(withInterceptorsFromDi()),
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ]
 })

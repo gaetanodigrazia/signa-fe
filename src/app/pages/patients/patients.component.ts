@@ -46,7 +46,9 @@ export class PatientsComponent implements OnInit, OnDestroy {
     email: '',
     address: '',
     SSN: '',
-    dateOfBirth: '' // ISO yyyy-MM-dd
+    dateOfBirth: '', // ISO yyyy-MM-dd
+    active: true
+
   };
   submitted = false; // mostra gli errori solo dopo il primo submit
 
@@ -81,7 +83,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
   }
 
   /* Utils */
-  trackByUuid(_i: number, p: PatientDto): string { return p.uuid; }
+  trackByUuid(_i: number, p: PatientDto): string { return p.id; }
 
   /* Load + filter */
   load(): void {
@@ -90,33 +92,48 @@ export class PatientsComponent implements OnInit, OnDestroy {
 
     this.patientSvc.findAllWithStatus(this.status).subscribe({
       next: (list) => {
-        this.patients = list ?? [];
+        // Normalizza active anche se arriva come string/number
+        this.patients = (list ?? []).map(p => ({
+          ...p,
+          active: typeof p.active === 'boolean'
+            ? p.active
+            : String((p as any).active).toLowerCase() === 'true'
+        }));
         this.applyFilter();
         this.loading = false;
-        console.log("Result ", list);
+        console.log('Result', list);
       },
       error: (err) => {
-        console.error('findAll patients error', err);
-        this.error = this.readError(err, 'Errore nel caricamento pazienti');
+        this.error = this.readError(err, 'Errore durante il caricamento dei pazienti');
         this.loading = false;
       }
     });
   }
 
   applyFilter(): void {
-    const q = this.search.trim().toLowerCase();
+    const q = (this.search ?? '').trim().toLowerCase();
+
+    // 1) filtro per stato
+    const filteredByStatus =
+      this.status === 'all'
+        ? this.patients
+        : this.patients.filter(p => p.active === (this.status === 'active'));
+
+    // 2) filtro per ricerca
     if (!q) {
-      this.filtered = [...this.patients];
+      this.filtered = [...filteredByStatus];
       return;
     }
-    this.filtered = this.patients.filter(p => {
+
+    this.filtered = filteredByStatus.filter(p => {
       const name = `${p.firstname ?? ''} ${p.lastname ?? ''}`.trim();
       return [
         name, p.firstname ?? '', p.lastname ?? '', p.email ?? '',
-        p.address ?? '', p.SSN ?? '', p.dateOfBirth ?? ''
+        p.address ?? '', (p as any).SSN ?? '', p.dateOfBirth ?? ''
       ].join(' ').toLowerCase().includes(q);
     });
   }
+
 
   /* Table actions */
   view(p: PatientDto): void {
@@ -126,7 +143,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
 
   openNew(): void {
     this.editing = null;
-    this.form = { firstname: '', lastname: '', email: '', address: '', SSN: '', dateOfBirth: '' };
+    this.form = { firstname: '', lastname: '', email: '', address: '', SSN: '', dateOfBirth: '', active: true };
     this.submitted = false;
     this.modalVisible = true;
   }
@@ -139,7 +156,8 @@ export class PatientsComponent implements OnInit, OnDestroy {
       email: p.email ?? '',
       address: p.address ?? '',
       SSN: (p as any).SSN ?? (p as any).ssn ?? '',
-      dateOfBirth: p.dateOfBirth ?? ''
+      dateOfBirth: p.dateOfBirth ?? '',
+      active: true
     };
     this.submitted = false;
     this.modalVisible = true;
@@ -154,7 +172,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
     if (!this.toDelete || this.deleting) return;
     this.deleting = true;
 
-    this.patientSvc.remove(this.toDelete.uuid).subscribe({
+    this.patientSvc.remove(this.toDelete.id).subscribe({
       next: () => {
         this.toDelete = null;
         this.confirmVisible = false;
@@ -184,11 +202,12 @@ export class PatientsComponent implements OnInit, OnDestroy {
       email: f.email.trim(),
       address: f.address?.trim() || '',
       SSN: f.SSN?.trim() || '',
-      dateOfBirth: f.dateOfBirth || ''
+      dateOfBirth: f.dateOfBirth || '',
+      active: true
     };
 
     const req$ = this.editing
-      ? this.patientSvc.update(this.editing.uuid, payload)   // <-- UPDATE
+      ? this.patientSvc.update(this.editing.id, payload)   // <-- UPDATE
       : this.patientSvc.create(payload);                     // <-- CREATE
 
     req$.subscribe({
@@ -252,7 +271,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
     this.changingStatus = true;
     this.error = null;
 
-    this.patientSvc.setActive(p.uuid, true).subscribe({
+    this.patientSvc.setActive(p.id, true).subscribe({
       next: () => {
         this.changingStatus = false;
         this.load(); // ricarica la lista con lo status corrente
@@ -270,7 +289,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
     this.changingStatus = true;
     this.error = null;
 
-    this.patientSvc.setActive(p.uuid, false).subscribe({
+    this.patientSvc.setActive(p.id, false).subscribe({
       next: () => {
         this.changingStatus = false;
         this.load();
