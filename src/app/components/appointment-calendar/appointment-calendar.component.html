@@ -14,6 +14,29 @@
     </div>
   </div>
 
+  <!-- Toolbar calendario -->
+  <div class="cal-toolbar">
+    <div class="left">
+      <button class="btn" (click)="goPrev()">‹</button>
+      <button class="btn" (click)="goToday()">Oggi</button>
+      <button class="btn" (click)="goNext()">›</button>
+      <span class="current-period">{{ viewDate | date: (view === CalendarView.Month ? 'LLLL y' : (view ===
+        CalendarView.Week ? '\'Settimana del\' d MMM y' : 'd MMM y')) }}</span>
+    </div>
+    <div class="right">
+      <label class="status-filter">
+        <span>Stato</span>
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange($event)">
+          <option value="ALL">Tutti</option>
+          <option value="BOOKED">BOOKED</option>
+          <option value="CONFIRMED">CONFIRMED</option>
+          <option value="CLOSED">CLOSED</option>
+          <option value="CANCELLED">CANCELLED</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
   <!-- Calendario -->
   <div class="calendar-wrap">
     <mwl-calendar-month-view *ngIf="view === CalendarView.Month" [viewDate]="viewDate" [events]="events"
@@ -29,6 +52,8 @@
     <mwl-calendar-day-view *ngIf="view === CalendarView.Day" [viewDate]="viewDate" [events]="events" [refresh]="refresh"
       (hourSegmentClicked)="onTimeSlotClick($event.date)" (eventClicked)="openEventDetails($event.event)">
     </mwl-calendar-day-view>
+
+    <div *ngIf="loading" class="loading">Caricamento appuntamenti…</div>
   </div>
 </div>
 
@@ -65,7 +90,6 @@
         <!-- Dropdown risultati -->
         <div class="user-results" *ngIf="userListOpen" [class.open-up]="userListOpenUp"
           [ngStyle]="{ 'max-height.px': userListMaxHeight }">
-
           <button *ngFor="let p of userResults; let i = index" class="user-option" [class.active]="i === highlightIndex"
             (mousedown)="$event.preventDefault()" (click)="selectPatient(p)">
 
@@ -78,9 +102,7 @@
               <small>{{ p.email || 'n/d' }}</small>
               <small>{{ p.SSN || 'CF n/d' }}</small>
             </span>
-
           </button>
-
 
           <div class="empty" *ngIf="userResults.length === 0">Nessun risultato</div>
         </div>
@@ -90,9 +112,11 @@
       <button type="button" class="btn-inline" (click)="openNewPatientModal()" title="Crea nuovo paziente">＋</button>
     </div>
 
-    <div class="modal-actions">
-      <button (click)="saveEvent()">Salva</button>
-      <button (click)="closeModal()">Annulla</button>
+    <div class="actions">
+      <button class="btn primary" [disabled]="saving" (click)="saveAppointment()">
+        {{ editingRef ? 'Salva' : 'Crea appuntamento' }}
+      </button>
+      <button class="btn" (click)="modalVisible=false">Annulla</button>
     </div>
   </div>
 </div>
@@ -156,7 +180,8 @@
         </label>
         <label>
           <span>SSN</span>
-          <input [(ngModel)]="newPatient.ssn" placeholder="RSSMRA80A01F205X" />
+          <!-- ⚠️ maiuscolo: combacia con il TS (CreatePatientDto.SSN) -->
+          <input [(ngModel)]="newPatient.SSN" placeholder="RSSMRA80A01F205X" />
         </label>
       </div>
     </div>
