@@ -3,13 +3,16 @@
   <div class="view-switch">
     <span class="sr-only" id="view-label">Visualizzazione</span>
     <div class="segmented" role="radiogroup" aria-labelledby="view-label">
-      <input type="radio" id="view-month" name="calendarView" [value]="CalendarView.Month" [(ngModel)]="view" />
+      <input type="radio" id="view-month" name="calendarView" [value]="CalendarView.Month" [(ngModel)]="view"
+        (ngModelChange)="onViewChanged()" />
       <label for="view-month">🗓️ <span>Mese</span></label>
 
-      <input type="radio" id="view-week" name="calendarView" [value]="CalendarView.Week" [(ngModel)]="view" />
+      <input type="radio" id="view-week" name="calendarView" [value]="CalendarView.Week" [(ngModel)]="view"
+        (ngModelChange)="onViewChanged()" />
       <label for="view-week">📅 <span>Settimana</span></label>
 
-      <input type="radio" id="view-day" name="calendarView" [value]="CalendarView.Day" [(ngModel)]="view" />
+      <input type="radio" id="view-day" name="calendarView" [value]="CalendarView.Day" [(ngModel)]="view"
+        (ngModelChange)="onViewChanged()" />
       <label for="view-day">🕘 <span>Giorno</span></label>
     </div>
   </div>
@@ -20,8 +23,11 @@
       <button class="btn" (click)="goPrev()">‹</button>
       <button class="btn" (click)="goToday()">Oggi</button>
       <button class="btn" (click)="goNext()">›</button>
-      <span class="current-period">{{ viewDate | date: (view === CalendarView.Month ? 'LLLL y' : (view ===
-        CalendarView.Week ? '\'Settimana del\' d MMM y' : 'd MMM y')) }}</span>
+      <span class="current-period">
+        {{ viewDate | date: (view === CalendarView.Month
+        ? 'LLLL y'
+        : (view === CalendarView.Week ? '\'Settimana del\' d MMM y' : 'd MMM y')) }}
+      </span>
     </div>
     <div class="right">
       <label class="status-filter">
@@ -52,71 +58,53 @@
     <mwl-calendar-day-view *ngIf="view === CalendarView.Day" [viewDate]="viewDate" [events]="events" [refresh]="refresh"
       (hourSegmentClicked)="onTimeSlotClick($event.date)" (eventClicked)="openEventDetails($event.event)">
     </mwl-calendar-day-view>
+  </div>
 
-    <div *ngIf="loading" class="loading">Caricamento appuntamenti…</div>
+  <!-- Overlay caricamento globale (centrato e sopra il calendario) -->
+  <div class="page-loading-overlay" *ngIf="loading" role="status" aria-live="polite" aria-busy="true">
+    <span class="spinner spinner--big" aria-hidden="true"></span>
+    <span class="sr-only">Caricamento appuntamenti…</span>
   </div>
 </div>
 
 <!-- === MODALE EVENTO (CREA / MODIFICA) === -->
 <div class="modal-overlay" *ngIf="modalVisible" (click)="closeModal()">
   <div class="modal" (click)="$event.stopPropagation()">
+
+    <!-- overlay spinner salvataggio -->
+    <div class="spinner-overlay" *ngIf="saving" aria-live="assertive">
+      <span class="spinner" aria-hidden="true"></span>
+      <span class="sr-only">Salvataggio in corso…</span>
+    </div>
+
     <h2>{{ editingRef ? 'Modifica appuntamento' : 'Nuovo appuntamento' }}</h2>
 
     <label for="title">Titolo</label>
-    <input id="title" [(ngModel)]="modalData.title" />
+    <input id="title" [(ngModel)]="modalData.title" [disabled]="saving" />
 
     <label for="description">Descrizione</label>
-    <textarea id="description" rows="3" [(ngModel)]="modalData.description"></textarea>
+    <textarea id="description" rows="3" [(ngModel)]="modalData.description" [disabled]="saving"></textarea>
 
     <div class="row-2">
       <div>
         <label for="startTime">Ora inizio</label>
-        <input id="startTime" type="time" [(ngModel)]="modalData.startTime" />
+        <input id="startTime" type="time" [(ngModel)]="modalData.startTime" [disabled]="saving" />
       </div>
       <div>
         <label for="endTime">Ora fine</label>
-        <input id="endTime" type="time" [(ngModel)]="modalData.endTime" />
+        <input id="endTime" type="time" [(ngModel)]="modalData.endTime" [disabled]="saving" />
       </div>
     </div>
 
     <!-- Paziente -->
-    <label for="patientSearch">Paziente</label>
-    <div class="user-picker">
-      <div #userInputWrap class="user-input-wrap">
-        <input id="patientSearch" type="text" placeholder="Cerca nome o email…" [(ngModel)]="userSearch"
-          (focus)="openUserList()" (input)="onUserSearchChange(userSearch)" (keydown)="onUserInputKeydown($event)"
-          (blur)="closeUserListSoon()" autocomplete="off" />
-
-        <!-- Dropdown risultati -->
-        <div class="user-results" *ngIf="userListOpen" [class.open-up]="userListOpenUp"
-          [ngStyle]="{ 'max-height.px': userListMaxHeight }">
-          <button *ngFor="let p of userResults; let i = index" class="user-option" [class.active]="i === highlightIndex"
-            (mousedown)="$event.preventDefault()" (click)="selectPatient(p)">
-
-            <span class="avatar">
-              {{ (p.firstname?.[0] || '') + (p.lastname?.[0] || '') || (p.email?.[0] || '?') }}
-            </span>
-
-            <span class="meta" style="display:inline-block; padding:2px;">
-              <strong>{{ p.firstname || '?' }} {{ p.lastname || '?' }}</strong>
-              <small>{{ p.email || 'n/d' }}</small>
-              <small>{{ p.SSN || 'CF n/d' }}</small>
-            </span>
-          </button>
-
-          <div class="empty" *ngIf="userResults.length === 0">Nessun risultato</div>
-        </div>
-      </div>
-
-      <!-- Pulsante + per nuovo paziente -->
-      <button type="button" class="btn-inline" (click)="openNewPatientModal()" title="Crea nuovo paziente">＋</button>
-    </div>
+    <app-patient-picker [(model)]="modalData.patientId" (addRequested)="openNewPatientModal()">
+    </app-patient-picker>
 
     <div class="actions">
       <button class="btn primary" [disabled]="saving" (click)="saveAppointment()">
         {{ editingRef ? 'Salva' : 'Crea appuntamento' }}
       </button>
-      <button class="btn" (click)="modalVisible=false">Annulla</button>
+      <button class="btn" [disabled]="saving" (click)="modalVisible=false">Annulla</button>
     </div>
   </div>
 </div>
@@ -137,10 +125,15 @@
       👤 <strong>{{ getPatientLabel(pid) }}</strong>
     </div>
 
+    <!-- inline feedback eliminazione -->
+    <div class="inline-status" *ngIf="deleting">
+      <span class="spinner spinner--inline" aria-hidden="true"></span> Eliminazione in corso…
+    </div>
+
     <div class="modal-actions">
-      <button (click)="editSelected()">Modifica</button>
-      <button class="danger" (click)="deleteSelected()">Elimina</button>
-      <button (click)="closeDetails()">Chiudi</button>
+      <button (click)="editSelected()" [disabled]="deleting">Modifica</button>
+      <button class="danger" (click)="deleteSelected()" [disabled]="deleting">Elimina</button>
+      <button (click)="closeDetails()" [disabled]="deleting">Chiudi</button>
     </div>
   </div>
 </div>
@@ -180,7 +173,6 @@
         </label>
         <label>
           <span>SSN</span>
-          <!-- ⚠️ maiuscolo: combacia con il TS (CreatePatientDto.SSN) -->
           <input [(ngModel)]="newPatient.SSN" placeholder="RSSMRA80A01F205X" />
         </label>
       </div>

@@ -1,0 +1,25 @@
+<div #wrap class="user-input-wrap">
+    <label class="picker-label">Paziente</label>
+    <div class="picker-row">
+        <input type="text" [placeholder]="placeholder" [(ngModel)]="userSearch" (focus)="openList()"
+            (input)="onSearchChange(userSearch)" (keydown)="onKeydown($event)" (blur)="closeListSoon()"
+            autocomplete="off" />
+
+        <button type="button" class="btn-inline" (click)="requestAdd()" title="Crea nuovo paziente">＋</button>
+    </div>
+
+    <div class="user-results" *ngIf="listOpen" [class.open-up]="listOpenUp" [ngStyle]="{ 'max-height.px': listMaxH }">
+        <button *ngFor="let p of results; let i = index" class="user-option" [class.active]="i === highlight"
+            (mousedown)="$event.preventDefault()" (click)="pick(p)">
+            <span class="avatar">
+                {{ (p.firstname?.[0] || '') + (p.lastname?.[0] || '') || (p.email?.[0] || '?') }}
+            </span>
+            <span class="meta">
+                <strong>{{ p.firstname || '?' }} {{ p.lastname || '?' }}</strong>
+                <small>{{ p.email || 'n/d' }}</small>
+                <small>{{ p.SSN || 'CF n/d' }}</small>
+            </span>
+        </button>
+        <div class="empty" *ngIf="results.length === 0">Nessun risultato</div>
+    </div>
+</div>

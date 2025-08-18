@@ -940,3 +940,51 @@ mwl-calendar-day-view {
   color: #6f95cb;
   /* già presente nel tuo file, va bene così */
 }
+
+/* Spinner base (già presente) */
+.spinner {
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+  border: 3px solid rgba(0, 0, 0, 0.15);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner--big {
+  width: 44px;
+  height: 44px;
+  border-width: 4px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Accessibilità: screen-reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Overlay a tutta pagina per caricamento appuntamenti */
+.page-loading-overlay {
+  position: absolute;
+  /* pieno viewport */
+  inset: 0;
+  background: rgba(255, 255, 255, 0.65);
+  display: grid;
+  place-items: center;
+  z-index: 999;
+  /* sopra al calendario, sotto a eventuali modali se hanno z-index maggiore */
+}

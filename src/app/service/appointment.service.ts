@@ -44,4 +44,9 @@ export class AppointmentService {
 
         return this.http.get<AppointmentDTO[]>(this.baseUrl, { params });
     }
+
+    /** Elimina appuntamento */
+    delete(appointmentId: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${appointmentId}`);
+    }
 }

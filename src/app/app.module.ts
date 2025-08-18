@@ -18,6 +18,7 @@ import { AuthInterceptor } from './auth/auth.interceptor';
 import { AppRoutingModule } from './config/app-routing.module';
 import { ErrorModalComponent } from './components/shared/error-modal/error-modal.component';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { PatientPickerComponent } from './components/shared/patient-picker/patient-picker.component';
 
 
 
@@ -29,7 +30,8 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
     SettingsComponent,
     AppointmentCalendarComponent,
     LockScreenComponent,
-    LoginComponent],
+    LoginComponent,
+    PatientPickerComponent],
   imports: [
     ErrorModalComponent,
     BrowserModule,
@@ -43,6 +45,9 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
     }),
     FormsModule,
     HttpClientModule
+  ],
+  exports: [
+    AppointmentCalendarComponent
   ],
   bootstrap: [AppComponent],
   providers: [
