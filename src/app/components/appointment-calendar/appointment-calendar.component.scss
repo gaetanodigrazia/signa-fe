@@ -988,3 +988,227 @@ mwl-calendar-day-view {
   z-index: 999;
   /* sopra al calendario, sotto a eventuali modali se hanno z-index maggiore */
 }
+
+:host {
+  display: block;
+}
+
+.page-wrap {
+  position: relative;
+  padding: 12px 0 0;
+}
+
+/* ===== Segmented switch (Mese/Settimana/Giorno) ===== */
+.view-switch {
+  display: grid;
+  place-items: center;
+  margin: 8px 0 24px;
+}
+
+.segmented {
+  display: inline-flex;
+  gap: 6px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .06);
+}
+
+.segmented input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmented label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+}
+
+.segmented label:hover {
+  background: #f3f4f6;
+}
+
+.segmented input:checked+label {
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, .35);
+}
+
+/* ===== Toolbar calendario ===== */
+.cal-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 4px 0 12px;
+}
+
+.cal-toolbar .left {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cal-toolbar .right {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.current-period {
+  font-weight: 600;
+  color: #111827;
+  letter-spacing: .2px;
+  padding-left: 6px;
+}
+
+/* Pulsanti nav */
+.btn {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #111827;
+  font-weight: 600;
+  line-height: 34px;
+  transition: background .15s ease, box-shadow .15s ease, transform .02s ease;
+}
+
+.btn:hover {
+  background: #f9fafb;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn.primary {
+  background: #2563eb;
+  color: #fff;
+  border-color: transparent;
+}
+
+.btn.primary:hover {
+  filter: brightness(1.04);
+}
+
+/* ===== Dropdown “Stato” ===== */
+.status-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-filter>span {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.status-filter select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  height: 36px;
+  line-height: 36px;
+  padding: 0 36px 0 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  font-weight: 600;
+  color: #111827;
+  cursor: pointer;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 8 10 12 14 8'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+
+.status-filter select:hover {
+  border-color: #d1d5db;
+}
+
+.status-filter select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+}
+
+/* ===== Calendario wrap ===== */
+.calendar-wrap {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ===== Spinner overlay (già integrato) ===== */
+.spinner {
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+  border: 3px solid rgba(0, 0, 0, .15);
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+
+.spinner--big {
+  width: 48px;
+  height: 48px;
+  border-width: 4px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.page-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, .7);
+  display: grid;
+  place-items: center;
+  z-index: 99999;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== Responsive tweaks ===== */
+@media (max-width: 720px) {
+  .current-period {
+    flex-basis: 100%;
+    padding-left: 0;
+    margin-top: 6px;
+  }
+
+  .cal-toolbar {
+    gap: 8px;
+  }
+}
