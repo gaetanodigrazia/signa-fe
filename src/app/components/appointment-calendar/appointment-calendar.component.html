@@ -109,6 +109,8 @@
   </div>
 </div>
 
+<!-- ... header, switch vista, toolbar, calendario, overlay loading (come già hai) ... -->
+
 <!-- === MODALE DETTAGLI EVENTO === -->
 <div class="modal-overlay" *ngIf="detailsVisible" (click)="closeDetails()">
   <div class="modal details" (click)="$event.stopPropagation()">
@@ -125,18 +127,36 @@
       👤 <strong>{{ getPatientLabel(pid) }}</strong>
     </div>
 
+    <!-- Stato appuntamento (PATCH) -->
+    <div class="status-inline">
+      <label>
+        <span>Stato</span>
+        <select [(ngModel)]="statusEdit" [disabled]="statusSaving">
+          <option value="BOOKED">BOOKED</option>
+          <option value="CONFIRMED">CONFIRMED</option>
+          <option value="CLOSED">CLOSED</option>
+          <option value="CANCELLED">CANCELLED</option>
+        </select>
+      </label>
+      <button class="btn" (click)="applyStatusChange()" [disabled]="statusSaving">
+        <span *ngIf="!statusSaving">Aggiorna</span>
+        <span *ngIf="statusSaving" class="spinner spinner--inline" aria-hidden="true"></span>
+      </button>
+    </div>
+
     <!-- inline feedback eliminazione -->
     <div class="inline-status" *ngIf="deleting">
       <span class="spinner spinner--inline" aria-hidden="true"></span> Eliminazione in corso…
     </div>
 
     <div class="modal-actions">
-      <button (click)="editSelected()" [disabled]="deleting">Modifica</button>
-      <button class="danger" (click)="deleteSelected()" [disabled]="deleting">Elimina</button>
-      <button (click)="closeDetails()" [disabled]="deleting">Chiudi</button>
+      <button (click)="editSelected()" [disabled]="deleting || statusSaving">Modifica</button>
+      <button class="danger" (click)="deleteSelected()" [disabled]="deleting || statusSaving">Elimina</button>
+      <button (click)="closeDetails()" [disabled]="deleting || statusSaving">Chiudi</button>
     </div>
   </div>
 </div>
+
 
 <!-- === SECONDA MODALE: NUOVO PAZIENTE === -->
 <div class="modal-overlay modal-overlay--nested" *ngIf="newPatientModalVisible" (click)="cancelNewPatient()">

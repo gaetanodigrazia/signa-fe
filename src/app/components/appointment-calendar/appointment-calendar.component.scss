@@ -1212,3 +1212,49 @@ mwl-calendar-day-view {
     gap: 8px;
   }
 }
+
+/* ... resto del tuo SCSS ... */
+
+/* Riga stato nella modale dettagli */
+.status-inline {
+  margin: 12px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    >span {
+      color: #6b7280;
+      font-weight: 600;
+    }
+
+    select {
+      appearance: none;
+      height: 34px;
+      line-height: 34px;
+      padding: 0 32px 0 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #fff;
+      font-weight: 600;
+      color: #111827;
+      cursor: pointer;
+      background-image:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 8 10 12 14 8'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 14px;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+    }
+  }
+}

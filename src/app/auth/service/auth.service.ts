@@ -3,7 +3,7 @@ import { Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map, tap, Subject } from 'rxjs';
-import { API_BASE_URL } from 'src/app/config/api.config';
+import { API_BASE_URL, AUTH_BASE_URL } from 'src/app/config/api.config';
 
 const LS_LOCKED = 'app_locked';
 const LS_RETURN_URL = 'app_locked_return_url';
@@ -18,7 +18,7 @@ export interface LoginSimpleResponse { id: string; }
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   // Base URL auth
-  private readonly baseUrl = `${API_BASE_URL}/auth`;
+  private readonly baseUrl = `${AUTH_BASE_URL}/auth`;
 
   // === Auto-logout config ===
   private readonly IDLE_TIMEOUT_MS = 15 * 60_000;  // 15 minuti inattività
@@ -49,18 +49,20 @@ export class AuthService {
 
   /* ======== LOGIN reale ======== */
   login(email: string, password: string): Observable<string> {
-    const params = new HttpParams().set('email', email).set('password', password);
-    // Backend accetta @RequestParam → POST con query params e body nullo
-    return this.http.post<LoginSimpleResponse>(`${this.baseUrl}/login`, null, { params }).pipe(
+    const body = { email, password };
+
+    return this.http.post<LoginSimpleResponse>(`${this.baseUrl}/login`, body).pipe(
       map(resp => resp.id),
       tap(userId => {
         // Salvo l'id come “token” semplice per la tua logica attuale
         localStorage.setItem(LS_TOKEN, userId);
         localStorage.setItem(LS_USER_ID, userId);
+
         // Inizio sessione e attività
         const now = Date.now();
         localStorage.setItem(LS_SESSION_START, String(now));
         localStorage.setItem(LS_LAST_ACTIVITY, String(now));
+
         this.startAutoLogout();
       })
     );

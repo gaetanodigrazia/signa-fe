@@ -45,6 +45,17 @@ export class AppointmentService {
         return this.http.get<AppointmentDTO[]>(this.baseUrl, { params });
     }
 
+    /** Update completo dell’appuntamento (PUT /{id}) */
+    update(appointmentId: string, dto: AppointmentInputDTO): Observable<void> {
+        return this.http.put<void>(`${this.baseUrl}/${appointmentId}`, dto);
+    }
+
+    /** Update solo dello status (PATCH /{id}?status=CONFIRMED) */
+    updateStatus(appointmentId: string, status: AppointmentStatus): Observable<void> {
+        const params = new HttpParams().set('status', status);
+        return this.http.patch<void>(`${this.baseUrl}/${appointmentId}`, null, { params });
+    }
+
     /** Elimina appuntamento */
     delete(appointmentId: string): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/${appointmentId}`);
