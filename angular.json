@@ -18,20 +18,25 @@
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "_redirects"
+            ],
             "styles": [
-  "node_modules/angular-calendar/css/angular-calendar.css",
-  "src/styles.scss"
-],
-
+              "node_modules/angular-calendar/css/angular-calendar.css",
+              "src/styles.scss"
+            ],
             "scripts": []
           },
           "configurations": {
             "production": {
-              "fileReplacements": [{
-                "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.prod.ts"
-              }],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
