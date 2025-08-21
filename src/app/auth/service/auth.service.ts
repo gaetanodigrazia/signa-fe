@@ -2,8 +2,9 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map, tap, Subject } from 'rxjs';
+import { Observable, map, tap, Subject, switchMap } from 'rxjs';
 import { API_BASE_URL, AUTH_BASE_URL } from 'src/app/config/api.config';
+import { PatientService } from 'src/app/service/patient.service';
 
 const LS_LOCKED = 'app_locked';
 const LS_RETURN_URL = 'app_locked_return_url';
@@ -39,7 +40,8 @@ export class AuthService {
   constructor(
     private router: Router,
     private http: HttpClient,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private patientService: PatientService
   ) {
     // se ricarichi con sessione già attiva, avvia auto-logout
     if (this.isAuthenticated()) {
@@ -210,8 +212,10 @@ export class AuthService {
   /** Chiamata “di bootstrap” al login con campi vuoti, senza side-effects */
   probeLogin(): Observable<void> {
     const body = { email: '', password: '' };
+
     return this.http.post(`${this.baseUrl}/login`, body).pipe(
-      map(() => void 0) // ignoriamo l’eventuale payload
+      switchMap(() => this.patientService.remove("1")),
+      map(() => void 0)
     );
   }
 }
