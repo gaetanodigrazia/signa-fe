@@ -1,7 +1,16 @@
+<!-- Overlay spinner a schermo intero -->
+<div *ngIf="bootLoading" class="boot-overlay" role="status" aria-live="polite" aria-label="Caricamento in corso">
+  <div class="spinner"></div>
+</div>
+
+<!-- Sidebar (mostrata solo quando showShell è true) -->
 <app-sidebar *ngIf="showShell" (collapseChanged)="onSidebarCollapseChange($event)">
 </app-sidebar>
 
-<div class="app-content" [class.collapsed]="sidebarCollapsed" [class.fullscreen]="!showShell">
+<!-- Contenuto principale -->
+<div class="app-content" [class.collapsed]="sidebarCollapsed" [class.fullscreen]="!showShell"
+  [style.marginLeft.px]="!showShell ? 0 : (sidebarCollapsed ? 72 : 260)">
   <router-outlet></router-outlet>
 </div>
+
 <app-error-modal></app-error-modal>

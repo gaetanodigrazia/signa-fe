@@ -142,3 +142,38 @@
   background: #e5e7eb;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
+
+/* Overlay + spinner */
+.boot-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.7);
+  /* o tema scuro se preferisci */
+  z-index: 9999;
+  /* opzionale: impedisci interazioni sotto */
+  pointer-events: all;
+}
+
+.spinner {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 6px solid #ddd;
+  border-top-color: #555;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* (opzionale) se vuoi bloccare lo scroll sotto l’overlay */
+:host-context(body) {
+  &.loading {
+    overflow: hidden;
+  }
+}
