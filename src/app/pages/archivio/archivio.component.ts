@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ArchiveService, PatientHistoryItem } from 'src/app/service/archive.service';
 import { PatientDto } from 'src/app/model/patient.model';
+import { AppointmentDTO } from 'src/app/model/appointment.model';
 
 @Component({
   selector: 'app-archivio',
@@ -23,7 +24,7 @@ export class ArchivioComponent implements OnInit {
   // Dettaglio/History
   detailsVisible = false;
   viewing: PatientDto | null = null;
-  history: PatientHistoryItem[] = [];
+  history: AppointmentDTO[] = [];
   historyLoading = false;
   historyError: string | null = null;
 
@@ -72,6 +73,8 @@ export class ArchivioComponent implements OnInit {
 
     this.archiveSvc.getHistory(p.id).subscribe({
       next: (items) => {
+        console.log("Result, " + items);
+
         this.history = items ?? [];
         this.historyLoading = false;
       },
