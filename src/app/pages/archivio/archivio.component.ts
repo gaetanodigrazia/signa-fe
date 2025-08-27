@@ -4,13 +4,26 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ArchiveService, PatientHistoryItem } from 'src/app/service/archive.service';
 import { PatientDto } from 'src/app/model/patient.model';
+import { AppointmentDTO, AppointmentHistoryDTO, HistoryItem } from 'src/app/model/appointment.model';
+import { ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-archivio',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './archivio.component.html',
-  styleUrls: ['./archivio.component.scss']
+  styleUrls: ['./archivio.component.scss'],
+  animations: [
+    trigger('detailPulse', [
+      transition('* => *', [
+        style({ opacity: 0, transform: 'translateY(6px) scale(.98)' }),
+        animate('180ms ease-out', style({ opacity: 1, transform: 'none' }))
+      ])
+    ])
+  ]
+
+
 })
 export class ArchivioComponent implements OnInit {
   patients: PatientDto[] = [];
@@ -23,9 +36,10 @@ export class ArchivioComponent implements OnInit {
   // Dettaglio/History
   detailsVisible = false;
   viewing: PatientDto | null = null;
-  history: PatientHistoryItem[] = [];
+  history: HistoryItem[] = [];
   historyLoading = false;
   historyError: string | null = null;
+  selectedHistory?: HistoryItem;
 
   constructor(private archiveSvc: ArchiveService) { }
 
@@ -71,8 +85,19 @@ export class ArchivioComponent implements OnInit {
     this.historyError = null;
 
     this.archiveSvc.getHistory(p.id).subscribe({
-      next: (items) => {
-        this.history = items ?? [];
+      next: (items: AppointmentHistoryDTO[]) => {
+        console.log("Result", items);
+
+        this.history = (items ?? []).map(a => ({
+          id: a.id,
+          date: new Date(a.startAt),
+          description: a.reason,
+          studioName: a.studio?.name,
+          doctorName: `${a.doctor?.firstname} ${a.doctor?.lastname}`,
+          patientName: `${a.patient?.firstname} ${a.patient?.lastname}`,
+          status: a.status
+        } as HistoryItem));
+
         this.historyLoading = false;
       },
       error: (err) => {
@@ -83,10 +108,26 @@ export class ArchivioComponent implements OnInit {
     });
   }
 
+
   closeDetails(): void {
     this.detailsVisible = false;
     this.viewing = null;
     this.history = [];
     this.historyError = null;
+    this.closeHistoryDetail();
   }
+
+  trackByDateDesc = (_: number, h: HistoryItem) => `${h.date?.toISOString?.() ?? h.date}-${h.description}`;
+
+
+  detailAnimKey = 0;
+  openHistoryDetail(h: HistoryItem) {
+    this.selectedHistory = h;
+    this.detailAnimKey++; // ogni click cambia stato e fa ripartire l’animazione
+  }
+  closeHistoryDetail(): void {        // <-- deve essere public
+    this.selectedHistory = null;
+  }
+
 }
+

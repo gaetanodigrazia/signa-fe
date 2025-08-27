@@ -5,9 +5,10 @@ import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
 import { PatientDto } from '../model/patient.model';
 import { PatientService } from './patient.service';
+import { AppointmentDTO, AppointmentHistoryDTO } from '../model/appointment.model';
 
 export interface PatientHistoryItem {
-    date: string;          // ISO
+    date: string;
     description: string;
     studioName?: string;
     doctorName?: string;
@@ -16,7 +17,7 @@ export interface PatientHistoryItem {
 @Injectable({ providedIn: 'root' })
 export class ArchiveService {
     private readonly patientsUrl = `${API_BASE_URL}/patient`;
-    private readonly historyUrl = `${API_BASE_URL}/patients/history`;
+    private readonly historyUrl = `${API_BASE_URL}/appointments/history`;
 
     constructor(private http: HttpClient, private patientSvc: PatientService) { }
 
@@ -24,8 +25,7 @@ export class ArchiveService {
         return this.patientSvc.findAll();
     }
 
-    getHistory(patientId: string): Observable<PatientHistoryItem[]> {
-        const params = new HttpParams().set('patientId', patientId);
-        return this.http.get<PatientHistoryItem[]>(this.historyUrl, { params });
+    getHistory(patientId: string): Observable<AppointmentHistoryDTO[]> {
+        return this.http.get<AppointmentHistoryDTO[]>(this.historyUrl + "/" + patientId);
     }
 }

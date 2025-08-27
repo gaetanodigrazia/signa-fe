@@ -32,3 +32,27 @@ app-root {
   min-height: 100dvh;
   display: block;
 }
+
+/* Sfondo di pagina uniforme */
+html,
+body {
+  background: #f5f7fb;
+}
+
+/* Il wrapper del contenuto NON deve essere una card */
+.app-content {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  /* niente bordi arrotondati */
+  border-radius: 0 !important;
+}
+
+/* Se per caso il wrapper ha anche la classe "surface" */
+.app-content.surface,
+.surface.app-content {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}

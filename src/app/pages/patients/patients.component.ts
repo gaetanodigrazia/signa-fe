@@ -93,6 +93,7 @@ export class PatientsComponent implements OnInit, OnDestroy {
       next: (list: any[]) => {
         const arr = Array.isArray(list) ? list : [];
         this.patients = arr.map(raw => this.normalize(raw));
+        console.log("results: ", this.patients);
         this.applyFilter();
         this.loading = false;
       },
