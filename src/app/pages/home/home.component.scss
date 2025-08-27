@@ -271,3 +271,203 @@
         display: none;
     }
 }
+
+/* wrapper della home */
+.home-page,
+.home-wrapper {
+    display: block;
+}
+
+/* blocchi di statistiche / sezioni a card */
+.home-section .cards-grid {
+    /* usa la classe globale */
+    /* niente qui: eredita già tutto dallo styles.scss */
+}
+
+.home {
+    padding-bottom: 12px;
+}
+
+/* ---------- Toolbar ---------- */
+.home .toolbar.surface {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.home .toolbar .left h2 {
+    margin: 0 0 4px;
+}
+
+.home .toolbar .subtitle {
+    margin: 0;
+    color: #6b7280;
+}
+
+.home .toolbar .right .btn {
+    white-space: nowrap;
+}
+
+/* ---------- GRID KPI (la tua: section.grid.kpi) ---------- */
+.home .grid.kpi {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    /* desktop */
+    gap: 12px;
+}
+
+@media (max-width: 992px) {
+    .home .grid.kpi {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* tablet/mobile */
+}
+
+@media (max-width: 420px) {
+    .home .grid.kpi {
+        grid-template-columns: 1fr;
+    }
+
+    /* telefoni stretti */
+}
+
+/* Card generiche della home */
+.home .card.surface {
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, .05);
+}
+
+/* ---------- SEZIONE DUE COLONNE (la tua: section.grid.two) ---------- */
+.home .grid.two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* desktop */
+    gap: 12px;
+    margin-top: 12px;
+}
+
+@media (max-width: 992px) {
+    .home .grid.two {
+        grid-template-columns: 1fr;
+    }
+
+    /* mobile: UNA colonna */
+}
+
+/* ---------- LISTE (appuntamenti/pazienti) ---------- */
+.home .list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.home .list li {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    /* time | main | status | actions */
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+/* elementi interni */
+.home .list .time {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.home .list .main {
+    min-width: 0;
+}
+
+.home .list .main .title {
+    font-weight: 600;
+    margin: 0 0 2px;
+    line-height: 1.2;
+}
+
+.home .list .main .meta {
+    color: #6b7280;
+    font-size: .9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.home .list .status .badge {
+    font-size: .8rem;
+    padding: 2px 8px;
+}
+
+.home .list .actions .btn-outline {
+    font-size: .85rem;
+    padding: 4px 8px;
+}
+
+/* layout mobile leggibile (2 righe) */
+@media (max-width: 576px) {
+    .home .card.surface {
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .home .list li {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "main actions"
+            "time status";
+        align-items: start;
+    }
+
+    .home .list .main {
+        grid-area: main;
+    }
+
+    .home .list .actions {
+        grid-area: actions;
+    }
+
+    .home .list .time {
+        grid-area: time;
+    }
+
+    .home .list .status {
+        grid-area: status;
+        justify-self: start;
+    }
+
+    /* permetti ai testi di andare a capo su schermi stretti */
+    .home .list .main .meta {
+        white-space: normal;
+    }
+}
+
+/* --- FIX: le sezioni .grid devono rispettare il padding del contenitore --- */
+.home .grid,
+.home .grid.kpi,
+.home .grid.two {
+    box-sizing: border-box;
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    /* ← elimina il “taglio” a destra */
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* Le card non devono “spingere” la griglia */
+.home .grid>.card,
+.home .grid>.surface {
+    max-width: 100%;
+    min-width: 0;
+    /* evita overflow dei figli (badge, bottoni, testi lunghi) */
+}

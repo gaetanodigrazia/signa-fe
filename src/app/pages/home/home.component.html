@@ -6,56 +6,71 @@
             <p class="subtitle">Situazione di oggi</p>
         </div>
         <div class="right">
-            <button class="btn" type="button" (click)="refresh()" [disabled]="loadingAll">Aggiorna</button>
+            <button class="btn" type="button" (click)="refresh()" [disabled]="loadingAll">
+                Aggiorna
+            </button>
         </div>
     </div>
 
     <!-- KPI -->
-    <section class="grid kpi">
+    <section class="cards-grid kpi">
         <article class="card surface">
-            <header class="card-kpi-header">Appuntamenti oggi</header>
-            <div class="kpi-value">{{ stats.todayTotal }}</div>
-            <footer class="kpi-extra">
+            <header class="card__title">Appuntamenti oggi</header>
+            <div class="card__value kpi-value">{{ stats.todayTotal }}</div>
+            <footer class="card__meta kpi-extra">
                 <span class="badge">Confermati: {{ stats.todayConfirmed }}</span>
                 <span class="badge">Cancellati: {{ stats.todayCancelled }}</span>
             </footer>
         </article>
 
         <article class="card surface">
-            <header class="card-kpi-header">Pazienti attivi</header>
-            <div class="kpi-value">{{ stats.activePatients }}</div>
-            <footer class="kpi-extra">Inattivi: {{ stats.inactivePatients }}</footer>
+            <header class="card__title">Pazienti attivi</header>
+            <div class="card__value kpi-value">{{ stats.activePatients }}</div>
+            <footer class="card__meta kpi-extra">
+                Inattivi: {{ stats.inactivePatients }}
+            </footer>
         </article>
 
         <article class="card surface">
-            <header class="card-kpi-header">Tasso cancellazioni (30gg)</header>
-            <div class="kpi-value">{{ stats.cancellationRate30d | percent:'1.0-1' }}</div>
-            <footer class="kpi-extra">su tutti gli appuntamenti</footer>
+            <header class="card__title">Tasso cancellazioni (30gg)</header>
+            <div class="card__value kpi-value">
+                {{ stats.cancellationRate30d | percent:'1.0-1' }}
+            </div>
+            <footer class="card__meta kpi-extra">su tutti gli appuntamenti</footer>
         </article>
     </section>
 
     <!-- DUE COLONNE -->
-    <section class="grid two">
+    <section class="cards-grid two">
         <!-- Appuntamenti -->
         <article class="card surface">
             <header class="card-header">
-                <h3>Prossimi appuntamenti (oggi)</h3>
-                <button class="btn-link" type="button" routerLink="/calendar">Calendario completo →</button>
+                <h3 class="card__title">Prossimi appuntamenti (oggi)</h3>
+                <button class="btn-link" type="button" routerLink="/calendar">
+                    Calendario completo →
+                </button>
             </header>
 
             <div *ngIf="loadingUpcoming" class="skeleton">Caricamento appuntamenti…</div>
-            <div *ngIf="!loadingUpcoming && upcoming.length === 0" class="empty">Nessun appuntamento imminente.</div>
+            <div *ngIf="!loadingUpcoming && upcoming.length === 0" class="empty">
+                Nessun appuntamento imminente.
+            </div>
 
             <ul class="list" *ngIf="!loadingUpcoming && upcoming.length">
                 <li *ngFor="let a of upcoming; trackBy: trackByAppt">
-                    <div class="time">{{ a.startAt | date:'HH:mm' }}<ng-container *ngIf="a.endAt">–{{ a.endAt |
-                            date:'HH:mm' }}</ng-container></div>
+                    <div class="time">
+                        {{ a.startAt | date:'HH:mm' }}
+                        <ng-container *ngIf="a.endAt">–{{ a.endAt | date:'HH:mm' }}</ng-container>
+                    </div>
                     <div class="main">
-                        <div class="title">{{ a.reason || a.kind || 'Appuntamento' }}</div>
+                        <div class="title">
+                            {{ a.reason || a.kind || 'Appuntamento' }}
+                        </div>
                         <div class="meta">
                             <span>👤 {{ (a.patient?.firstname || '') + ' ' + (a.patient?.lastname || '') }}</span>
-                            <span *ngIf="a.doctor?.user?.firstName || a.doctor?.user?.lastName"> · {{
-                                (a.doctor?.user?.firstName || '') + ' ' + (a.doctor?.user?.lastName || '') }}</span>
+                            <span *ngIf="a.doctor?.user?.firstName || a.doctor?.user?.lastName">
+                                · {{ (a.doctor?.user?.firstName || '') + ' ' + (a.doctor?.user?.lastName || '') }}
+                            </span>
                         </div>
                     </div>
                     <div class="status">
@@ -76,17 +91,22 @@
         <!-- Pazienti -->
         <article class="card surface">
             <header class="card-header">
-                <h3>Pazienti</h3>
-                <button class="btn-link" type="button" routerLink="/patients">Gestisci pazienti →</button>
+                <h3 class="card__title">Pazienti</h3>
+                <button class="btn-link" type="button" routerLink="/patients">
+                    Gestisci pazienti →
+                </button>
             </header>
 
             <div *ngIf="loadingPatients" class="skeleton">Caricamento pazienti…</div>
-            <div *ngIf="!loadingPatients && recentPatients.length === 0" class="empty">Nessun paziente da mostrare.
+            <div *ngIf="!loadingPatients && recentPatients.length === 0" class="empty">
+                Nessun paziente da mostrare.
             </div>
 
             <ul class="list" *ngIf="!loadingPatients && recentPatients.length">
                 <li *ngFor="let p of recentPatients; trackBy: trackByPatient">
-                    <div class="avatar">{{ (p.firstname || '?')[0] }}{{ (p.lastname || '')[0] }}</div>
+                    <div class="avatar">
+                        {{ (p.firstname || '?')[0] }}{{ (p.lastname || '')[0] }}
+                    </div>
                     <div class="main">
                         <div class="title">{{ p.firstname }} {{ p.lastname }}</div>
                         <div class="meta">

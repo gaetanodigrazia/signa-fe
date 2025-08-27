@@ -240,3 +240,36 @@ body {
 .app-content.fullscreen {
   margin-left: 0 !important;
 }
+
+.app-content {
+  height: 100dvh;
+  /* occupa tutta la viewport */
+  overflow-y: auto;
+  /* QUI avviene lo scroll */
+  -webkit-overflow-scrolling: touch;
+  padding: 1rem;
+  transition: margin-left .25s ease;
+}
+
+/* Desktop: spazio per la sidebar fissa */
+@media (min-width: 992px) {
+  .app-content {
+    margin-left: 260px;
+  }
+
+  .app-content.collapsed {
+    margin-left: 72px;
+  }
+}
+
+/* Mobile/tablet: nessun margine */
+@media (max-width: 991.98px) {
+  .app-content {
+    margin-left: 0 !important;
+  }
+}
+
+/* Fullscreen (shell nascosta) */
+.app-content.fullscreen {
+  margin-left: 0 !important;
+}
