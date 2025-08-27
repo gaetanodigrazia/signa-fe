@@ -6,13 +6,24 @@ import { ArchiveService, PatientHistoryItem } from 'src/app/service/archive.serv
 import { PatientDto } from 'src/app/model/patient.model';
 import { AppointmentDTO, AppointmentHistoryDTO, HistoryItem } from 'src/app/model/appointment.model';
 import { ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-archivio',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './archivio.component.html',
-  styleUrls: ['./archivio.component.scss']
+  styleUrls: ['./archivio.component.scss'],
+  animations: [
+    trigger('detailPulse', [
+      transition('* => *', [
+        style({ opacity: 0, transform: 'translateY(6px) scale(.98)' }),
+        animate('180ms ease-out', style({ opacity: 1, transform: 'none' }))
+      ])
+    ])
+  ]
+
+
 })
 export class ArchivioComponent implements OnInit {
   patients: PatientDto[] = [];
@@ -78,6 +89,7 @@ export class ArchivioComponent implements OnInit {
         console.log("Result", items);
 
         this.history = (items ?? []).map(a => ({
+          id: a.id,
           date: new Date(a.startAt),
           description: a.reason,
           studioName: a.studio?.name,
@@ -102,16 +114,19 @@ export class ArchivioComponent implements OnInit {
     this.viewing = null;
     this.history = [];
     this.historyError = null;
+    this.closeHistoryDetail();
   }
 
   trackByDateDesc = (_: number, h: HistoryItem) => `${h.date?.toISOString?.() ?? h.date}-${h.description}`;
 
+
+  detailAnimKey = 0;
   openHistoryDetail(h: HistoryItem) {
-    // qui puoi aprire un drawer/modale o navigare a una pagina dettaglio
-    // ad es.: this.router.navigate(['/appointments', h.id]);  <-- se salvi l'id
-    // per ora, mostra un pannello di dettaglio:
     this.selectedHistory = h;
-    this.detailsVisible = true;
+    this.detailAnimKey++; // ogni click cambia stato e fa ripartire l’animazione
+  }
+  closeHistoryDetail(): void {        // <-- deve essere public
+    this.selectedHistory = null;
   }
 
 }

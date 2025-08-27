@@ -425,3 +425,35 @@
         transform: rotate(360deg);
     }
 }
+
+.modal {
+    max-width: 720px;
+    width: 100%;
+}
+
+.history-table-wrap {
+    overflow: auto;
+    max-height: 260px;
+}
+
+.history-detail {
+    margin-top: 12px;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.history-detail__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.history-detail__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+}
+
+.history-detail__grid .col-span-2 {
+    grid-column: 1 / -1;
+}

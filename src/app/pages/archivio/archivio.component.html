@@ -6,7 +6,7 @@
         <div class="right">
             <input class="search" type="search" placeholder="Cerca paziente…" [(ngModel)]="search"
                 (ngModelChange)="applyFilter()" />
-            <button class="btn" (click)="load()" [disabled]="loading">Ricarica</button>
+            <button class="btn" type="button" (click)="load()" [disabled]="loading">Ricarica</button>
         </div>
     </div>
 
@@ -24,13 +24,17 @@
             </thead>
             <tbody>
                 <tr *ngFor="let p of filtered; trackBy: trackByUuid">
-                    <td><button class="linklike" (click)="view(p)">{{ p.firstname }} {{ p.lastname }}</button></td>
+                    <td>
+                        <button class="linklike" type="button" (click)="view(p)">
+                            {{ p.firstname }} {{ p.lastname }}
+                        </button>
+                    </td>
                     <td>{{ p.email }}</td>
                     <td>{{ p.SSN }}</td>
                     <td>{{ p.dateOfBirth | date:'d MMM y' }}</td>
                     <td>{{ p.address }}</td>
                     <td class="actions">
-                        <button class="icon" title="Visualizza storico" (click)="view(p)">👁️</button>
+                        <button class="icon" type="button" title="Visualizza storico" (click)="view(p)">👁️</button>
                     </td>
                 </tr>
                 <tr *ngIf="filtered.length === 0 && !loading">
@@ -45,7 +49,7 @@
 
 <!-- MODALE DETTAGLI + HISTORY -->
 <div class="modal-overlay" *ngIf="detailsVisible" (click)="closeDetails()">
-    <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal" (click)="$event.stopPropagation()" (keydown.escape)="closeHistoryDetail()">
         <h3>Storico paziente</h3>
 
         <div class="details" *ngIf="viewing as v">
@@ -59,12 +63,10 @@
         <hr />
 
         <h4>Storico</h4>
+
+        <!-- stati: loading / errore / vuoto -->
         <div *ngIf="historyLoading" style="padding:8px;">Caricamento storico…</div>
         <div *ngIf="historyError" class="error" style="padding:8px;">{{ historyError }}</div>
-
-        <!-- stato: loading / errore / vuoto -->
-        <div *ngIf="historyLoading">Caricamento…</div>
-        <div *ngIf="historyError" class="error">{{ historyError }}</div>
         <div *ngIf="!historyLoading && !historyError && (!history || history.length === 0)">
             Nessun appuntamento.
         </div>
@@ -104,13 +106,34 @@
             </table>
         </div>
 
+        <!-- DETTAGLIO SINGOLO APPUNTAMENTO -->
+        <div class="history-detail surface" *ngIf="selectedHistory as d" role="dialog"
+            aria-label="Dettaglio appuntamento" [@detailPulse]="detailAnimKey">
+            <div class="history-detail__header">
+                <h5>Dettaglio appuntamento</h5>
+                <button class="icon" type="button" (click)="closeHistoryDetail()"
+                    aria-label="Chiudi dettaglio">✖</button>
+            </div>
 
-        <div *ngIf="!historyLoading && !historyError && history.length === 0" class="empty" style="padding:8px;">
-            Nessun evento storico disponibile.
+            <div class="history-detail__grid">
+                <div><strong>Data:</strong> {{ d.date | date:'EEE d MMM y, HH:mm' }}</div>
+                <div>
+                    <strong>Stato:</strong>
+                    <span class="badge" [class.badge--booked]="d.status==='BOOKED'"
+                        [class.badge--done]="d.status==='DONE'" [class.badge--cancelled]="d.status==='CANCELLED'">
+                        {{ d.status || '—' }}
+                    </span>
+                </div>
+                <div><strong>Studio:</strong> {{ d.studioName || '—' }}</div>
+                <div><strong>Medico:</strong> {{ d.doctorName || '—' }}</div>
+                <div class="col-span-2"><strong>Descrizione:</strong> {{ d.description || '—' }}</div>
+                <div class="col-span-2"><strong>Note:</strong> {{ d.notes || '—' }}</div>
+            </div>
+
         </div>
 
         <div class="modal-actions">
-            <button class="btn" (click)="closeDetails()">Chiudi</button>
+            <button class="btn" type="button" (click)="closeDetails()">Chiudi</button>
         </div>
     </div>
 </div>

@@ -93,6 +93,7 @@ export interface AppointmentHistoryDTO {
 
 // history-item.model.ts
 export interface HistoryItem {
+    id: string;
     date: Date;
     description: string;
     studioName?: string;
