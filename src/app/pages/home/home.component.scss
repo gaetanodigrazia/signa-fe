@@ -5,7 +5,7 @@
     color: #111827;
 }
 
-/* Layout base */
+/* ===================== Layout base ===================== */
 .home {
     max-width: 1200px;
     margin: 0 auto;
@@ -14,7 +14,7 @@
     gap: 20px;
 }
 
-/* Toolbar */
+/* ===================== Toolbar ===================== */
 .toolbar {
     display: flex;
     align-items: center;
@@ -32,21 +32,21 @@
     color: #667085;
 }
 
-/* Griglie */
-.grid.kpi {
+/* ===================== Griglie desktop ===================== */
+.cards-grid.kpi {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
 }
 
-.grid.two {
+.cards-grid.two {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 16px;
     align-items: start;
 }
 
-/* Card */
+/* ===================== Card ===================== */
 .surface.card {
     background: #fff;
     border: 1px solid #e6e9f0;
@@ -75,7 +75,7 @@
     margin-bottom: 4px;
 }
 
-/* KPI */
+/* ===================== KPI ===================== */
 .kpi-value {
     font-size: 2.4rem;
     line-height: 1;
@@ -99,7 +99,7 @@
     padding: 2px 10px;
 }
 
-/* Liste */
+/* ===================== Liste ===================== */
 .list {
     list-style: none;
     margin: 0;
@@ -151,7 +151,7 @@
     color: #111827;
 }
 
-/* Badge stato */
+/* ===================== Badge stato ===================== */
 .status .badge {
     font-size: .78rem;
     line-height: 1;
@@ -180,7 +180,7 @@
     color: #7f1d1d;
 }
 
-/* Bottoni/link */
+/* ===================== Bottoni/link ===================== */
 .btn-link {
     color: #2563eb;
     background: transparent;
@@ -208,7 +208,7 @@
     border-color: #cdd5e3;
 }
 
-/* Overlay spinner */
+/* ===================== Overlay spinner ===================== */
 .page-loading-overlay {
     position: fixed;
     inset: 0;
@@ -240,7 +240,7 @@
     }
 }
 
-/* Accessibilità */
+/* ===================== Accessibilità ===================== */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -253,14 +253,11 @@
     border: 0;
 }
 
-/* Responsive */
+/* ===================== Responsive ===================== */
+/* Tablet: KPI 2 colonne, lista più stretta */
 @media (max-width: 900px) {
-    .grid.kpi {
-        grid-template-columns: 1fr;
-    }
-
-    .grid.two {
-        grid-template-columns: 1fr;
+    .cards-grid.kpi {
+        grid-template-columns: 1fr 1fr;
     }
 
     .list li {
@@ -270,157 +267,13 @@
     .status {
         display: none;
     }
+
+    /* compatta la riga */
 }
 
-/* wrapper della home */
-.home-page,
-.home-wrapper {
-    display: block;
-}
-
-/* blocchi di statistiche / sezioni a card */
-.home-section .cards-grid {
-    /* usa la classe globale */
-    /* niente qui: eredita già tutto dallo styles.scss */
-}
-
-.home {
-    padding-bottom: 12px;
-}
-
-/* ---------- Toolbar ---------- */
-.home .toolbar.surface {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 8px;
-}
-
-.home .toolbar .left h2 {
-    margin: 0 0 4px;
-}
-
-.home .toolbar .subtitle {
-    margin: 0;
-    color: #6b7280;
-}
-
-.home .toolbar .right .btn {
-    white-space: nowrap;
-}
-
-/* ---------- GRID KPI (la tua: section.grid.kpi) ---------- */
-.home .grid.kpi {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    /* desktop */
-    gap: 12px;
-}
-
-@media (max-width: 992px) {
-    .home .grid.kpi {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    /* tablet/mobile */
-}
-
-@media (max-width: 420px) {
-    .home .grid.kpi {
-        grid-template-columns: 1fr;
-    }
-
-    /* telefoni stretti */
-}
-
-/* Card generiche della home */
-.home .card.surface {
-    background: #fff;
-    border-radius: 12px;
-    padding: 14px;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, .05);
-}
-
-/* ---------- SEZIONE DUE COLONNE (la tua: section.grid.two) ---------- */
-.home .grid.two {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    /* desktop */
-    gap: 12px;
-    margin-top: 12px;
-}
-
-@media (max-width: 992px) {
-    .home .grid.two {
-        grid-template-columns: 1fr;
-    }
-
-    /* mobile: UNA colonna */
-}
-
-/* ---------- LISTE (appuntamenti/pazienti) ---------- */
-.home .list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.home .list li {
-    display: grid;
-    grid-template-columns: auto 1fr auto auto;
-    /* time | main | status | actions */
-    align-items: center;
-    gap: 8px;
-    padding: 10px;
-    border-radius: 10px;
-    background: #f8fafc;
-}
-
-/* elementi interni */
-.home .list .time {
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-}
-
-.home .list .main {
-    min-width: 0;
-}
-
-.home .list .main .title {
-    font-weight: 600;
-    margin: 0 0 2px;
-    line-height: 1.2;
-}
-
-.home .list .main .meta {
-    color: #6b7280;
-    font-size: .9rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.home .list .status .badge {
-    font-size: .8rem;
-    padding: 2px 8px;
-}
-
-.home .list .actions .btn-outline {
-    font-size: .85rem;
-    padding: 4px 8px;
-}
-
-/* layout mobile leggibile (2 righe) */
+/* Mobile stretto: righe lista a due linee leggibili */
 @media (max-width: 576px) {
-    .home .card.surface {
-        padding: 10px;
-        border-radius: 10px;
-    }
-
-    .home .list li {
+    .list li {
         grid-template-columns: 1fr auto;
         grid-template-areas:
             "main actions"
@@ -428,46 +281,45 @@
         align-items: start;
     }
 
-    .home .list .main {
+    .list .main {
         grid-area: main;
     }
 
-    .home .list .actions {
+    .list .actions {
         grid-area: actions;
     }
 
-    .home .list .time {
+    .list .time {
         grid-area: time;
     }
 
-    .home .list .status {
+    .list .status {
         grid-area: status;
         justify-self: start;
     }
 
-    /* permetti ai testi di andare a capo su schermi stretti */
-    .home .list .main .meta {
+    .main .meta {
         white-space: normal;
     }
 }
 
-/* --- FIX: le sezioni .grid devono rispettare il padding del contenitore --- */
-.home .grid,
-.home .grid.kpi,
-.home .grid.two {
-    box-sizing: border-box;
-    width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    /* ← elimina il “taglio” a destra */
-    padding-left: 0;
-    padding-right: 0;
-}
+/* ===================== Mobile: UNA colonna centrata ===================== */
+@media (max-width: 768px) {
 
-/* Le card non devono “spingere” la griglia */
-.home .grid>.card,
-.home .grid>.surface {
-    max-width: 100%;
-    min-width: 0;
-    /* evita overflow dei figli (badge, bottoni, testi lunghi) */
+    .cards-grid.kpi,
+    .cards-grid.two {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        /* centra le card */
+        gap: 16px;
+    }
+
+    .cards-grid.kpi>.card,
+    .cards-grid.kpi>.surface,
+    .cards-grid.two>.card,
+    .cards-grid.two>.surface {
+        width: 100%;
+        max-width: 480px;
+        /* card centrata e leggibile */
+    }
 }
