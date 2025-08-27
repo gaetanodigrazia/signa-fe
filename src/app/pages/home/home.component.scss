@@ -1,7 +1,6 @@
 :host {
     display: block;
     background: #f5f7fb;
-    /* sfondo pagina */
     color: #111827;
 }
 
@@ -44,6 +43,7 @@
     grid-template-columns: 2fr 1fr;
     gap: 16px;
     align-items: start;
+
 }
 
 /* ===================== Card ===================== */
@@ -53,6 +53,12 @@
     box-shadow: 0 2px 10px rgba(17, 24, 39, .04);
     border-radius: 14px;
     padding: 14px;
+}
+
+/* 👉 padding base +6px sempre */
+.cards-grid.two>.card {
+    padding-bottom: 20px;
+    /* 14 + 6 */
 }
 
 .card-header,
@@ -149,6 +155,15 @@
     font-weight: 800;
     background: #eaf0f7;
     color: #111827;
+}
+
+/* 👉 +6px di aria in fondo alla lista Pazienti */
+.cards-grid.two>article.card.surface:last-child .list {
+    padding-bottom: 6px !important;
+}
+
+.cards-grid.two>article.card.surface:last-child .list>li:last-child {
+    margin-bottom: 6px !important;
 }
 
 /* ===================== Badge stato ===================== */
@@ -254,7 +269,7 @@
 }
 
 /* ===================== Responsive ===================== */
-/* Tablet: KPI 2 colonne, lista più stretta */
+/* Tablet */
 @media (max-width: 900px) {
     .cards-grid.kpi {
         grid-template-columns: 1fr 1fr;
@@ -267,11 +282,9 @@
     .status {
         display: none;
     }
-
-    /* compatta la riga */
 }
 
-/* Mobile stretto: righe lista a due linee leggibili */
+/* Mobile stretto */
 @media (max-width: 576px) {
     .list li {
         grid-template-columns: 1fr auto;
@@ -303,14 +316,13 @@
     }
 }
 
-/* ===================== Mobile: UNA colonna centrata ===================== */
+/* Mobile: 1 colonna centrata */
 @media (max-width: 768px) {
 
     .cards-grid.kpi,
     .cards-grid.two {
         grid-template-columns: 1fr;
         justify-items: center;
-        /* centra le card */
         gap: 16px;
     }
 
@@ -320,6 +332,71 @@
     .cards-grid.two>.surface {
         width: 100%;
         max-width: 480px;
-        /* card centrata e leggibile */
     }
+}
+
+/* Spacer fuori dalla griglia */
+.home {
+    padding-bottom: 16px;
+}
+
+.home::after {
+    content: "";
+    display: block;
+    height: 70px;
+}
+
+/* +6px di padding in fondo alle card */
+.cards-grid.two>.card {
+    padding-bottom: 20px !important;
+    /* 14 + 6 */
+}
+
+/* 6px extra solo sull’ultima lista della card Pazienti */
+.cards-grid.two>article.card.surface:last-child .list {
+    padding-bottom: 6px !important;
+}
+
+.cards-grid.two>article.card.surface:last-child .list>li:last-child {
+    margin-bottom: 6px !important;
+}
+
+/* ===================== Bottone Aggiorna ===================== */
+.btn-refresh {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    /* blu più vivo */
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+.btn-refresh:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-refresh:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 0 3px 6px rgba(37, 99, 235, 0.2);
+}
+
+.btn-refresh:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* opzionale: icona refresh */
+.btn-refresh .icon {
+    font-size: 1.1rem;
+    line-height: 0;
 }
