@@ -70,3 +70,46 @@ export interface AppointmentInputDTO {
     reason?: string;
     notes?: string;
 }
+
+// appointment.dto.ts
+
+export interface AppointmentHistoryDTO {
+    id: string;
+    kind: AppointmentKind; // es. "VISIT"
+    reason: string;
+    notes: string | null;
+    status: AppointmentStatus; // es. "BOOKED"
+    startAt: string; // ISO string
+    endAt: string;   // ISO string
+    createdAt: string;
+    updatedAt: string;
+    canceledAt: string | null;
+    cancelReason: string | null;
+    createdBy: string | null;
+    doctor: DoctorDto;
+    patient: PatientDto;
+    studio: StudioDto;
+}
+
+// history-item.model.ts
+export interface HistoryItem {
+    date: Date;
+    description: string;
+    studioName?: string;
+    doctorName?: string;
+    patientName?: string;
+    status?: string;
+}
+
+export interface DoctorDto {
+    id: string;
+    firstname: string;
+    lastname: string;
+    email?: string; // opzionale se nel JSON futuro
+}
+
+export interface StudioDto {
+    id: string;
+    name: string;
+    address?: string;
+}

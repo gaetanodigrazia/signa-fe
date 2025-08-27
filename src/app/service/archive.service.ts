@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
 import { PatientDto } from '../model/patient.model';
 import { PatientService } from './patient.service';
-import { AppointmentDTO } from '../model/appointment.model';
+import { AppointmentDTO, AppointmentHistoryDTO } from '../model/appointment.model';
 
 export interface PatientHistoryItem {
     date: string;
@@ -25,7 +25,7 @@ export class ArchiveService {
         return this.patientSvc.findAll();
     }
 
-    getHistory(patientId: string): Observable<AppointmentDTO[]> {
-        return this.http.get<AppointmentDTO[]>(this.historyUrl + "/" + patientId);
+    getHistory(patientId: string): Observable<AppointmentHistoryDTO[]> {
+        return this.http.get<AppointmentHistoryDTO[]>(this.historyUrl + "/" + patientId);
     }
 }

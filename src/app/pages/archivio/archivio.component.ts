@@ -4,7 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ArchiveService, PatientHistoryItem } from 'src/app/service/archive.service';
 import { PatientDto } from 'src/app/model/patient.model';
-import { AppointmentDTO } from 'src/app/model/appointment.model';
+import { AppointmentDTO, AppointmentHistoryDTO, HistoryItem } from 'src/app/model/appointment.model';
+import { ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-archivio',
@@ -24,9 +25,10 @@ export class ArchivioComponent implements OnInit {
   // Dettaglio/History
   detailsVisible = false;
   viewing: PatientDto | null = null;
-  history: AppointmentDTO[] = [];
+  history: HistoryItem[] = [];
   historyLoading = false;
   historyError: string | null = null;
+  selectedHistory?: HistoryItem;
 
   constructor(private archiveSvc: ArchiveService) { }
 
@@ -72,10 +74,18 @@ export class ArchivioComponent implements OnInit {
     this.historyError = null;
 
     this.archiveSvc.getHistory(p.id).subscribe({
-      next: (items) => {
-        console.log("Result, " + items);
+      next: (items: AppointmentHistoryDTO[]) => {
+        console.log("Result", items);
 
-        this.history = items ?? [];
+        this.history = (items ?? []).map(a => ({
+          date: new Date(a.startAt),
+          description: a.reason,
+          studioName: a.studio?.name,
+          doctorName: `${a.doctor?.firstname} ${a.doctor?.lastname}`,
+          patientName: `${a.patient?.firstname} ${a.patient?.lastname}`,
+          status: a.status
+        } as HistoryItem));
+
         this.historyLoading = false;
       },
       error: (err) => {
@@ -86,10 +96,23 @@ export class ArchivioComponent implements OnInit {
     });
   }
 
+
   closeDetails(): void {
     this.detailsVisible = false;
     this.viewing = null;
     this.history = [];
     this.historyError = null;
   }
+
+  trackByDateDesc = (_: number, h: HistoryItem) => `${h.date?.toISOString?.() ?? h.date}-${h.description}`;
+
+  openHistoryDetail(h: HistoryItem) {
+    // qui puoi aprire un drawer/modale o navigare a una pagina dettaglio
+    // ad es.: this.router.navigate(['/appointments', h.id]);  <-- se salvi l'id
+    // per ora, mostra un pannello di dettaglio:
+    this.selectedHistory = h;
+    this.detailsVisible = true;
+  }
+
 }
+

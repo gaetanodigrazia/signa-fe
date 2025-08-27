@@ -39,7 +39,6 @@
             </tbody>
         </table>
 
-        <div *ngIf="loading" style="padding:12px;">Caricamento…</div>
         <div *ngIf="error" class="error" style="padding:12px;">{{ error }}</div>
     </div>
 </div>
@@ -63,18 +62,48 @@
         <div *ngIf="historyLoading" style="padding:8px;">Caricamento storico…</div>
         <div *ngIf="historyError" class="error" style="padding:8px;">{{ historyError }}</div>
 
-        <ul *ngIf="!historyLoading && !historyError && history.length > 0" class="history-list">
-            <li *ngFor="let h of history">
-                <div class="row">
-                    <div class="date">{{ h.date | date:'EEE d MMM y, HH:mm' }}</div>
-                    <div class="desc">{{ h.description }}</div>
-                </div>
-                <div class="meta" *ngIf="h.studioName || h.doctorName">
-                    <small *ngIf="h.studioName"><strong>Studio:</strong> {{ h.studioName }}</small>
-                    <small *ngIf="h.doctorName"><strong>Medico:</strong> {{ h.doctorName }}</small>
-                </div>
-            </li>
-        </ul>
+        <!-- stato: loading / errore / vuoto -->
+        <div *ngIf="historyLoading">Caricamento…</div>
+        <div *ngIf="historyError" class="error">{{ historyError }}</div>
+        <div *ngIf="!historyLoading && !historyError && (!history || history.length === 0)">
+            Nessun appuntamento.
+        </div>
+
+        <!-- tabella scrollabile -->
+        <div *ngIf="!historyLoading && !historyError && history?.length" class="history-table-wrap" role="region"
+            aria-label="Storico appuntamenti">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Descrizione</th>
+                        <th>Studio</th>
+                        <th>Medico</th>
+                        <th>Stato</th>
+                        <th aria-label="azioni"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let h of history; trackBy: trackByDateDesc">
+                        <td>{{ h.date | date:'EEE d MMM y, HH:mm' }}</td>
+                        <td>{{ h.description }}</td>
+                        <td>{{ h.studioName || '—' }}</td>
+                        <td>{{ h.doctorName || '—' }}</td>
+                        <td>
+                            <span class="badge" [class.badge--booked]="h.status==='BOOKED'"
+                                [class.badge--done]="h.status==='DONE'"
+                                [class.badge--cancelled]="h.status==='CANCELLED'">
+                                {{ h.status || '—' }}
+                            </span>
+                        </td>
+                        <td class="actions">
+                            <button type="button" (click)="openHistoryDetail(h)" class="btn-link">Dettaglio</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
 
         <div *ngIf="!historyLoading && !historyError && history.length === 0" class="empty" style="padding:8px;">
             Nessun evento storico disponibile.
@@ -84,4 +113,10 @@
             <button class="btn" (click)="closeDetails()">Chiudi</button>
         </div>
     </div>
+</div>
+
+<!-- Overlay caricamento globale (centrato e sopra la tabella) -->
+<div class="page-loading-overlay" *ngIf="loading" role="status" aria-live="polite" aria-busy="true">
+    <span class="spinner spinner--big" aria-hidden="true"></span>
+    <span class="sr-only">Caricamento pazienti…</span>
 </div>

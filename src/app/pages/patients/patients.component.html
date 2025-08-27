@@ -58,7 +58,6 @@
             </tbody>
         </table>
 
-        <div *ngIf="loading" style="padding:12px;">Caricamento…</div>
         <div *ngIf="error" class="error" style="padding:12px;">{{ error }}</div>
     </div>
 </div>
@@ -176,4 +175,10 @@
             <button class="btn" (click)="confirmVisible=false; toDelete=null">Annulla</button>
         </div>
     </div>
+</div>
+
+<!-- Overlay caricamento globale (centrato e sopra la tabella) -->
+<div class="page-loading-overlay" *ngIf="loading" role="status" aria-live="polite" aria-busy="true">
+    <span class="spinner spinner--big" aria-hidden="true"></span>
+    <span class="sr-only">Caricamento pazienti…</span>
 </div>
