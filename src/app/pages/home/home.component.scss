@@ -5,7 +5,7 @@
     color: #111827;
 }
 
-/* Layout base */
+/* ===================== Layout base ===================== */
 .home {
     max-width: 1200px;
     margin: 0 auto;
@@ -14,7 +14,7 @@
     gap: 20px;
 }
 
-/* Toolbar */
+/* ===================== Toolbar ===================== */
 .toolbar {
     display: flex;
     align-items: center;
@@ -32,21 +32,21 @@
     color: #667085;
 }
 
-/* Griglie */
-.grid.kpi {
+/* ===================== Griglie desktop ===================== */
+.cards-grid.kpi {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
 }
 
-.grid.two {
+.cards-grid.two {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 16px;
     align-items: start;
 }
 
-/* Card */
+/* ===================== Card ===================== */
 .surface.card {
     background: #fff;
     border: 1px solid #e6e9f0;
@@ -75,7 +75,7 @@
     margin-bottom: 4px;
 }
 
-/* KPI */
+/* ===================== KPI ===================== */
 .kpi-value {
     font-size: 2.4rem;
     line-height: 1;
@@ -99,7 +99,7 @@
     padding: 2px 10px;
 }
 
-/* Liste */
+/* ===================== Liste ===================== */
 .list {
     list-style: none;
     margin: 0;
@@ -151,7 +151,7 @@
     color: #111827;
 }
 
-/* Badge stato */
+/* ===================== Badge stato ===================== */
 .status .badge {
     font-size: .78rem;
     line-height: 1;
@@ -180,7 +180,7 @@
     color: #7f1d1d;
 }
 
-/* Bottoni/link */
+/* ===================== Bottoni/link ===================== */
 .btn-link {
     color: #2563eb;
     background: transparent;
@@ -208,7 +208,7 @@
     border-color: #cdd5e3;
 }
 
-/* Overlay spinner */
+/* ===================== Overlay spinner ===================== */
 .page-loading-overlay {
     position: fixed;
     inset: 0;
@@ -240,7 +240,7 @@
     }
 }
 
-/* Accessibilità */
+/* ===================== Accessibilità ===================== */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -253,14 +253,11 @@
     border: 0;
 }
 
-/* Responsive */
+/* ===================== Responsive ===================== */
+/* Tablet: KPI 2 colonne, lista più stretta */
 @media (max-width: 900px) {
-    .grid.kpi {
-        grid-template-columns: 1fr;
-    }
-
-    .grid.two {
-        grid-template-columns: 1fr;
+    .cards-grid.kpi {
+        grid-template-columns: 1fr 1fr;
     }
 
     .list li {
@@ -269,5 +266,60 @@
 
     .status {
         display: none;
+    }
+
+    /* compatta la riga */
+}
+
+/* Mobile stretto: righe lista a due linee leggibili */
+@media (max-width: 576px) {
+    .list li {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "main actions"
+            "time status";
+        align-items: start;
+    }
+
+    .list .main {
+        grid-area: main;
+    }
+
+    .list .actions {
+        grid-area: actions;
+    }
+
+    .list .time {
+        grid-area: time;
+    }
+
+    .list .status {
+        grid-area: status;
+        justify-self: start;
+    }
+
+    .main .meta {
+        white-space: normal;
+    }
+}
+
+/* ===================== Mobile: UNA colonna centrata ===================== */
+@media (max-width: 768px) {
+
+    .cards-grid.kpi,
+    .cards-grid.two {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        /* centra le card */
+        gap: 16px;
+    }
+
+    .cards-grid.kpi>.card,
+    .cards-grid.kpi>.surface,
+    .cards-grid.two>.card,
+    .cards-grid.two>.surface {
+        width: 100%;
+        max-width: 480px;
+        /* card centrata e leggibile */
     }
 }

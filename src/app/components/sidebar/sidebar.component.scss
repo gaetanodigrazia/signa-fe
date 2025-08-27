@@ -430,3 +430,36 @@
     letter-spacing: .2px;
   }
 }
+
+/* Drawer mobile dall’alto – FISSO, senza scroll interno */
+@media (max-width: 991.98px) {
+  .sidebar.mobile {
+    position: fixed;
+    inset: 60px 0 auto 0;
+    /* sotto la topbar */
+    width: 100vw;
+    height: min(60svh, calc(100dvh - 60px));
+    transform: translateY(-100%);
+    transition: transform .28s ease;
+    z-index: 1200;
+
+    background: rgba(17, 24, 39, 0.85);
+    backdrop-filter: blur(8px);
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+
+    overflow: hidden;
+    /* ← niente scroll nella sidebar */
+    -webkit-overflow-scrolling: auto;
+  }
+
+  .sidebar.mobile.open {
+    transform: translateY(0);
+  }
+
+  /* RIMUOVI il backdrop a pieno schermo o NON usarlo quando vuoi scorrere il contenuto.
+     Se vuoi tenerlo solo per il click-to-close, evita che copra la parte scrollabile: */
+  /* .sidebar-backdrop { display: none; } */
+}
+
+/* La pagina sotto continua a scorrere nello stesso modo tramite .app-content (punto 1) */
