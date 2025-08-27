@@ -8,8 +8,7 @@
 </app-sidebar>
 
 <!-- Contenuto principale -->
-<div class="app-content" [class.collapsed]="sidebarCollapsed" [class.fullscreen]="!showShell"
-  [style.marginLeft.px]="!showShell ? 0 : (sidebarCollapsed ? 72 : 260)">
+<div class="app-content" [class.collapsed]="sidebarCollapsed" [class.fullscreen]="!showShell">
   <router-outlet></router-outlet>
 </div>
 

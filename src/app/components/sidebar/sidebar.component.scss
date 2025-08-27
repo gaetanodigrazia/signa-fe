@@ -5,12 +5,13 @@
   color: #e5e7eb;
 
   position: fixed;
-  inset: 0 auto 0 0;
-  /* top:0; left:0; bottom:0 */
-  width: 240px;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 260px;
   height: 100dvh;
   /* più affidabile di 100vh su iOS */
-  z-index: 1000;
+  z-index: 1100;
   box-sizing: border-box;
   overflow: hidden;
   padding: 1rem;
@@ -93,65 +94,9 @@
   }
 }
 
-/* =================== MOBILE DRAWER (FULL-WIDTH + TRASPARENZA) =================== */
-.sidebar.mobile {
-  position: fixed;
-  inset: 60px 0 auto 0;
-  /* top:60px; left:0; right:0 */
-  width: 100vw;
-  /* altezza base: comportati da desktop/tablet; sui telefoni la riduciamo sotto */
-  height: calc(100dvh - 60px);
-
-  background: rgba(17, 24, 39, 0.85);
-  /* (oppure: rgba(52,73,94,.85) se preferisci il vecchio) */
-  backdrop-filter: blur(8px);
-  transform: translateY(-100%);
-  transition: transform .3s ease;
-
-  border: none;
-  box-shadow: none;
-  border-bottom-left-radius: 16px;
-  border-bottom-right-radius: 16px;
-
-  overflow: hidden;
-  padding: 1rem;
-  z-index: 1000;
-}
-
-.sidebar.mobile.open {
-  transform: translateY(0);
-}
-
-/* Telefoni: altezza 60% schermo (come richiesto) */
-@media (max-width: 767px) {
-  .sidebar.mobile {
-    /* fallback vecchi browser */
-    height: 40vh;
-    /* unità moderne: 60% dell’area visibile, ma non oltre lo spazio utile */
-    height: min(60svh, calc(100dvh - 40px));
-  }
-}
-
-/* Barra toggle visibile su mobile */
-.mobile-toggle {
-  background: linear-gradient(160deg, #1f2937 0%, #111827 100%);
-  height: 60px;
-  display: flex;
-  align-items: center;
-  padding: 0 1rem;
-  z-index: 1001;
-
-  button {
-    color: #fff;
-    font-weight: 700;
-    font-size: 1.2rem;
-    letter-spacing: .2px;
-  }
-}
-
 /* =================== STATO COLLASSATO =================== */
 .sidebar.collapsed {
-  width: 60px;
+  width: 72px;
 
   .collapse-toggle {
     display: flex;
@@ -222,7 +167,6 @@
   align-items: center;
   justify-content: center;
   font-size: 1.6rem;
-  /* icone più grandi di base */
   line-height: 1;
   cursor: pointer;
   transition: transform .2s ease, box-shadow .2s ease, background .2s ease, width .2s ease;
@@ -238,11 +182,8 @@
 /* Collassata: bottoni in colonna, centrati e rotondi */
 .sidebar.collapsed {
   --btn-diam: 48px;
-  /* diametro bottoni in collapsed */
   --btn-gap: 12px;
-  /* spazio tra i due */
   --curve-clear: 10px;
-  /* distanza extra dalla curva */
 }
 
 .sidebar.collapsed .sidebar-bottom {
@@ -270,8 +211,6 @@
   border-radius: 50%;
   padding: 0;
   font-size: 1.8rem;
-  /* icone ancora un pelo più grandi in collapsed */
-  /* taglio anti-aloni (cerchi perfetti) */
   overflow: hidden;
   clip-path: circle(50% at 50% 50%);
   -webkit-mask-image: radial-gradient(#000 99%, transparent 100%);
@@ -306,83 +245,22 @@
   box-shadow: 0 4px 10px rgba(185, 28, 28, .28);
 }
 
-/* =================== iOS fallback (vecchie versioni) =================== */
+/* =================== iOS fallback =================== */
 @supports (-webkit-touch-callout: none) {
   .sidebar {
     height: -webkit-fill-available;
   }
 
   .sidebar.mobile {
-    height: calc(-webkit-fill-available - 60px);
+    height: -webkit-fill-available;
   }
 }
 
+/* =================== MENU & SOTTOMENU =================== */
 .sidebar nav {
   .menu-group {
     display: block;
 
-    .menu-parent {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-      background: transparent;
-      border: 0;
-      padding: .6rem .8rem;
-      cursor: pointer;
-      text-align: left;
-
-      .icon {
-        width: 1.4rem;
-        display: inline-flex;
-        justify-content: center;
-      }
-
-      .text {
-        flex: 1;
-      }
-
-      .chevron {
-        transition: transform .15s ease;
-      }
-
-      .chevron.rot {
-        transform: rotate(180deg);
-      }
-    }
-
-    .submenu {
-      display: flex;
-      flex-direction: column;
-      margin-left: 2.2rem; // indent rispetto all’icona
-      padding-left: .4rem;
-      border-left: 1px solid rgba(0, 0, 0, .08);
-
-      a {
-        padding: .35rem .4rem;
-        text-decoration: none;
-      }
-
-      a.active {
-        font-weight: 600;
-      }
-    }
-  }
-}
-
-/* Mobile sidebar può condividere le stesse classi,
-   eventualmente riduci i margini se necessario */
-.sidebar.mobile nav .menu-group .submenu {
-  margin-left: .8rem;
-  border-left: none;
-}
-
-/* === SOTTOMENU PAZIENTI (stile identico agli altri item) === */
-.sidebar nav {
-  .menu-group {
-    display: block;
-
-    /* Il "genitore" si comporta come un link della sidebar */
     .menu-parent {
       color: #e5e7eb;
       text-decoration: none;
@@ -399,16 +277,9 @@
       cursor: pointer;
       text-align: left;
       transition: background .2s ease, color .2s ease, box-shadow .2s ease;
-      /* aggiunte per allineare allo stile dei link */
       appearance: none;
-      -webkit-appearance: none;
       font: inherit;
-      /* eredita family, size, weight, line-height */
-      color: inherit;
-      font-weight: 400;
-      /* uguale a nav a { font-weight: 400 } */
       line-height: inherit;
-      /* evita differenze verticali */
 
       .icon {
         width: 24px;
@@ -436,18 +307,15 @@
       }
     }
 
-    /* Stato "aperto" = stesso highlight dell'active/hover */
     &.open .menu-parent {
       background: rgba(255, 255, 255, .08);
       color: #fff;
     }
 
-    /* Voci del sottomenu con stile link coerente ma più compatto */
     .submenu {
       display: flex;
       flex-direction: column;
       margin-left: 2.2rem;
-      /* indent rispetto all’icona */
       padding-left: .4rem;
       border-left: 1px solid rgba(255, 255, 255, .08);
 
@@ -473,37 +341,92 @@
   }
 }
 
-/* Collassata: mantieni allineamento/icone come gli altri item */
-.sidebar.collapsed {
-  nav {
-    .menu-group {
-      .menu-parent {
-        justify-content: center;
-        gap: 0;
-        padding-left: 0;
-        padding-right: 0;
+/* Collassata: submenu non visibili */
+.sidebar.collapsed nav .menu-group {
+  .menu-parent {
+    justify-content: center;
+    gap: 0;
+    padding-left: 0;
+    padding-right: 0;
 
-        .icon {
-          width: 24px;
-          margin: 0 auto;
-        }
-
-        .text,
-        .chevron {
-          display: none;
-        }
-      }
-
-      /* Nessun sottomenu visibile in collapsed */
-      .submenu {
-        display: none !important;
-      }
+    .icon {
+      width: 24px;
+      margin: 0 auto;
     }
+
+    .text,
+    .chevron {
+      display: none;
+    }
+  }
+
+  .submenu {
+    display: none !important;
   }
 }
 
-/* Mobile: margini più stretti e niente bordo sinistro */
-.sidebar.mobile nav .menu-group .submenu {
-  margin-left: .8rem;
-  border-left: none;
+/* =================== MOBILE (drawer dall'alto, 60%) =================== */
+@media (max-width: 991.98px) {
+
+  /* Drawer mobile: piena larghezza, parte sotto la topbar (60px) */
+  .sidebar.mobile {
+    position: fixed;
+    inset: 60px 0 auto 0;
+    /* top:60px; left:0; right:0 */
+    width: 100vw;
+    /* 60% dell'area visibile; fallback per browser vecchi */
+    height: 40vh;
+    height: min(60svh, calc(100dvh - 60px));
+    transform: translateY(-100%);
+    /* nascosta sopra lo schermo */
+    transition: transform .28s ease;
+    z-index: 1200;
+
+    /* aspetto “glass” */
+    background: rgba(17, 24, 39, 0.85);
+    backdrop-filter: blur(8px);
+
+    /* arrotonda gli angoli inferiori */
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+
+    /* la larghezza non deve restare 260px su mobile */
+    width: 100vw;
+  }
+
+  .sidebar.mobile.open {
+    transform: translateY(0);
+    /* scende dall'alto */
+  }
+
+  /* Backdrop per intercettare il tap sul contenuto */
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .35);
+    z-index: 1190;
+  }
+
+  /* Submenu più compatti su mobile */
+  .sidebar.mobile nav .menu-group .submenu {
+    margin-left: .8rem;
+    border-left: none;
+  }
+}
+
+/* =================== TOGGLE BAR MOBILE =================== */
+.mobile-toggle {
+  background: linear-gradient(160deg, #1f2937 0%, #111827 100%);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  z-index: 1200;
+
+  button {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: .2px;
+  }
 }

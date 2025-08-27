@@ -203,3 +203,40 @@ body {
     /* nel caso fosse posizionato */
   }
 }
+
+:host {
+  display: block;
+}
+
+/* Stili generali del contenuto */
+.app-content {
+  min-height: 100vh;
+  padding: 16px;
+  transition: margin-left .25s ease;
+}
+
+/* Desktop: la sidebar occupa spazio fisso */
+@media (min-width: 992px) {
+  .app-content {
+    margin-left: 260px;
+  }
+
+  /* sidebar aperta */
+  .app-content.collapsed {
+    margin-left: 72px;
+  }
+
+  /* sidebar compressa */
+}
+
+/* Mobile/Tablet: la sidebar è overlay, quindi NIENTE margine */
+@media (max-width: 991.98px) {
+  .app-content {
+    margin-left: 0 !important;
+  }
+}
+
+/* Fullscreen (quando showShell è false) */
+.app-content.fullscreen {
+  margin-left: 0 !important;
+}
