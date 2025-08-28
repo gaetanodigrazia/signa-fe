@@ -1,4 +1,20 @@
-/* ========== LAYOUT & SURFACE ========== */
+/***** PAGE BASE *****/
+:host {
+    /* sfondo coerente con la home */
+    --page-bg: #f0f4ff;
+    --card-bg: #ffffff;
+    --card-border: rgba(17, 24, 39, .10);
+    --title-card-bg: #aed0ff;
+    /* azzurrino per la card-titolo */
+    --title-card-border: #6fa4ff;
+
+    display: block;
+    min-height: 100vh;
+    background: var(--page-bg);
+    color: #111827;
+}
+
+/***** LAYOUT & SURFACE *****/
 .users-page {
     display: grid;
     gap: 12px;
@@ -6,19 +22,27 @@
     overflow-x: hidden;
 }
 
+/* contenitori “card” senza ombra */
 .surface {
-    background: #fff;
-    border: 1px solid rgba(17, 24, 39, .10);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+    box-shadow: none;
+    /* niente ombre */
 }
 
-/* ========== TOOLBAR ========== */
+/* la prima card in alto (titolo/toolbar) in azzurro */
+.toolbar.surface {
+    background: var(--title-card-bg);
+    border-color: var(--title-card-border);
+}
+
+/***** TOOLBAR *****/
 .toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px;
+    padding: 12px 12px;
 }
 
 .toolbar h2 {
@@ -34,7 +58,7 @@
 
 .search {
     background: #f9fafb;
-    border: 1px solid rgba(17, 24, 39, .10);
+    border: 1px solid var(--card-border);
     border-radius: 10px;
     padding: 10px 12px;
     min-width: 220px;
@@ -46,11 +70,11 @@
     box-shadow: 0 0 0 4px rgba(17, 24, 39, .08);
 }
 
-/* Buttons */
+/***** BUTTONS *****/
 .btn {
     background: #f3f4f6;
     color: #111827;
-    border: 1px solid rgba(17, 24, 39, .10);
+    border: 1px solid var(--card-border);
     border-radius: 10px;
     padding: 10px 14px;
     font-weight: 600;
@@ -60,7 +84,6 @@
 
 .btn:hover {
     background: #e5e7eb;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, .06);
 }
 
 .btn.primary {
@@ -88,7 +111,7 @@ button[disabled] {
     cursor: not-allowed;
 }
 
-/* ========== TABELLA (DESKTOP) ========== */
+/***** TABLE (DESKTOP) *****/
 .table-wrap {
     padding: 6px;
     max-width: 100%;
@@ -108,7 +131,7 @@ button[disabled] {
     font-weight: 700;
     color: #111827;
     background: #f3f4f6;
-    border-bottom: 1px solid rgba(17, 24, 39, .10);
+    border-bottom: 1px solid var(--card-border);
     padding: 10px;
     position: sticky;
     top: 0;
@@ -119,9 +142,6 @@ button[disabled] {
 .users-table td {
     word-break: break-word;
     overflow-wrap: anywhere;
-}
-
-.users-table tbody td {
     padding: 10px;
     border-bottom: 1px solid rgba(17, 24, 39, .06);
     color: #1f2937;
@@ -138,7 +158,7 @@ button[disabled] {
 
 .users-table .icon {
     background: #fff;
-    border: 1px solid rgba(17, 24, 39, .10);
+    border: 1px solid var(--card-border);
     border-radius: 8px;
     padding: 6px 8px;
     cursor: pointer;
@@ -154,6 +174,7 @@ button[disabled] {
     background: #fee2e2;
 }
 
+/***** TEXT LINKS *****/
 .linklike {
     background: none;
     border: none;
@@ -166,7 +187,7 @@ button[disabled] {
     text-decoration: underline;
 }
 
-/* Badge */
+/***** BADGES *****/
 .badge {
     display: inline-block;
     padding: 4px 8px;
@@ -184,7 +205,7 @@ button[disabled] {
     color: #991b1b;
 }
 
-/* Empty/Errors */
+/***** EMPTY / ERROR *****/
 .empty {
     text-align: center;
     color: #6b7280;
@@ -198,7 +219,7 @@ button[disabled] {
     display: block;
 }
 
-/* Overlay */
+/***** OVERLAY & SPINNER *****/
 .page-loading-overlay {
     position: fixed;
     inset: 0;
@@ -230,7 +251,7 @@ button[disabled] {
     }
 }
 
-/* Modali */
+/***** MODALS *****/
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -245,7 +266,7 @@ button[disabled] {
     max-width: calc(100% - 32px);
     background: #fff;
     color: #111827;
-    border: 1px solid rgba(17, 24, 39, .10);
+    border: 1px solid var(--card-border);
     border-radius: 14px;
     padding: 18px;
     box-shadow: 0 12px 28px rgba(0, 0, 0, .18);
@@ -283,7 +304,7 @@ label span {
 .modal select,
 .modal textarea {
     background: #f9fafb;
-    border: 1px solid rgba(17, 24, 39, .10);
+    border: 1px solid var(--card-border);
     border-radius: 10px;
     padding: 10px 12px;
     outline: none;
@@ -301,15 +322,45 @@ input.ng-invalid.ng-touched {
     background: #fff6f6;
 }
 
-/* ========== MOBILE: CARD LIST (UNA SOLA VERSIONE) ========== */
+/***** MOBILE (CARD LIST) *****/
 @media (max-width: 768px) {
+
+    /* toolbar “card” responsiva */
+    .users-page .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .users-page .toolbar .right {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+    }
+
+    .users-page .toolbar .search {
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+    }
+
+    .users-page .toolbar .btn,
+    .users-page .toolbar .btn.primary {
+        height: 40px;
+        padding: 0 12px;
+        white-space: nowrap;
+    }
+
+    /* tabella → card */
     .table-wrap.surface {
         background: transparent;
         border: 0;
         box-shadow: none;
-        padding: 0;
+        padding: 0 8px;
+        /* un filo di respiro ai lati */
         overflow: visible;
-        /* niente clipping */
     }
 
     .users-table thead {
@@ -326,30 +377,28 @@ input.ng-invalid.ng-touched {
     }
 
     .users-table tr {
-        background: #fff;
-        border: 1px solid #e6e9f0;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
         border-radius: 14px;
-        box-shadow: 0 2px 10px rgba(17, 24, 39, .04);
+        box-shadow: none;
+        /* niente ombra anche qui */
         padding: 12px 14px;
-        /* un filo di spazio a dx */
         margin-bottom: 12px;
 
         display: grid;
-        grid-template-columns: 1fr minmax(112px, auto);
-        /* contenuto + azioni con larghezza minima */
+        grid-template-columns: 1fr max-content;
+        /* contenuto + azioni */
         gap: 6px 12px;
         align-items: start;
         overflow: visible;
     }
 
-    /* Nome come titolo su tutta la card */
     .users-table td[data-label="Nome"] {
         grid-column: 1 / -1;
         font-weight: 700;
         padding: 0 0 4px;
     }
 
-    /* Altri campi su riga intera */
     .users-table td:not(.actions):not([data-label="Nome"]) {
         grid-column: 1 / -1;
         padding: 2px 0;
@@ -357,57 +406,12 @@ input.ng-invalid.ng-touched {
         font-size: .9rem;
     }
 
-    /* Etichetta */
     .users-table td[data-label]::before {
         content: attr(data-label) ": ";
         color: #6b7280;
         font-weight: 600;
     }
 
-    /* Azioni in alto a destra, con spazio e senza tagli */
-    .users-table td.actions {
-        grid-column: 2;
-        grid-row: 1;
-        justify-self: end;
-        padding: 0 2px 0 0;
-        display: inline-flex;
-        gap: 8px;
-        align-items: center;
-        white-space: nowrap;
-        overflow: visible;
-    }
-
-    .users-table td.actions * {
-        flex-shrink: 0;
-    }
-
-    .users-table .icon {
-        padding: 6px 8px;
-        font-size: 16px;
-        line-height: 1;
-        margin-left: 0;
-    }
-}
-
-/* ======= MOBILE FIX: azioni sempre visibili, niente tagli a destra ======= */
-@media (max-width: 768px) {
-
-    /* un filo di respiro lato destro/sinistro al contenitore */
-    .table-wrap.surface {
-        padding: 0 8px;
-    }
-
-    /* card-riga: contenuto + colonna azioni “a misura” */
-    .users-table tr {
-        grid-template-columns: 1fr max-content;
-        /* evita compressioni */
-        padding-right: 12px;
-        /* aria lato destro */
-        overflow: visible;
-        /* nessun clipping interno */
-    }
-
-    /* blocco azioni: in alto a dx, su una riga, senza wrap */
     .users-table td.actions {
         grid-column: 2;
         grid-row: 1;
@@ -416,74 +420,30 @@ input.ng-invalid.ng-touched {
         align-items: center;
         gap: 8px;
         white-space: nowrap;
-        /* non andare a capo */
         padding: 0;
-        /* niente padding extra */
         overflow: visible;
-        /* icone mai tagliate */
     }
 
-    /* dimensioni icone più “clickabili” e centrate */
     .users-table td.actions .icon {
         width: 34px;
         height: 34px;
         padding: 0;
-        /* il box fa da hit area */
         display: grid;
         place-items: center;
         margin-left: 0;
-        /* niente push fuori bordo */
         line-height: 1;
     }
-}
 
-/* ===== Toolbar: fix layout mobile (card in alto) ===== */
-@media (max-width: 768px) {
-    .users-page .toolbar {
-        flex-direction: column;
-        /* titolo sopra, controlli sotto */
-        align-items: stretch;
-        /* i figli occupano tutta la larghezza */
-        gap: 10px;
-        padding: 12px;
-    }
+    /* piccolissimi schermi: bottone su nuova riga */
+    @media (max-width: 380px) {
+        .users-page .toolbar .right {
+            grid-template-columns: 1fr;
+        }
 
-    .users-page .toolbar .right {
-        width: 100%;
-        display: grid;
-        /* ricerca + bottone sulla stessa riga */
-        grid-template-columns: 1fr auto;
-        gap: 8px;
-    }
-
-    .users-page .toolbar .search {
-        width: 100%;
-        min-width: 0;
-        /* elimina la min-width che la stringe */
-        margin: 0;
-        /* niente margini che la decentrano */
-    }
-
-    .users-page .toolbar .btn,
-    .users-page .toolbar .btn.primary {
-        height: 40px;
-        /* touch target comodo */
-        padding: 0 12px;
-        white-space: nowrap;
-        /* non andare a capo su “Nuovo paziente” */
-    }
-}
-
-/* piccolissimi schermi: stack verticale */
-@media (max-width: 380px) {
-    .users-page .toolbar .right {
-        grid-template-columns: 1fr;
-        /* prima input, poi bottone full-width */
-    }
-
-    .users-page .toolbar .btn,
-    .users-page .toolbar .btn.primary {
-        width: 100%;
-        justify-self: stretch;
+        .users-page .toolbar .btn,
+        .users-page .toolbar .btn.primary {
+            width: 100%;
+            justify-self: stretch;
+        }
     }
 }
