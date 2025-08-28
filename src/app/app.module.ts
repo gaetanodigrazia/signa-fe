@@ -11,7 +11,6 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { AppointmentCalendarComponent } from './components/appointment-calendar/appointment-calendar.component';
 import { FormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { LockScreenComponent } from './components/shared/lock-screen/lock-screen.component';
 import { LoginComponent } from './pages/login/login.component';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthInterceptor } from './auth/auth.interceptor';
@@ -28,7 +27,6 @@ import { PatientPickerComponent } from './components/shared/patient-picker/patie
     SidebarComponent,
     SettingsComponent,
     AppointmentCalendarComponent,
-    LockScreenComponent,
     LoginComponent,
     PatientPickerComponent],
   imports: [

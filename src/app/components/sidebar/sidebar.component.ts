@@ -81,15 +81,6 @@ export class SidebarComponent implements OnInit {
     }
   }
 
-  /** Blocca la sessione: salva URL corrente, imposta locked e vai a /lock */
-  lockScreen(): void {
-    const currentUrl = this.router.url || '/home';
-    localStorage.setItem(LS_LOCKED, 'true');
-    localStorage.setItem(LS_RETURN_URL, currentUrl);
-
-    if (this.isMobile) this.menuOpen = false;
-    this.router.navigateByUrl('/lock');
-  }
   // stato submenu
   patientsOpen = false;
   patientsOpenMobile = false;
