@@ -10,7 +10,7 @@
 /* ----- Card del login (override della .card globale) ----- */
 .login-page form.card {
     width: min(420px, 92vw);
-    background: #1b2a39;
+    background: #baddff;
     /* scuro, non ereditare il bianco globale */
     color: #e5e7eb;
     border: 1px solid rgba(255, 255, 255, .06);
@@ -65,18 +65,25 @@
     caret-color: #e5e7eb;
 }
 
-/* ----- Bottone ----- */
+/* Bottone: stile del testo come gli input */
 .login-page form.card button[type="submit"] {
     width: 100%;
     padding: 12px 14px;
     border: 0;
     border-radius: 12px;
-    background: linear-gradient(90deg, #10b981, #06b6d4);
-    color: #09202c;
-    font-weight: 800;
+    background: #243a4f;
+    color: #e5e7eb;
+    /* <-- stesso colore degli input */
+    font-size: 1rem;
+    font-family: inherit;
+    font-weight: 200;
     letter-spacing: .3px;
     cursor: pointer;
     transition: filter .2s, box-shadow .2s, transform .05s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .login-page form.card button[type="submit"]:hover {
@@ -92,4 +99,25 @@
 .login-page form.card .error {
     color: #fca5a5;
     text-align: center;
+}
+
+.logo-img {
+    width: 500px;
+    /* regola a piacere */
+    height: auto;
+    display: block;
+    margin: 0 auto 1rem;
+}
+
+.btn-logo {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* assicurati che nessun contenitore dia uno sfondo bianco */
+.logo img,
+.btn-logo {
+    background: transparent;
 }

@@ -1,8 +1,8 @@
 <div class="login-page">
     <form class="card" (ngSubmit)="submit()">
-        <div class="logo">🔐</div>
-        <h2>Accedi</h2>
-
+        <div class="logo">
+            <img src="assets/logo/logo.svg" alt="Signa by BeCare" class="logo-img" />
+        </div>
         <input type="email" [(ngModel)]="email" name="email" required autocomplete="username" placeholder="Email"
             aria-label="Email" />
 
