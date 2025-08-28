@@ -25,7 +25,6 @@ import { PatientPickerComponent } from './components/shared/patient-picker/patie
   declarations: [
     AppComponent,
     SidebarComponent,
-    SettingsComponent,
     AppointmentCalendarComponent,
     LoginComponent,
     PatientPickerComponent],

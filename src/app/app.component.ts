@@ -20,14 +20,6 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(public auth: AuthService) { }
 
   ngOnInit(): void {
-    // Spinner iniziale + probe, a fine probe togli overlay
-    this.bootSub = this.auth.probeLogin()
-      .pipe(finalize(() => { this.bootLoading = false; }))
-      .subscribe({
-        next: () => {/* ok */ },
-        error: (err) => console.warn('Probe login failed:', err)
-      });
-
     // (Opzionale) avviso auto-logout se lo usi
     this.warnSub = this.auth.autoLogoutWarning$?.subscribe(msLeft => {
       console.warn(`Logout automatico tra ${Math.ceil(msLeft / 1000)}s`);

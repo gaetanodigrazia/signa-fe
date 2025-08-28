@@ -1,0 +1,449 @@
+/***** PAGE BASE *****/
+:host {
+    /* sfondo coerente con la home */
+    --page-bg: #f0f4ff;
+    --card-bg: #ffffff;
+    --card-border: rgba(17, 24, 39, .10);
+    --title-card-bg: #aed0ff;
+    /* azzurrino per la card-titolo */
+    --title-card-border: #6fa4ff;
+
+    display: block;
+    min-height: 100vh;
+    background: var(--page-bg);
+    color: #111827;
+}
+
+/***** LAYOUT & SURFACE *****/
+.users-page {
+    display: grid;
+    gap: 12px;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* contenitori “card” senza ombra */
+.surface {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    box-shadow: none;
+    /* niente ombre */
+}
+
+/* la prima card in alto (titolo/toolbar) in azzurro */
+.toolbar.surface {
+    background: var(--title-card-bg);
+    border-color: var(--title-card-border);
+}
+
+/***** TOOLBAR *****/
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 12px;
+}
+
+.toolbar h2 {
+    margin: 0;
+    color: #111827;
+}
+
+.toolbar .right {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.search {
+    background: #f9fafb;
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    min-width: 220px;
+    outline: none;
+}
+
+.search:focus {
+    border-color: rgba(17, 24, 39, .16);
+    box-shadow: 0 0 0 4px rgba(17, 24, 39, .08);
+}
+
+/***** BUTTONS *****/
+.btn {
+    background: #f3f4f6;
+    color: #111827;
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, box-shadow .2s, transform .1s;
+}
+
+.btn:hover {
+    background: #e5e7eb;
+}
+
+.btn.primary {
+    background: #2563eb;
+    color: #fff;
+    border-color: transparent;
+}
+
+.btn.primary:hover {
+    background: #1d4ed8;
+}
+
+.btn.danger {
+    background: #dc2626;
+    color: #fff;
+    border-color: transparent;
+}
+
+.btn.danger:hover {
+    background: #b91c1c;
+}
+
+button[disabled] {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+/***** TABLE (DESKTOP) *****/
+.table-wrap {
+    padding: 6px;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+    /* impedisce allargamenti */
+}
+
+.users-table thead th {
+    text-align: left;
+    font-weight: 700;
+    color: #111827;
+    background: #f3f4f6;
+    border-bottom: 1px solid var(--card-border);
+    padding: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 0;
+}
+
+.users-table th,
+.users-table td {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    padding: 10px;
+    border-bottom: 1px solid rgba(17, 24, 39, .06);
+    color: #1f2937;
+}
+
+.users-table tbody tr:hover {
+    background: rgba(17, 24, 39, .02);
+}
+
+.users-table .actions {
+    width: 120px;
+    text-align: right;
+}
+
+.users-table .icon {
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 6px 8px;
+    cursor: pointer;
+    margin-left: 6px;
+    line-height: 1;
+}
+
+.users-table .icon:hover {
+    background: #f3f4f6;
+}
+
+.users-table .icon.danger:hover {
+    background: #fee2e2;
+}
+
+/***** TEXT LINKS *****/
+.linklike {
+    background: none;
+    border: none;
+    color: #2563eb;
+    cursor: pointer;
+    padding: 0;
+}
+
+.linklike:hover {
+    text-decoration: underline;
+}
+
+/***** BADGES *****/
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: .85rem;
+}
+
+.badge.ok {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge.off {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/***** EMPTY / ERROR *****/
+.empty {
+    text-align: center;
+    color: #6b7280;
+    padding: 18px 0;
+}
+
+.error {
+    color: #d93025;
+    font-size: .85rem;
+    margin-top: 4px;
+    display: block;
+}
+
+/***** OVERLAY & SPINNER *****/
+.page-loading-overlay {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: color-mix(in srgb, #000 10%, transparent);
+    z-index: 1000;
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 3px solid currentColor;
+    border-right-color: transparent;
+    animation: spin .8s linear infinite;
+    display: inline-block;
+}
+
+.spinner--big {
+    width: 48px;
+    height: 48px;
+    border-width: 4px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/***** MODALS *****/
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .5);
+    display: grid;
+    place-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    width: 420px;
+    max-width: calc(100% - 32px);
+    background: #fff;
+    color: #111827;
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .18);
+    display: grid;
+    gap: 10px;
+}
+
+.modal.small {
+    width: 360px;
+}
+
+.modal h3 {
+    margin: 0 0 6px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+label {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+}
+
+label span {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.modal input,
+.modal select,
+.modal textarea {
+    background: #f9fafb;
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    outline: none;
+}
+
+.modal input:focus,
+.modal select:focus,
+.modal textarea:focus {
+    border-color: rgba(17, 24, 39, .16);
+    box-shadow: 0 0 0 4px rgba(17, 24, 39, .08);
+}
+
+input.ng-invalid.ng-touched {
+    border: 1px solid #d93025;
+    background: #fff6f6;
+}
+
+/***** MOBILE (CARD LIST) *****/
+@media (max-width: 768px) {
+
+    /* toolbar “card” responsiva */
+    .users-page .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .users-page .toolbar .right {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+    }
+
+    .users-page .toolbar .search {
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+    }
+
+    .users-page .toolbar .btn,
+    .users-page .toolbar .btn.primary {
+        height: 40px;
+        padding: 0 12px;
+        white-space: nowrap;
+    }
+
+    /* tabella → card */
+    .table-wrap.surface {
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+        padding: 0 8px;
+        /* un filo di respiro ai lati */
+        overflow: visible;
+    }
+
+    .users-table thead {
+        display: none;
+    }
+
+    .users-table,
+    .users-table tbody,
+    .users-table tr,
+    .users-table td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .users-table tr {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        box-shadow: none;
+        /* niente ombra anche qui */
+        padding: 12px 14px;
+        margin-bottom: 12px;
+
+        display: grid;
+        grid-template-columns: 1fr max-content;
+        /* contenuto + azioni */
+        gap: 6px 12px;
+        align-items: start;
+        overflow: visible;
+    }
+
+    .users-table td[data-label="Nome"] {
+        grid-column: 1 / -1;
+        font-weight: 700;
+        padding: 0 0 4px;
+    }
+
+    .users-table td:not(.actions):not([data-label="Nome"]) {
+        grid-column: 1 / -1;
+        padding: 2px 0;
+        color: #374151;
+        font-size: .9rem;
+    }
+
+    .users-table td[data-label]::before {
+        content: attr(data-label) ": ";
+        color: #6b7280;
+        font-weight: 600;
+    }
+
+    .users-table td.actions {
+        grid-column: 2;
+        grid-row: 1;
+        justify-self: end;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+        padding: 0;
+        overflow: visible;
+    }
+
+    .users-table td.actions .icon {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        display: grid;
+        place-items: center;
+        margin-left: 0;
+        line-height: 1;
+    }
+
+    /* piccolissimi schermi: bottone su nuova riga */
+    @media (max-width: 380px) {
+        .users-page .toolbar .right {
+            grid-template-columns: 1fr;
+        }
+
+        .users-page .toolbar .btn,
+        .users-page .toolbar .btn.primary {
+            width: 100%;
+            justify-self: stretch;
+        }
+    }
+}

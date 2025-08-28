@@ -1,8 +1,3 @@
-<!-- Overlay spinner a schermo intero -->
-<div *ngIf="bootLoading" class="boot-overlay" role="status" aria-live="polite" aria-label="Caricamento in corso">
-  <div class="spinner"></div>
-</div>
-
 <!-- Sidebar visibile solo se l'utente è loggato -->
 <app-sidebar *ngIf="auth.isAuthenticated()" (collapseChanged)="onSidebarCollapseChange($event)">
 </app-sidebar>

@@ -1,0 +1,333 @@
+/* Layout base */
+.settings-page {
+    display: grid;
+    gap: 20px;
+    padding: 16px;
+}
+
+.toolbar.surface {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-radius: 12px;
+}
+
+.subtitle {
+    margin: 0;
+    color: var(--muted, #6b7280);
+}
+
+/* TABBAR */
+.tabs {
+    position: relative;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 8px;
+    background: var(--card-bg, #fff);
+    border: 1px solid #e5eaf3;
+    border-radius: 12px;
+    padding: 6px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+.tab {
+    position: relative;
+    background: transparent;
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font: inherit;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s ease, color .15s ease;
+}
+
+.tab[aria-selected="true"],
+.tab.active {
+    color: #0f172a;
+    background: #eef2ff;
+}
+
+.tab:hover {
+    background: #f6f8ff;
+}
+
+.tab__icon {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.tabs__indicator {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    width: calc(100% / 7 - 8px);
+    /* 7 tab: adattare se cambi numero */
+    height: 3px;
+    border-radius: 999px;
+    background: #6366f1;
+    transition: transform .25s ease;
+    pointer-events: none;
+}
+
+/* PANELS */
+.panels {
+    display: grid;
+    gap: 16px;
+}
+
+.panel.surface {
+    border-radius: 14px;
+    padding: 14px;
+    display: grid;
+    gap: 12px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e9edf5;
+}
+
+.card__title {
+    margin: 0;
+}
+
+/* Campi */
+.grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field {
+    display: grid;
+    gap: 6px;
+}
+
+.field>span {
+    font-size: .9rem;
+    color: var(--muted, #6b7280);
+}
+
+.field input,
+.field select,
+.field textarea {
+    width: 100%;
+    border: 1px solid #cfd6e3;
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font: inherit;
+    color: inherit;
+}
+
+.field textarea {
+    resize: vertical;
+}
+
+.hint {
+    color: var(--muted, #6b7280);
+    font-size: .8rem;
+}
+
+.switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+}
+
+.switch input {
+    width: 18px;
+    height: 18px;
+}
+
+.inline-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.mt {
+    margin-top: 6px;
+}
+
+/* Bottoni (riuso) */
+.btn-outline {
+    padding: 8px 12px;
+    border-radius: 10px;
+}
+
+.btn-refresh {
+    padding: 10px 14px;
+    border-radius: 12px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tabs {
+        grid-auto-columns: max-content;
+    }
+
+    /* pill scroll su mobile */
+    .tabs__indicator {
+        display: none;
+    }
+
+    /* su mobile la pill evidenziata basta */
+}
+
+/* Assicura che i pannelli nascosti restino invisibili
+   anche se altrove impostiamo display:grid/ flex, ecc. */
+[hidden] {
+    display: none !important;
+}
+
+/* === Mobile: tab su più righe === */
+
+/* Tablet / small laptop: 3 colonne (≈ 2–3 righe con 7 tab) */
+@media (max-width: 1024px) {
+    .tabs {
+        display: grid;
+        grid-auto-flow: row;
+        /* smette di forzare una sola riga */
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        /* spazio uniforme tra pill */
+        overflow-x: visible;
+        /* niente scroll orizzontale */
+    }
+
+    .tabs__indicator {
+        display: none;
+    }
+
+    /* l’indicatore non serve a griglia */
+}
+
+/* Mobile stretto: 2 colonne (più grandi e leggibili) */
+@media (max-width: 640px) {
+    .tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* === Toolbar: allineamento e pulsanti moderni === */
+.settings-page .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.settings-page .toolbar .right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* Bottoni base */
+.btn {
+    appearance: none;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease, color .2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    line-height: 1;
+}
+
+/* Primario (Salva) */
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    border-color: rgba(37, 99, 235, .25);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, .25);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(29, 78, 216, .30);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.btn-primary:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Secondario (Annulla) */
+.btn-ghost {
+    background: #fff;
+    color: #334155;
+    border-color: #d0d7e6;
+}
+
+.btn-ghost:hover {
+    background: #f6f8ff;
+    border-color: #c3cde3;
+}
+
+.btn-ghost:active {
+    transform: translateY(1px);
+}
+
+/* --- Mobile layout: due pulsanti affiancati e full-width --- */
+@media (max-width: 640px) {
+    .settings-page .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .settings-page .toolbar .right {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        /* Annulla | Salva */
+        gap: 8px;
+    }
+
+    .settings-page .toolbar .right .btn {
+        width: 100%;
+    }
+}
+
+/* Schermi molto stretti: fallback in colonna */
+@media (max-width: 380px) {
+    .settings-page .toolbar .right {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+.settings-page::after {
+    content: "";
+    display: block;
+    height: 70px;
+}

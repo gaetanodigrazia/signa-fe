@@ -209,13 +209,4 @@ export class AuthService {
     if (this.warnTimer) { clearTimeout(this.warnTimer); this.warnTimer = null; }
     if (this.logoutTimer) { clearTimeout(this.logoutTimer); this.logoutTimer = null; }
   }
-  /** Chiamata “di bootstrap” al login con campi vuoti, senza side-effects */
-  probeLogin(): Observable<void> {
-    const body = { email: '', password: '' };
-
-    return this.http.post(`${this.baseUrl}/login`, body).pipe(
-      switchMap(() => this.patientService.remove("1")),
-      map(() => void 0)
-    );
-  }
 }
