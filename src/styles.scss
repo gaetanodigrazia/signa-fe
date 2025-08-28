@@ -1,31 +1,13 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
-body {
-  margin: 0;
-  font-family: Roboto, sans-serif;
-}
-
+/* ===================== BASE ===================== */
 html,
 body {
   height: 100%;
-}
-
-body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-}
-
-:root {
-  /* stesso gradiente che usi per la parte non-sidebar */
-  --page-g1: #f0f2f5;
-  --page-g2: #e2e5ea;
-}
-
-html,
-body {
-  height: 100%;
-  margin: 0;
-  background: linear-gradient(135deg, var(--page-g1), var(--page-g2));
+  background: #f5f7fb;
+  /* sfondo uniforme */
 }
 
 app-root {
@@ -33,22 +15,14 @@ app-root {
   display: block;
 }
 
-/* Sfondo di pagina uniforme */
-html,
-body {
-  background: #f5f7fb;
-}
-
-/* Il wrapper del contenuto NON deve essere una card */
+/* ===================== APP CONTENT ===================== */
 .app-content {
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
-  /* niente bordi arrotondati */
   border-radius: 0 !important;
 }
 
-/* Se per caso il wrapper ha anche la classe "surface" */
 .app-content.surface,
 .surface.app-content {
   background: transparent !important;
@@ -57,7 +31,7 @@ body {
   border-radius: 0 !important;
 }
 
-/* ---------- Card responsive (globali) ---------- */
+/* ===================== VARIABILI GLOBALI ===================== */
 :root {
   --space-xxs: 6px;
   --space-xs: 8px;
@@ -67,19 +41,26 @@ body {
   --radius-md: 12px;
 }
 
-/* contenitori “surface/card” che usi ovunque */
+/* ===================== CARD & SURFACE ===================== */
 .surface,
 .card {
   box-sizing: border-box;
   width: auto;
   max-width: 100%;
   min-width: 0;
-  /* IMPORTANTISSIMO: evita overflow nelle grid */
   border-radius: var(--radius-md);
   padding: var(--space-md);
 }
 
-/* tipografia dentro card */
+.card * {
+  min-width: 0;
+}
+
+.surface * {
+  min-width: 0;
+}
+
+/* Tipografia dentro card */
 .card__title,
 .surface .title {
   font-size: clamp(0.95rem, 1.6vw, 1.15rem);
@@ -98,58 +79,7 @@ body {
   font-size: clamp(.8rem, 1.5vw, .95rem);
 }
 
-/* griglia riutilizzabile per righe di card */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: var(--space-sm);
-}
-
-/* quando lo spazio è davvero poco (mobile “vero”) */
-@media (max-width: 575.98px) {
-
-  .surface,
-  .card {
-    padding: var(--space-sm);
-    border-radius: var(--radius-sm);
-  }
-
-  .cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    /* 2 per riga quando possibile */
-    gap: var(--space-xs);
-  }
-}
-
-/* telefoni stretti */
-@media (max-width: 380px) {
-  .cards-grid {
-    grid-template-columns: 1fr;
-  }
-
-  /* 1 per riga se serve */
-}
-
-/* utility: righe con elementi che non devono allargare la card */
-.card * {
-  min-width: 0;
-}
-
-/* ---------- FIX GLOBALI DI SICUREZZA ---------- */
-/* Evita che elementi interni allargino le card su schermi stretti */
-.card,
-.surface {
-  box-sizing: border-box;
-  max-width: 100%;
-  min-width: 0;
-}
-
-.card *,
-.surface * {
-  min-width: 0;
-}
-
-/* Header card: titolo e link devono potersi andare a capo senza spingere */
+/* Header card */
 .card-header {
   display: flex;
   align-items: center;
@@ -167,7 +97,6 @@ body {
   white-space: nowrap;
 }
 
-/* Tipografia base delle card (scalabile) */
 .card h3,
 .card .card-kpi-header,
 .surface h3 {
@@ -175,14 +104,40 @@ body {
   line-height: 1.25;
 }
 
-/* Valori grandi nei KPI */
 .kpi-value {
   font-weight: 800;
   font-size: clamp(1.6rem, 7vw, 2.2rem);
   line-height: 1.1;
 }
 
-/* Badge più compatti su mobile */
+/* ===================== CARDS GRID ===================== */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-sm);
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 575.98px) {
+
+  .surface,
+  .card {
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-xs);
+  }
+}
+
+@media (max-width: 380px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 576px) {
   .badge {
     font-size: .8rem;

@@ -5,16 +5,18 @@
   overflow: hidden;
 }
 
-/* Area contenuto principale */
+/* Area contenuto scrollabile */
 .app-content {
   flex: 1;
   min-height: 100dvh;
-  height: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 1rem;
-  background: linear-gradient(135deg, var(--g1, #f0f2f5), var(--g2, #e2e5ea));
-  color: var(--text, #111827);
+
+  /* IMPORTANTISSIMO: niente sfondo qui, lasciamo vedere il body azzurrino */
+  background: transparent;
+  color: var(--text);
+
+  padding: 16px;
   transition: margin-left .25s ease;
 }
 
@@ -22,27 +24,55 @@
 @media (min-width: 992px) {
   .app-content {
     margin-left: 260px;
-    /* sidebar aperta */
   }
 
   .app-content.collapsed {
     margin-left: 72px;
-    /* sidebar compressa */
   }
 }
 
-/* Mobile e tablet: overlay sidebar → nessun margine */
+/* Mobile e tablet: sidebar overlay → nessun margine */
 @media (max-width: 991.98px) {
   .app-content {
     margin-left: 0 !important;
     max-width: 100%;
-    /* elimina overflow a destra */
   }
 }
 
-/* Fullscreen (shell nascosta) */
+/* Fullscreen (quando showShell è false) */
 .app-content.fullscreen {
   margin-left: 0 !important;
   width: 100%;
   max-width: 100%;
+}
+
+/* Overlay caricamento riutilizzabile */
+.page-loading-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, .08);
+  z-index: 1000;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 3px solid currentColor;
+  border-right-color: transparent;
+  animation: spin .8s linear infinite;
+}
+
+.spinner--big {
+  width: 48px;
+  height: 48px;
+  border-width: 4px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

@@ -1,10 +1,26 @@
+/************ PALETTE ************/
 :host {
-    display: block;
-    background: #f5f7fb;
-    color: #111827;
+    --page-bg: #eef4ff;
+    /* azzurrino più evidente */
+    --text: #111827;
+    /* gray-900 */
+    --muted: #566074;
+    /* gray-600 un filo più scuro */
+    --card-bg: #ffffff;
+    --card-bd: #d8dee9;
+    /* bordo più contrastato */
+    --card-sh: 0 4px 18px rgba(17, 24, 39, .06);
+
+    --chip-bg: #eef2ff;
+    --chip-bd: #c7d2fe;
+
+    --row-bg: #f7f9fc;
+    --row-bd: #e3e8f2;
+
+    color: var(--text);
 }
 
-/* ===================== Layout base ===================== */
+/************ CONTAINER ************/
 .home {
     max-width: 1200px;
     margin: 0 auto;
@@ -13,25 +29,35 @@
     gap: 20px;
 }
 
-/* ===================== Toolbar ===================== */
+/* sfondo pagina (solo in questa view) */
+:host::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: var(--page-bg);
+    z-index: -1;
+    /* resta dietro a tutto */
+}
+
+/************ TOOLBAR ************/
 .toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
     border-radius: 12px;
-    background: #fff;
-    border: 1px solid #e6e9f0;
-    box-shadow: 0 2px 10px rgba(17, 24, 39, .04);
+    background: var(--card-bg);
+    border: 1px solid var(--card-bd);
+    box-shadow: var(--card-sh);
 }
 
 .subtitle {
     margin: 0;
     font-size: .95rem;
-    color: #667085;
+    color: var(--muted);
 }
 
-/* ===================== Griglie desktop ===================== */
+/************ GRIGLIE ************/
 .cards-grid.kpi {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -43,22 +69,20 @@
     grid-template-columns: 2fr 1fr;
     gap: 16px;
     align-items: start;
-
 }
 
-/* ===================== Card ===================== */
+/************ CARD ************/
 .surface.card {
-    background: #fff;
-    border: 1px solid #e6e9f0;
-    box-shadow: 0 2px 10px rgba(17, 24, 39, .04);
+    background: var(--card-bg);
+    border: 1px solid var(--card-bd);
     border-radius: 14px;
+    box-shadow: var(--card-sh);
     padding: 14px;
 }
 
-/* 👉 padding base +6px sempre */
+/* +6px di aria in fondo alle card della colonna destra (Pazienti) */
 .cards-grid.two>.card {
     padding-bottom: 20px;
-    /* 14 + 6 */
 }
 
 .card-header,
@@ -67,26 +91,22 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    border-bottom: 1px solid #edf1f7;
+    border-bottom: 1px solid #e9edf5;
     padding-bottom: 8px;
-}
-
-.card-header {
-    margin-bottom: 8px;
 }
 
 .card-kpi-header {
     font-weight: 600;
-    opacity: .85;
+    opacity: .9;
     margin-bottom: 4px;
 }
 
-/* ===================== KPI ===================== */
+/************ KPI ************/
 .kpi-value {
     font-size: 2.4rem;
     line-height: 1;
     font-weight: 800;
-    margin: 4px 0 6px;
+    margin: 6px 0 8px;
     letter-spacing: -.02em;
 }
 
@@ -98,14 +118,14 @@
 }
 
 .kpi-extra .badge {
-    background: #f3f6ff;
-    border: 1px solid #e3e8ff;
+    background: var(--chip-bg);
+    border: 1px solid var(--chip-bd);
     color: #1f2937;
     border-radius: 999px;
     padding: 2px 10px;
 }
 
-/* ===================== Liste ===================== */
+/************ LISTE ************/
 .list {
     list-style: none;
     margin: 0;
@@ -121,15 +141,15 @@
     align-items: center;
     padding: 10px 12px;
     border-radius: 12px;
-    background: #f6f8fb;
-    border: 1px solid #e6e9f0;
+    background: var(--row-bg);
+    border: 1px solid var(--row-bd);
     transition: background .15s, box-shadow .15s, border-color .15s;
 }
 
 .list li:hover {
-    background: #f2f5f9;
-    border-color: #dfe4ee;
-    box-shadow: 0 2px 8px rgba(16, 24, 40, .05);
+    background: #f0f4fa;
+    border-color: #d7dfec;
+    box-shadow: 0 2px 10px rgba(16, 24, 40, .06);
 }
 
 .time {
@@ -142,7 +162,7 @@
 }
 
 .main .meta {
-    color: #667085;
+    color: var(--muted);
     font-size: .92rem;
 }
 
@@ -154,19 +174,19 @@
     place-items: center;
     font-weight: 800;
     background: #eaf0f7;
-    color: #111827;
+    color: var(--text);
 }
 
-/* 👉 +6px di aria in fondo alla lista Pazienti */
+/* +6px extra solo sull’ultima lista della card Pazienti */
 .cards-grid.two>article.card.surface:last-child .list {
-    padding-bottom: 6px !important;
+    padding-bottom: 6px;
 }
 
 .cards-grid.two>article.card.surface:last-child .list>li:last-child {
-    margin-bottom: 6px !important;
+    margin-bottom: 6px;
 }
 
-/* ===================== Badge stato ===================== */
+/************ BADGE STATO ************/
 .status .badge {
     font-size: .78rem;
     line-height: 1;
@@ -176,12 +196,12 @@
 }
 
 .badge--booked {
-    background: #e8edff;
+    background: #e7ecff;
     color: #1f2937;
 }
 
 .badge--confirmed {
-    background: #e9f7ef;
+    background: #e7f7ef;
     color: #14532d;
 }
 
@@ -195,7 +215,7 @@
     color: #7f1d1d;
 }
 
-/* ===================== Bottoni/link ===================== */
+/************ LINK/BUTTON ************/
 .btn-link {
     color: #2563eb;
     background: transparent;
@@ -212,7 +232,7 @@
 
 .btn-outline {
     background: #fff;
-    border: 1px solid #d7ddea;
+    border: 1px solid #cfd6e3;
     border-radius: 12px;
     padding: 6px 12px;
     cursor: pointer;
@@ -220,10 +240,40 @@
 
 .btn-outline:hover {
     background: #f3f4f6;
-    border-color: #cdd5e3;
+    border-color: #c5cede;
 }
 
-/* ===================== Overlay spinner ===================== */
+/* bottone refresh già migliorato in precedenza */
+.btn-refresh {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, .25);
+}
+
+.btn-refresh:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    transform: translateY(-1px);
+}
+
+.btn-refresh:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.btn-refresh:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+/************ OVERLAY/SPINNER ************/
 .page-loading-overlay {
     position: fixed;
     inset: 0;
@@ -255,7 +305,6 @@
     }
 }
 
-/* ===================== Accessibilità ===================== */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -268,7 +317,7 @@
     border: 0;
 }
 
-/* ===================== Responsive ===================== */
+/************ RESPONSIVE ************/
 /* Tablet */
 @media (max-width: 900px) {
     .cards-grid.kpi {
@@ -288,9 +337,7 @@
 @media (max-width: 576px) {
     .list li {
         grid-template-columns: 1fr auto;
-        grid-template-areas:
-            "main actions"
-            "time status";
+        grid-template-areas: "main actions" "time status";
         align-items: start;
     }
 
@@ -316,7 +363,7 @@
     }
 }
 
-/* Mobile: 1 colonna centrata */
+/* 1 colonna centrata */
 @media (max-width: 768px) {
 
     .cards-grid.kpi,
@@ -327,15 +374,15 @@
     }
 
     .cards-grid.kpi>.card,
-    .cards-grid.kpi>.surface,
     .cards-grid.two>.card,
+    .cards-grid.kpi>.surface,
     .cards-grid.two>.surface {
         width: 100%;
         max-width: 480px;
     }
 }
 
-/* Spacer fuori dalla griglia */
+/* piccolo spacer finale della vista */
 .home {
     padding-bottom: 16px;
 }
@@ -344,59 +391,4 @@
     content: "";
     display: block;
     height: 70px;
-}
-
-/* +6px di padding in fondo alle card */
-.cards-grid.two>.card {
-    padding-bottom: 20px !important;
-    /* 14 + 6 */
-}
-
-/* 6px extra solo sull’ultima lista della card Pazienti */
-.cards-grid.two>article.card.surface:last-child .list {
-    padding-bottom: 6px !important;
-}
-
-.cards-grid.two>article.card.surface:last-child .list>li:last-child {
-    margin-bottom: 6px !important;
-}
-
-/* ===================== Bottone Aggiorna ===================== */
-.btn-refresh {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    /* blu più vivo */
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    padding: 10px 20px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
-}
-
-.btn-refresh:hover:not(:disabled) {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.3);
-    transform: translateY(-1px);
-}
-
-.btn-refresh:active:not(:disabled) {
-    transform: translateY(1px);
-    box-shadow: 0 3px 6px rgba(37, 99, 235, 0.2);
-}
-
-.btn-refresh:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
-/* opzionale: icona refresh */
-.btn-refresh .icon {
-    font-size: 1.1rem;
-    line-height: 0;
 }

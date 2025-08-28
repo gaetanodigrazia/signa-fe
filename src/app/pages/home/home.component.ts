@@ -137,7 +137,7 @@ export class HomeComponent implements OnInit {
   /* ===== azioni UI ===== */
   openPatient(p: PatientDto): void {
     // vai ai pazienti con query precompilata
-    const q = [p.firstname, p.lastname].filter(Boolean).join(' ');
+    const q = p.id;
     this.router.navigate(['/patients'], { queryParams: { q } });
   }
 
