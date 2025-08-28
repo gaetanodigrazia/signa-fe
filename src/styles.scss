@@ -1,89 +1,34 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
-/* ===================== BASE ===================== */
+/* base */
 html,
 body {
   height: 100%;
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-  background: #f5f7fb;
-  /* sfondo uniforme */
+  font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+/* niente background qui: lo gestiscono i singoli layout (home scura/chiara, login, ecc.) */
 app-root {
-  min-height: 100dvh;
   display: block;
+  min-height: 100dvh;
 }
 
-/* ===================== APP CONTENT ===================== */
-.app-content {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-}
-
-.app-content.surface,
-.surface.app-content {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-}
-
-/* ===================== VARIABILI GLOBALI ===================== */
-:root {
-  --space-xxs: 6px;
-  --space-xs: 8px;
-  --space-sm: 12px;
-  --space-md: 16px;
-  --radius-sm: 10px;
-  --radius-md: 12px;
-}
-
-/* ===================== CARD & SURFACE ===================== */
+/* card/surface globali: non tocchiamo colori, solo box-model coerente */
 .surface,
 .card {
   box-sizing: border-box;
-  width: auto;
   max-width: 100%;
   min-width: 0;
-  border-radius: var(--radius-md);
-  padding: var(--space-md);
+  border-radius: 12px;
+  padding: 16px;
 }
 
-.card * {
-  min-width: 0;
-}
-
-.surface * {
-  min-width: 0;
-}
-
-/* Tipografia dentro card */
-.card__title,
-.surface .title {
-  font-size: clamp(0.95rem, 1.6vw, 1.15rem);
-  line-height: 1.25;
-  margin: 0 0 var(--space-xs);
-}
-
-.card__value {
-  font-weight: 700;
-  font-size: clamp(1.4rem, 5vw, 2rem);
-  line-height: 1.1;
-}
-
-.card__meta {
-  color: #6b7280;
-  font-size: clamp(.8rem, 1.5vw, .95rem);
-}
-
-/* Header card */
+/* header card: evita overflow su mobile */
 .card-header {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
   flex-wrap: wrap;
 }
 
@@ -97,59 +42,8 @@ app-root {
   white-space: nowrap;
 }
 
-.card h3,
-.card .card-kpi-header,
-.surface h3 {
-  font-size: clamp(0.95rem, 2vw, 1.1rem);
-  line-height: 1.25;
-}
-
-.kpi-value {
-  font-weight: 800;
-  font-size: clamp(1.6rem, 7vw, 2.2rem);
-  line-height: 1.1;
-}
-
-/* ===================== CARDS GRID ===================== */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: var(--space-sm);
-}
-
-/* ===================== RESPONSIVE ===================== */
-@media (max-width: 575.98px) {
-
-  .surface,
-  .card {
-    padding: var(--space-sm);
-    border-radius: var(--radius-sm);
-  }
-
-  .cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-xs);
-  }
-}
-
-@media (max-width: 380px) {
-  .cards-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 576px) {
-  .badge {
-    font-size: .8rem;
-    padding: 2px 8px;
-  }
-}
-
-@media (max-width: 992px) {
-  .grid {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    width: 100% !important;
-    box-sizing: border-box;
-  }
+/* utilità */
+.surface *,
+.card * {
+  min-width: 0;
 }

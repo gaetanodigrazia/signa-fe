@@ -1,26 +1,26 @@
 :host {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
-/* Area contenuto scrollabile */
+/* wrapper contenuti */
 .app-content {
   flex: 1;
   min-height: 100dvh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-
-  /* IMPORTANTISSIMO: niente sfondo qui, lasciamo vedere il body azzurrino */
-  background: transparent;
-  color: var(--text);
-
   padding: 16px;
   transition: margin-left .25s ease;
+  background: transparent;
+  /* normale: trasparente (vedi pagine interne) */
+  border: 0;
+  box-shadow: none;
+  /* non deve mai sembrare una card */
 }
 
-/* Desktop: sidebar fissa → margine */
+/* sidebar desktop */
 @media (min-width: 992px) {
   .app-content {
     margin-left: 260px;
@@ -31,44 +31,43 @@
   }
 }
 
-/* Mobile e tablet: sidebar overlay → nessun margine */
+/* mobile/tablet: nessun margine */
 @media (max-width: 991.98px) {
   .app-content {
     margin-left: 0 !important;
-    max-width: 100%;
   }
 }
 
-/* Fullscreen (quando showShell è false) */
+/* === FULLSCREEN (LOGIN): niente padding, nessun bordo, e sfondo scuro che copre TUTTO === */
 .app-content.fullscreen {
   margin-left: 0 !important;
-  width: 100%;
-  max-width: 100%;
+  padding: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: linear-gradient(135deg, #0f2430, #0c1c26);
+  /* stesso look che usavi */
+  width: 100vw;
+  min-height: 100dvh;
+  overflow: auto;
 }
 
-/* Overlay caricamento riutilizzabile */
-.page-loading-overlay {
+/* overlay boot */
+.boot-overlay {
   position: fixed;
   inset: 0;
   display: grid;
   place-items: center;
-  background: rgba(0, 0, 0, .08);
-  z-index: 1000;
+  background: rgba(0, 0, 0, .12);
+  z-index: 9999;
 }
 
 .spinner {
-  width: 24px;
-  height: 24px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  border: 3px solid currentColor;
-  border-right-color: transparent;
+  border: 6px solid #ddd;
+  border-top-color: #555;
   animation: spin .8s linear infinite;
-}
-
-.spinner--big {
-  width: 48px;
-  height: 48px;
-  border-width: 4px;
 }
 
 @keyframes spin {
