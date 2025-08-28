@@ -1,6 +1,5 @@
 /* =================== SIDEBAR BASE =================== */
 .sidebar {
-  /* colore ok (graphite moderno) */
   background: linear-gradient(160deg, #1f2937 0%, #111827 100%);
   color: #e5e7eb;
 
@@ -39,6 +38,17 @@
         background: rgba(255, 255, 255, .08);
         color: #fff;
       }
+
+      .icon {
+        width: 24px;
+        display: inline-flex;
+        justify-content: center;
+        line-height: 1;
+      }
+
+      .text {
+        flex: 1;
+      }
     }
   }
 
@@ -57,7 +67,6 @@
     align-items: center;
     justify-content: center;
 
-    /* icona hamburger */
     .hamburger-icon {
       position: relative;
       width: 22px;
@@ -142,118 +151,6 @@
   border-bottom-right-radius: 100vh;
   box-shadow: 6px 0 20px rgba(0, 0, 0, .15);
   overflow: hidden;
-}
-
-/* =================== BOTTONI IN BASSO =================== */
-.sidebar-bottom {
-  position: absolute;
-  left: 0;
-  bottom: 12px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  padding: 0 12px;
-}
-
-/* Base pulsanti */
-.sidebar-bottom .block-btn,
-.sidebar-bottom .logout-btn {
-  flex: 0 0 auto;
-  height: 44px;
-  border-radius: 12px;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.6rem;
-  line-height: 1;
-  cursor: pointer;
-  transition: transform .2s ease, box-shadow .2s ease, background .2s ease, width .2s ease;
-  color: #fff;
-}
-
-/* Larghezza in sidebar aperta */
-.sidebar:not(.collapsed) .sidebar-bottom .block-btn,
-.sidebar:not(.collapsed) .sidebar-bottom .logout-btn {
-  width: 84px;
-}
-
-/* Collassata: bottoni in colonna, centrati e rotondi */
-.sidebar.collapsed {
-  --btn-diam: 48px;
-  --btn-gap: 12px;
-  --curve-clear: 10px;
-}
-
-.sidebar.collapsed .sidebar-bottom {
-  position: absolute;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  width: var(--btn-diam);
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--btn-gap);
-}
-
-.sidebar.collapsed:not(.mobile) .sidebar-bottom {
-  bottom: calc(var(--btn-diam) * 0.5 + var(--btn-gap) + var(--curve-clear) + env(safe-area-inset-bottom, 0));
-}
-
-.sidebar.collapsed .sidebar-bottom .block-btn,
-.sidebar.collapsed .sidebar-bottom .logout-btn {
-  width: var(--btn-diam);
-  height: var(--btn-diam);
-  border-radius: 50%;
-  padding: 0;
-  font-size: 1.8rem;
-  overflow: hidden;
-  clip-path: circle(50% at 50% 50%);
-  -webkit-mask-image: radial-gradient(#000 99%, transparent 100%);
-  mask-image: radial-gradient(#000 99%, transparent 100%);
-}
-
-/* Click feedback dolce */
-.sidebar-bottom .block-btn:active,
-.sidebar-bottom .logout-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, .18);
-}
-
-/* =================== COLORI PULSANTI (moderni) =================== */
-.block-btn {
-  background: linear-gradient(135deg, #1d4ed8, #2563eb);
-}
-
-.block-btn:hover {
-  background: linear-gradient(135deg, #1e40af, #3b82f6);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(30, 64, 175, .28);
-}
-
-.logout-btn {
-  background: linear-gradient(135deg, #b91c1c, #dc2626);
-}
-
-.logout-btn:hover {
-  background: linear-gradient(135deg, #991b1b, #ef4444);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(185, 28, 28, .28);
-}
-
-/* =================== iOS fallback =================== */
-@supports (-webkit-touch-callout: none) {
-  .sidebar {
-    height: -webkit-fill-available;
-  }
-
-  .sidebar.mobile {
-    height: -webkit-fill-available;
-  }
 }
 
 /* =================== MENU & SOTTOMENU =================== */
@@ -365,46 +262,135 @@
   }
 }
 
+/* =================== BOTTONI IN BASSO =================== */
+/* Contenitore ancorato ai bordi interni della sidebar (pad 1rem) */
+.sidebar-bottom {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: max(12px, env(safe-area-inset-bottom, 0));
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+/* Logout: full-width quando sidebar aperta */
+.logout-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 3px 8px rgba(220, 38, 38, 0.35);
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.logout-btn .icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.logout-btn .text {
+  font-size: 0.95rem;
+}
+
+.logout-btn:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(185, 28, 28, .4);
+}
+
+.logout-btn:active {
+  transform: translateY(1px);
+}
+
+.logout-btn:focus {
+  outline: 2px solid #fca5a5;
+  outline-offset: 3px;
+}
+
+.sidebar-bottom .logout-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .18);
+}
+
+/* Collassata desktop → bottone rotondo, centrato e lontano dalla curva */
+.sidebar.collapsed:not(.mobile) {
+  --btn-diam: 48px;
+  /* diametro tasto rotondo */
+  --btn-gap: 12px;
+  /* spazio interno gruppo */
+  --curve-clear: 22px;
+  /* distanza extra dalla curva */
+  --curve-shift: 10px;
+  /* spostamento verso destra per compensare la curva */
+}
+
+.sidebar.collapsed:not(.mobile) .sidebar-bottom {
+  left: 50%;
+  right: auto;
+  width: var(--btn-diam);
+  padding: 0;
+  justify-content: center;
+  bottom: calc(var(--btn-diam) * 0.5 + var(--btn-gap) + var(--curve-clear) + env(safe-area-inset-bottom, 0));
+  transform: translateX(calc(-50% + var(--curve-shift)));
+}
+
+.sidebar.collapsed:not(.mobile) .logout-btn {
+  width: var(--btn-diam);
+  height: var(--btn-diam);
+  padding: 0;
+  border-radius: 50%;
+  gap: 0;
+}
+
+.sidebar.collapsed:not(.mobile) .logout-btn .text {
+  display: none;
+}
+
+/* =================== iOS fallback =================== */
+@supports (-webkit-touch-callout: none) {
+
+  .sidebar,
+  .sidebar.mobile {
+    height: -webkit-fill-available;
+  }
+}
+
 /* =================== MOBILE (drawer dall'alto, 60%) =================== */
 @media (max-width: 991.98px) {
-
-  /* Drawer mobile: piena larghezza, parte sotto la topbar (60px) */
   .sidebar.mobile {
     position: fixed;
     inset: 60px 0 auto 0;
-    /* top:60px; left:0; right:0 */
+    /* sotto la topbar */
     width: 100vw;
-    /* 60% dell'area visibile; fallback per browser vecchi */
-    height: 40vh;
     height: min(60svh, calc(100dvh - 60px));
     transform: translateY(-100%);
-    /* nascosta sopra lo schermo */
+    /* nascosta sopra */
     transition: transform .28s ease;
     z-index: 1200;
 
-    /* aspetto “glass” */
     background: rgba(17, 24, 39, 0.85);
     backdrop-filter: blur(8px);
-
-    /* arrotonda gli angoli inferiori */
     border-bottom-left-radius: 16px;
     border-bottom-right-radius: 16px;
 
-    /* la larghezza non deve restare 260px su mobile */
-    width: 100vw;
+    overflow: hidden;
+    /* nessuno scroll interno */
+    -webkit-overflow-scrolling: auto;
   }
 
   .sidebar.mobile.open {
     transform: translateY(0);
-    /* scende dall'alto */
-  }
-
-  /* Backdrop per intercettare il tap sul contenuto */
-  .sidebar-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, .35);
-    z-index: 1190;
   }
 
   /* Submenu più compatti su mobile */
@@ -430,36 +416,3 @@
     letter-spacing: .2px;
   }
 }
-
-/* Drawer mobile dall’alto – FISSO, senza scroll interno */
-@media (max-width: 991.98px) {
-  .sidebar.mobile {
-    position: fixed;
-    inset: 60px 0 auto 0;
-    /* sotto la topbar */
-    width: 100vw;
-    height: min(60svh, calc(100dvh - 60px));
-    transform: translateY(-100%);
-    transition: transform .28s ease;
-    z-index: 1200;
-
-    background: rgba(17, 24, 39, 0.85);
-    backdrop-filter: blur(8px);
-    border-bottom-left-radius: 16px;
-    border-bottom-right-radius: 16px;
-
-    overflow: hidden;
-    /* ← niente scroll nella sidebar */
-    -webkit-overflow-scrolling: auto;
-  }
-
-  .sidebar.mobile.open {
-    transform: translateY(0);
-  }
-
-  /* RIMUOVI il backdrop a pieno schermo o NON usarlo quando vuoi scorrere il contenuto.
-     Se vuoi tenerlo solo per il click-to-close, evita che copra la parte scrollabile: */
-  /* .sidebar-backdrop { display: none; } */
-}
-
-/* La pagina sotto continua a scorrere nello stesso modo tramite .app-content (punto 1) */

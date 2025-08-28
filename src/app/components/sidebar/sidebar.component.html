@@ -38,7 +38,7 @@
 
     <a routerLink="/calendar">
       <span class="icon">📆</span>
-      <span class="text" *ngIf="!isCollapsed">Calendar</span>
+      <span class="text" *ngIf="!isCollapsed">Calendario</span>
     </a>
     <a routerLink="/archive">
       <span class="icon">🗃️​</span>
@@ -59,7 +59,9 @@
   <div class="sidebar-bottom">
     <button class="logout-btn tip" (click)="logout()" title="Logout" aria-label="Logout">
       <span class="icon" aria-hidden="true">🚪</span>
+      <span class="text" *ngIf="!isCollapsed">Logout</span>
     </button>
+
   </div>
 
 </aside>
@@ -84,7 +86,7 @@
       </div>
 
     </div>
-    <a routerLink="/calendar" (click)="menuOpen = false">📆 Calendar</a>
+    <a routerLink="/calendar" (click)="menuOpen = false">📆 Calendario</a>
     <a routerLink="/archive" (click)="menuOpen = false">🗃️​ Archivio</a>
 
     <!--
@@ -96,7 +98,9 @@
   <div class="sidebar-bottom">
     <button class="logout-btn tip" (click)="logout()" title="Logout" aria-label="Logout">
       <span class="icon" aria-hidden="true">🚪</span>
+      <span class="text" *ngIf="!isCollapsed">Logout</span>
     </button>
+
   </div>
 
 </aside>

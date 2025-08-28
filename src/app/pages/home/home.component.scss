@@ -392,3 +392,83 @@
     display: block;
     height: 70px;
 }
+
+/* ===== Fix non intrusivo anti-sovrapposizione (versione Grid) ===== */
+
+/* Colonne: tempo | contenuto elastico | stato | azioni (misura contenuto) */
+.list li {
+    grid-template-columns: 72px minmax(0, 1fr) max-content max-content;
+}
+
+/* Il contenuto centrale può restringersi, non “spinge” sotto le azioni */
+.list .main {
+    min-width: 0;
+}
+
+.list .main .title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Le meta possono andare a capo ma non debordare */
+.list .main .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.list .main .meta span {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Le azioni restano nell’ultima colonna e allineate a destra */
+.list .actions {
+    justify-self: end;
+    align-self: center;
+}
+
+/* --- Tablet: rispetta il tuo layout originale nascondendo lo status --- */
+@media (max-width: 900px) {
+    .list li {
+        grid-template-columns: 56px minmax(0, 1fr) max-content;
+    }
+}
+
+/* --- Mobile: usa le aree che hai già definito, senza sovrapposizioni --- */
+@media (max-width: 576px) {
+    .list .main {
+        min-width: 0;
+    }
+}
+
+/* ===== Pazienti: rimuovi avatar/colonna e lascia solo nome + bottone ===== */
+.cards-grid.two>article.card.surface:last-child .avatar {
+    display: none;
+}
+
+.cards-grid.two>article.card.surface:last-child .list li {
+    /* Pazienti hanno: main | actions */
+    grid-template-columns: minmax(0, 1fr) max-content !important;
+}
+
+/* ===== Mobile: non troncare nome+cognome, consenti a capo ===== */
+@media (max-width: 576px) {
+
+    /* Manteniamo il tuo layout a 2 righe, ma permettiamo il wrap del titolo */
+    .list .main .title {
+        white-space: normal !important;
+        overflow: visible;
+        text-overflow: clip;
+    }
+
+    /* Anche le meta possono andare a capo senza tagli aggressivi */
+    .list .main .meta {
+        white-space: normal;
+    }
+}
