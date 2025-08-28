@@ -436,3 +436,54 @@ input.ng-invalid.ng-touched {
         line-height: 1;
     }
 }
+
+/* ===== Toolbar: fix layout mobile (card in alto) ===== */
+@media (max-width: 768px) {
+    .users-page .toolbar {
+        flex-direction: column;
+        /* titolo sopra, controlli sotto */
+        align-items: stretch;
+        /* i figli occupano tutta la larghezza */
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .users-page .toolbar .right {
+        width: 100%;
+        display: grid;
+        /* ricerca + bottone sulla stessa riga */
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+    }
+
+    .users-page .toolbar .search {
+        width: 100%;
+        min-width: 0;
+        /* elimina la min-width che la stringe */
+        margin: 0;
+        /* niente margini che la decentrano */
+    }
+
+    .users-page .toolbar .btn,
+    .users-page .toolbar .btn.primary {
+        height: 40px;
+        /* touch target comodo */
+        padding: 0 12px;
+        white-space: nowrap;
+        /* non andare a capo su “Nuovo paziente” */
+    }
+}
+
+/* piccolissimi schermi: stack verticale */
+@media (max-width: 380px) {
+    .users-page .toolbar .right {
+        grid-template-columns: 1fr;
+        /* prima input, poi bottone full-width */
+    }
+
+    .users-page .toolbar .btn,
+    .users-page .toolbar .btn.primary {
+        width: 100%;
+        justify-self: stretch;
+    }
+}
