@@ -16,7 +16,6 @@
                 <tr>
                     <th>Nome</th>
                     <th>Email</th>
-                    <th>Ruolo</th>
                     <th>Stato</th>
                     <th>Creato</th>
                     <th class="actions">Azioni</th>
@@ -25,13 +24,13 @@
 
             <tbody>
                 <tr *ngFor="let u of filtered; trackBy: trackById">
-                    <td><button class="linklike" (click)="view(u)">{{ u.name }}</button></td>
-                    <td>{{ u.email }}</td>
                     <td>
-                        <span class="role" [class.admin]="u.role === 'Admin'" [class.editor]="u.role === 'Editor'">
-                            {{ u.role }}
-                        </span>
+                        <button class="linklike" (click)="view(u)">
+                            {{ u.firstName || (u['name'] ? u['name'].split(' ')[0] : '') }}
+                            {{ u.lastName || (u['name'] ? u['name'].split(' ').slice(1).join(' ') : '') }}
+                        </button>
                     </td>
+                    <td>{{ u.email }}</td>
                     <td>
                         <span class="badge" [class.ok]="u.active" [class.off]="!u.active">
                             {{ u.active ? 'Attivo' : 'Sospeso' }}
@@ -46,44 +45,135 @@
                 </tr>
 
                 <tr *ngIf="filtered.length === 0">
-                    <td colspan="6" class="empty">Nessun utente trovato.</td>
+                    <td colspan="5" class="empty">Nessun utente trovato.</td>
                 </tr>
             </tbody>
         </table>
     </div>
 </div>
 
-<!-- MODALE CREA/MODIFICA -->
+<!-- MODALE CREA/MODIFICA (wizard) -->
 <div class="modal-overlay" *ngIf="modalVisible" (click)="cancelModal()">
     <div class="modal" (click)="$event.stopPropagation()">
         <h3>{{ editing ? 'Modifica utente' : 'Nuovo utente' }}</h3>
 
-        <label>
-            <span>Nome</span>
-            <input [(ngModel)]="form.name" required />
-        </label>
+        <!-- Stepper -->
+        <ol class="stepper">
+            <li [class.done]="step>0" [class.active]="step===0">Utente</li>
+            <li [class.done]="step>1" [class.active]="step===1">Appartenenze</li>
+            <li [class.active]="step===2">Riepilogo</li>
+        </ol>
 
-        <label>
-            <span>Email</span>
-            <input type="email" [(ngModel)]="form.email" required />
-        </label>
+        <form (ngSubmit)="save()" #userForm="ngForm" novalidate>
+            <!-- STEP 0: Dati utente -->
+            <div *ngIf="step===0" class="tab-content">
+                <label>
+                    <span>Nome</span>
+                    <input [(ngModel)]="form.firstName" name="firstName" required />
+                </label>
 
-        <label>
-            <span>Ruolo</span>
-            <select [(ngModel)]="form.role">
-                <option *ngFor="let r of roles" [ngValue]="r">{{ r }}</option>
-            </select>
-        </label>
+                <label>
+                    <span>Cognome</span>
+                    <input [(ngModel)]="form.lastName" name="lastName" required />
+                </label>
 
-        <label class="row">
-            <input type="checkbox" [(ngModel)]="form.active" />
-            <span>Attivo</span>
-        </label>
+                <label>
+                    <span>Email</span>
+                    <input type="email" [(ngModel)]="form.email" name="email" required />
+                </label>
 
-        <div class="modal-actions">
-            <button class="btn primary" (click)="save()">Salva</button>
-            <button class="btn" (click)="cancelModal()">Annulla</button>
-        </div>
+                <label>
+                    <span>Telefono</span>
+                    <input type="tel" [(ngModel)]="form.phone" name="phone" />
+                </label>
+
+                <label class="row">
+                    <input type="checkbox" [(ngModel)]="form.active" name="active" />
+                    <span>Attivo</span>
+                </label>
+            </div>
+
+            <!-- STEP 1: Appartenenze -->
+            <div *ngIf="step===1" class="tab-content">
+                <h4>Appartenenze agli studi</h4>
+                <div class="hint">Aggiungi gli studi e il ruolo dell’utente.</div>
+
+                <div class="studio-memberships">
+                    <div class="membership-row"
+                        *ngFor="let m of form.memberships; let i = index; trackBy: trackByMembership">
+                        <label>
+                            <span>Studio</span>
+                            <select [(ngModel)]="m.studioId" name="studio-{{i}}">
+                                <option [ngValue]="null" disabled>Seleziona…</option>
+                                <option *ngFor="let s of studios" [ngValue]="s.id">{{ s.name }}</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            <span>Ruolo nello studio</span>
+                            <select [(ngModel)]="m.role" name="studio-role-{{i}}">
+                                <option *ngFor="let r of studioRoles" [ngValue]="r">{{ r }}</option>
+                            </select>
+                        </label>
+
+                        <label class="row">
+                            <input type="checkbox" [(ngModel)]="m.active" name="studio-active-{{i}}" />
+                            <span>Attivo</span>
+                        </label>
+
+                        <button type="button" class="icon danger" (click)="removeMembership(i)">🗑️</button>
+                    </div>
+
+                    <button type="button" class="btn" (click)="addMembership()">＋ Aggiungi studio</button>
+                </div>
+            </div>
+
+            <!-- STEP 2: Riepilogo -->
+            <div *ngIf="step===2" class="tab-content">
+                <h4>Riepilogo</h4>
+                <div class="summary">
+                    <div><strong>Nome:</strong> {{ form.firstName }} {{ form.lastName }}</div>
+                    <div><strong>Email:</strong> {{ form.email }}</div>
+                    <div><strong>Telefono:</strong> {{ form.phone || '—' }}</div>
+                    <div>
+                        <strong>Stato:</strong>
+                        <span class="badge" [class.ok]="form.active" [class.off]="!form.active">
+                            {{ form.active ? 'Attivo' : 'Sospeso' }}
+                        </span>
+                    </div>
+
+                    <div class="mt">
+                        <strong>Appartenenze:</strong>
+                        <ul>
+                            <li *ngFor="let m of form.memberships | slice:0">
+                                <ng-container *ngIf="m.studioId; else empty">
+                                    {{ studioName(m.studioId) }} — {{ m.role }}
+
+                                    <span class="badge small" [class.ok]="m.active" [class.off]="!m.active">
+                                        {{ m.active ? 'Attiva' : 'Sospesa' }}
+                                    </span>
+                                </ng-container>
+                                <ng-template #empty>riga vuota (non verrà salvata)</ng-template>
+                            </li>
+                            <li *ngIf="!form.memberships.length">Nessuna</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer azioni wizard -->
+            <div class="modal-actions between">
+                <div class="left">
+                    <button type="button" class="btn" (click)="cancelModal()">Annulla</button>
+                </div>
+                <div class="right">
+                    <button *ngIf="step>0" type="button" class="btn" (click)="prev()">Indietro</button>
+                    <button *ngIf="step<2" type="button" class="btn primary" [disabled]="!isStepValid(step)"
+                        (click)="next()">Avanti</button>
+                    <button *ngIf="step===2" class="btn primary" type="submit">Conferma</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -93,9 +183,11 @@
         <h3>Dettagli utente</h3>
 
         <div class="details" *ngIf="viewing as v">
-            <div><strong>Nome:</strong> {{ v.name }}</div>
+            <div><strong>Nome:</strong>
+                {{ v.firstName || (v['name'] ? v['name'].split(' ')[0] : '') }}
+                {{ v.lastName || (v['name'] ? v['name'].split(' ').slice(1).join(' ') : '') }}
+            </div>
             <div><strong>Email:</strong> {{ v.email }}</div>
-            <div><strong>Ruolo:</strong> {{ v.role }}</div>
             <div>
                 <strong>Stato:</strong>
                 <span class="badge" [class.ok]="v.active" [class.off]="!v.active">
@@ -118,7 +210,13 @@
 <div class="modal-overlay" *ngIf="confirmVisible" (click)="confirmVisible = false">
     <div class="modal small" (click)="$event.stopPropagation()">
         <h3>Eliminare questo utente?</h3>
-        <p *ngIf="toDelete as d">Questa azione non è reversibile. <strong>{{ d.name }}</strong></p>
+        <p *ngIf="toDelete as d">
+            Questa azione non è reversibile.
+            <strong>
+                {{ d.firstName || (d['name'] ? d['name'].split(' ')[0] : '') }}
+                {{ d.lastName || (d['name'] ? d['name'].split(' ').slice(1).join(' ') : '') }}
+            </strong>
+        </p>
         <div class="modal-actions">
             <button class="btn danger" (click)="confirmDelete()">Elimina</button>
             <button class="btn" (click)="confirmVisible = false">Annulla</button>

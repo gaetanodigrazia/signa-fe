@@ -1,8 +1,9 @@
 export interface User {
     id: number;
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
-    role: 'Admin' | 'Editor' | 'Viewer';
+    phone?: string;
     active: boolean;
     createdAt: string;   // ISO
     updatedAt?: string;  // ISO
