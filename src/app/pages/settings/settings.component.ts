@@ -2,8 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms'; // per [(ngModel)] nella modale 2FA
-import { Subject, Observable } from 'rxjs';          // <— NEW
-import { BehaviorSubject } from 'rxjs';
 
 type TabKey =
   | 'profile' | 'notifications' | 'agenda'
@@ -12,7 +10,7 @@ type TabKey =
 type ToggleKey =
   | 'notifyEmail' | 'patientReminders'
   | 'gdprConsentRequired' | 'allowPatientPortal'
-  | 'enableAutoLogout'    // sicurezza
+  | 'enableAutoLogout'
   | 'googleSync' | 'outlookSync';
 
 @Component({
@@ -22,17 +20,23 @@ type ToggleKey =
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss']
 })
-
 export class SettingsComponent {
   saving = false;
+
+  // Modale conferma uscita
   showLeaveModal = false;
   private leaveResolve?: (result: boolean) => void;
 
-  private leaveDecision$ = new BehaviorSubject<boolean | null>(null);
-  confirmLeave$ = this.leaveDecision$.asObservable();
-
-  // opzioni per il timeout (puoi cambiare a piacere)
+  // Timeout di logout automatico
   autoLogoutOptions = [5, 10, 15, 20, 30, 45, 60, 90, 120];
+  ngOnInit() {
+    // ...tuo codice...
+    setTimeout(() => {
+      if (typeof window.onbeforeunload === 'function') {
+        console.warn('[Settings] Rilevato window.onbeforeunload attivo: questo provoca l’alert nativo.');
+      }
+    });
+  }
   tabs: { key: TabKey; label: string; icon: string }[] = [
     { key: 'profile', label: 'Profilo', icon: '👤' },
     { key: 'notifications', label: 'Notifiche', icon: '🔔' },
@@ -56,8 +60,7 @@ export class SettingsComponent {
   };
 
   isTabDirty(tab: TabKey): boolean {
-    const controls = this.tabFields[tab];
-    return controls.some(f => this.form.get(f)?.dirty);
+    return this.tabFields[tab].some(f => this.form.get(f)?.dirty);
   }
 
   days = [
@@ -102,9 +105,9 @@ export class SettingsComponent {
     allowPatientPortal: [false],
 
     // Sicurezza
-    enable2fa: [false],          // gestita via modale
-    enableAutoLogout: [true],    // nuovo toggle
-    autoLogoutMinutes: [15],          // <— NUOVO: tempo di inattività
+    enable2fa: [false],
+    enableAutoLogout: [true],
+    autoLogoutMinutes: [15],
 
     // Integrazioni
     googleSync: [false],
@@ -118,21 +121,16 @@ export class SettingsComponent {
     label: ''
   };
 
-  // Modale 2FA (configurazione)
+  // Modale 2FA
   twofa = {
     open: false,
     method: 'sms' as 'sms' | 'email',
     phone: '',
     email: ''
   };
-  pendingChanges = false;
-  private leaveDecision: ((res: boolean) => void) | null = null;
 
-  constructor(private fb: FormBuilder) {
-    this.form.valueChanges.subscribe(() => {
-      this.pendingChanges = this.form.dirty;
-    });
-  }
+  constructor(private fb: FormBuilder) { }
+
   /* ---------- Tabs ---------- */
   setTab(key: TabKey) {
     this.currentTab = key;
@@ -140,7 +138,8 @@ export class SettingsComponent {
     this.indicatorTransform = `translateX(${idx * 100}%)`;
   }
 
-  @HostListener('window:resize') onResize() {
+  @HostListener('window:resize')
+  onResize() {
     const idx = this.tabs.findIndex(t => t.key === this.currentTab);
     this.indicatorTransform = `translateX(${idx * 100}%)`;
   }
@@ -152,8 +151,7 @@ export class SettingsComponent {
     if (this.form.invalid) return;
     this.saving = true;
     try {
-      // TODO: chiama API di salvataggio con this.form.value
-      // await this.api.saveSettings(this.form.value).toPromise();
+      // TODO: chiamata API
     } finally {
       this.saving = false;
       this.form.markAsPristine();
@@ -163,26 +161,18 @@ export class SettingsComponent {
   changePassword() { alert('Funzione cambio password da implementare'); }
   downloadActivityLog() { alert('Download log attività…'); }
 
-  /* ---------- Toggle generici (bottoni verde/rosso) ---------- */
+  /* ---------- Toggle ---------- */
   onToggle(key: ToggleKey) {
     const current = !!this.form.get(key)?.value;
-    // Se stiamo passando da ON -> OFF, chiedi conferma
     if (current) {
-      this.confirm.state = true;
-      this.confirm.key = key;
-      this.confirm.label = this.labelFor(key);
-      return;
+      this.confirm = { state: true, key, label: this.labelFor(key) };
+    } else {
+      this.applyToggle(key, true);
     }
-    // Se stiamo passando da OFF -> ON, abilita subito
-    this.applyToggle(key, true);
   }
 
   private applyToggle(key: ToggleKey, next: boolean) {
     this.form.get(key)?.setValue(next);
-    // TODO: chiamata ottimistica al backend, con eventuale rollback
-    // this.api.updateToggle(key, next).subscribe({
-    //   error: () => this.form.get(key)?.setValue(!next)
-    // });
   }
 
   confirmDisable() {
@@ -205,14 +195,8 @@ export class SettingsComponent {
   }
 
   /* ---------- 2FA ---------- */
-  openTwofaModal() {
-    // opzionale: pre-carica dati dal backend qui
-    this.twofa.open = true;
-  }
-
-  closeTwofa() {
-    this.twofa.open = false;
-  }
+  openTwofaModal() { this.twofa.open = true; }
+  closeTwofa() { this.twofa.open = false; }
 
   saveTwofa() {
     if (this.twofa.method === 'sms' && !this.twofa.phone) {
@@ -223,22 +207,20 @@ export class SettingsComponent {
       alert('Inserisci un indirizzo email.');
       return;
     }
-    // TODO: chiama API per salvare le preferenze 2FA
-    // this.api.saveTwofa(this.twofa).subscribe({
-    //   next: () => {
     this.form.get('enable2fa')?.setValue(true);
     this.twofa.open = false;
-    //   },
-    //   error: () => { /* mostra errore */ }
-    // });
   }
 
-
+  /* ---------- Guard canDeactivate ---------- */
   canDeactivate(): Promise<boolean> | boolean {
+    console.log('[Settings] canDeactivate invocato. dirty=', this.form.dirty);
     if (!this.form.dirty) return true;
     this.showLeaveModal = true;
-    return new Promise<boolean>(resolve => {
-      this.leaveResolve = resolve;
+    return new Promise<boolean>((resolve) => {
+      this.leaveResolve = (ok: boolean) => {
+        console.log('[Settings] decisione utente =', ok);
+        resolve(ok);
+      };
     });
   }
 
@@ -253,4 +235,5 @@ export class SettingsComponent {
     this.leaveResolve?.(false);
     this.leaveResolve = undefined;
   }
+
 }
