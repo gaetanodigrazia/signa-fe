@@ -1,5 +1,6 @@
 <div class="settings-page">
 
+    <!-- Toolbar -->
     <header class="toolbar surface">
         <div class="left">
             <h2>Impostazioni</h2>
@@ -14,23 +15,23 @@
         </div>
     </header>
 
-
     <!-- Tabbar -->
     <nav class="tabs" role="tablist" aria-label="Sezioni impostazioni">
         <button *ngFor="let t of tabs; let i = index" class="tab" role="tab" [attr.aria-selected]="currentTab === t.key"
-            [attr.aria-controls]="t.key + '-panel'" [id]="t.key + '-tab'" [class.active]="currentTab === t.key"
             (click)="setTab(t.key)" type="button">
             <span class="tab__icon" aria-hidden="true">{{ t.icon }}</span>
             <span class="tab__label">{{ t.label }}</span>
+            <span *ngIf="isTabDirty(t.key)" class="tab__dot" aria-hidden="true"></span>
         </button>
-        <!-- focus ring helper -->
+
         <span class="tabs__indicator" [style.transform]="indicatorTransform"></span>
     </nav>
 
     <!-- Panels -->
     <form [formGroup]="form" class="panels">
+
         <!-- PROFILO -->
-        <section class="panel surface" role="tabpanel" [id]="'profile-panel'" [attr.aria-labelledby]="'profile-tab'"
+        <section class="panel surface" role="tabpanel" id="profile-panel" aria-labelledby="profile-tab"
             [hidden]="currentTab !== 'profile'">
             <header class="card-header">
                 <h3 class="card__title">Profilo</h3>
@@ -76,21 +77,35 @@
         </section>
 
         <!-- NOTIFICHE -->
-        <section class="panel surface" role="tabpanel" [id]="'notifications-panel'"
-            [attr.aria-labelledby]="'notifications-tab'" [hidden]="currentTab !== 'notifications'">
+        <section class="panel surface" role="tabpanel" id="notifications-panel" aria-labelledby="notifications-tab"
+            [hidden]="currentTab !== 'notifications'">
             <header class="card-header">
                 <h3 class="card__title">Notifiche</h3>
             </header>
 
-            <label class="switch">
-                <input type="checkbox" formControlName="notifyEmail" />
-                <span>Notifiche email personali</span>
-            </label>
+            <div class="row-setting">
+                <div class="row-text">
+                    <strong>Notifiche email personali</strong>
+                    <small>Invia aggiornamenti sul tuo account</small>
+                </div>
+                <button type="button" class="toggle-btn" [class.on]="form.value.notifyEmail"
+                    [class.off]="!form.value.notifyEmail" [attr.aria-pressed]="form.value.notifyEmail"
+                    (click)="onToggle('notifyEmail')">
+                    {{ form.value.notifyEmail ? 'Abilitato' : 'Disabilitato' }}
+                </button>
+            </div>
 
-            <label class="switch">
-                <input type="checkbox" formControlName="patientReminders" />
-                <span>Promemoria automatici ai pazienti (24h prima)</span>
-            </label>
+            <div class="row-setting">
+                <div class="row-text">
+                    <strong>Promemoria automatici ai pazienti</strong>
+                    <small>Invio promemoria 24h prima dell’appuntamento</small>
+                </div>
+                <button type="button" class="toggle-btn" [class.on]="form.value.patientReminders"
+                    [class.off]="!form.value.patientReminders" [attr.aria-pressed]="form.value.patientReminders"
+                    (click)="onToggle('patientReminders')">
+                    {{ form.value.patientReminders ? 'Abilitato' : 'Disabilitato' }}
+                </button>
+            </div>
 
             <label class="field mt">
                 <span>Firma email</span>
@@ -100,7 +115,7 @@
         </section>
 
         <!-- AGENDA -->
-        <section class="panel surface" role="tabpanel" [id]="'agenda-panel'" [attr.aria-labelledby]="'agenda-tab'"
+        <section class="panel surface" role="tabpanel" id="agenda-panel" aria-labelledby="agenda-tab"
             [hidden]="currentTab !== 'agenda'">
             <header class="card-header">
                 <h3 class="card__title">Agenda e disponibilità</h3>
@@ -138,7 +153,7 @@
         </section>
 
         <!-- STUDIO -->
-        <section class="panel surface" role="tabpanel" [id]="'clinic-panel'" [attr.aria-labelledby]="'clinic-tab'"
+        <section class="panel surface" role="tabpanel" id="clinic-panel" aria-labelledby="clinic-tab"
             [hidden]="currentTab !== 'clinic'">
             <header class="card-header">
                 <h3 class="card__title">Studio e fatturazione</h3>
@@ -183,34 +198,70 @@
         </section>
 
         <!-- PRIVACY -->
-        <section class="panel surface" role="tabpanel" [id]="'privacy-panel'" [attr.aria-labelledby]="'privacy-tab'"
+        <section class="panel surface" role="tabpanel" id="privacy-panel" aria-labelledby="privacy-tab"
             [hidden]="currentTab !== 'privacy'">
             <header class="card-header">
                 <h3 class="card__title">Privacy e pazienti</h3>
             </header>
 
-            <label class="switch">
-                <input type="checkbox" formControlName="gdprConsentRequired" />
-                <span>Richiedi consenso privacy alla prima visita</span>
-            </label>
+            <div class="row-setting">
+                <div class="row-text"><strong>Consenso privacy alla prima visita</strong></div>
+                <button type="button" class="toggle-btn" [class.on]="form.value.gdprConsentRequired"
+                    [class.off]="!form.value.gdprConsentRequired" [attr.aria-pressed]="form.value.gdprConsentRequired"
+                    (click)="onToggle('gdprConsentRequired')">
+                    {{ form.value.gdprConsentRequired ? 'Abilitato' : 'Disabilitato' }}
+                </button>
+            </div>
 
-            <label class="switch">
-                <input type="checkbox" formControlName="allowPatientPortal" />
-                <span>Abilita portale paziente</span>
-            </label>
+            <div class="row-setting">
+                <div class="row-text"><strong>Portale paziente</strong></div>
+                <button type="button" class="toggle-btn" [class.on]="form.value.allowPatientPortal"
+                    [class.off]="!form.value.allowPatientPortal" [attr.aria-pressed]="form.value.allowPatientPortal"
+                    (click)="onToggle('allowPatientPortal')">
+                    {{ form.value.allowPatientPortal ? 'Abilitato' : 'Disabilitato' }}
+                </button>
+            </div>
         </section>
 
         <!-- SICUREZZA -->
-        <section class="panel surface" role="tabpanel" [id]="'security-panel'" [attr.aria-labelledby]="'security-tab'"
+        <section class="panel surface" role="tabpanel" id="security-panel" aria-labelledby="security-tab"
             [hidden]="currentTab !== 'security'">
             <header class="card-header">
                 <h3 class="card__title">Sicurezza</h3>
             </header>
 
-            <label class="switch">
-                <input type="checkbox" formControlName="enable2fa" />
-                <span>Abilita autenticazione a due fattori (2FA)</span>
-            </label>
+            <!-- 2FA: apre modale configurazione -->
+            <div class="row-setting">
+                <div class="row-text">
+                    <strong>Autenticazione a due fattori (2FA)</strong>
+                    <small>Proteggi l’accesso con codice via SMS o Email</small>
+                </div>
+                <button type="button" class="toggle-btn" [class.on]="form.value.enable2fa"
+                    [class.off]="!form.value.enable2fa" [attr.aria-pressed]="form.value.enable2fa"
+                    (click)="openTwofaModal()">
+                    {{ form.value.enable2fa ? 'Configurata' : 'Disabilitata' }}
+                </button>
+            </div>
+
+            <!-- Logout automatico: tempo + bottone stato -->
+            <div class="row-setting">
+                <div class="row-text">
+                    <strong>Logout automatico</strong>
+                    <small>Disconnessione dopo inattività</small>
+                </div>
+                <div class="row-actions">
+                    <select class="logout-time" formControlName="autoLogoutMinutes"
+                        [disabled]="!form.value.enableAutoLogout" aria-label="Tempo logout automatico">
+                        <option *ngFor="let m of autoLogoutOptions" [ngValue]="m">{{ m }} min</option>
+                    </select>
+
+                    <button type="button" class="toggle-btn" [class.on]="form.value.enableAutoLogout"
+                        [class.off]="!form.value.enableAutoLogout" [attr.aria-pressed]="form.value.enableAutoLogout"
+                        (click)="onToggle('enableAutoLogout')">
+                        {{ form.value.enableAutoLogout ? 'Abilitato' : 'Disabilitato' }}
+                    </button>
+                </div>
+            </div>
 
             <div class="inline-actions">
                 <button type="button" class="btn-outline" (click)="changePassword()">Cambia password</button>
@@ -219,22 +270,87 @@
         </section>
 
         <!-- INTEGRAZIONI -->
-        <section class="panel surface" role="tabpanel" [id]="'integrations-panel'"
-            [attr.aria-labelledby]="'integrations-tab'" [hidden]="currentTab !== 'integrations'">
+        <section class="panel surface" role="tabpanel" id="integrations-panel" aria-labelledby="integrations-tab"
+            [hidden]="currentTab !== 'integrations'">
             <header class="card-header">
                 <h3 class="card__title">Integrazioni</h3>
             </header>
 
-            <label class="switch">
-                <input type="checkbox" formControlName="googleSync" />
-                <span>Sincronizza calendario Google</span>
-            </label>
+            <div class="row-setting">
+                <div class="row-text"><strong>Google Calendar</strong></div>
+                <button type="button" class="toggle-btn" [class.on]="form.value.googleSync"
+                    [class.off]="!form.value.googleSync" [attr.aria-pressed]="form.value.googleSync"
+                    (click)="onToggle('googleSync')">
+                    {{ form.value.googleSync ? 'Connesso' : 'Disconnesso' }}
+                </button>
+            </div>
 
-            <label class="switch">
-                <input type="checkbox" formControlName="outlookSync" />
-                <span>Sincronizza calendario Outlook</span>
-            </label>
+            <div class="row-setting">
+                <div class="row-text"><strong>Outlook Calendar</strong></div>
+                <button type="button" class="toggle-btn" [class.on]="form.value.outlookSync"
+                    [class.off]="!form.value.outlookSync" [attr.aria-pressed]="form.value.outlookSync"
+                    (click)="onToggle('outlookSync')">
+                    {{ form.value.outlookSync ? 'Connesso' : 'Disconnesso' }}
+                </button>
+            </div>
         </section>
 
     </form>
+</div>
+
+<!-- ============ MODALI ============ -->
+
+<!-- Conferma disabilitazione -->
+<div class="modal-overlay" *ngIf="confirm.state">
+    <div class="modal small" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+        <h3 id="confirm-title">Confermi la disabilitazione?</h3>
+        <p>Stai per disabilitare: <strong>{{ confirm.label }}</strong>.</p>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" (click)="closeConfirm()">Annulla</button>
+            <button class="btn btn-primary" (click)="confirmDisable()">Disabilita</button>
+        </div>
+    </div>
+</div>
+
+<!-- Impostazioni 2FA -->
+<div class="modal-overlay" *ngIf="twofa.open">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="twofa-title">
+        <h3 id="twofa-title">Imposta 2FA</h3>
+        <p class="hint">Scegli il metodo e inserisci i recapiti.</p>
+
+        <label class="field">
+            <span>Metodo</span>
+            <select [(ngModel)]="twofa.method">
+                <option value="sms">SMS (telefono)</option>
+                <option value="email">Email</option>
+            </select>
+        </label>
+
+        <label class="field" *ngIf="twofa.method === 'sms'">
+            <span>Telefono</span>
+            <input type="tel" [(ngModel)]="twofa.phone" placeholder="+39 ..." />
+        </label>
+
+        <label class="field" *ngIf="twofa.method === 'email'">
+            <span>Email</span>
+            <input type="email" [(ngModel)]="twofa.email" placeholder="nome@studio.it" />
+        </label>
+
+        <div class="modal-actions">
+            <button class="btn btn-ghost" (click)="closeTwofa()">Annulla</button>
+            <button class="btn btn-primary" (click)="saveTwofa()">Salva</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-overlay" *ngIf="showLeaveModal">
+    <div class="modal small">
+        <h3>Modifiche non salvate</h3>
+        <p>Hai modifiche non salvate. Vuoi davvero lasciare questa pagina?</p>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" (click)="onLeaveCancel()">Rimani</button>
+            <button type="button" class="btn btn-danger" (click)="onLeaveConfirm()">Esci senza salvare</button>
+        </div>
+    </div>
 </div>

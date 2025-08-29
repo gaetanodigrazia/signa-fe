@@ -8,7 +8,7 @@ import { UsersComponent } from '../pages/users/users.component';
 import { ArchivioComponent } from '../pages/archivio/archivio.component';
 import { AppointmentCalendarComponent } from '../components/appointment-calendar/appointment-calendar.component';
 import { SettingsComponent } from '../pages/settings/settings.component';
-import { StudioComponent } from '../pages/studio/studio.component';
+import { CanDeactivateSettingsGuard } from './can-deactivate-settings.guard';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -22,9 +22,12 @@ export const routes: Routes = [
 
     { path: 'calendar', component: AppointmentCalendarComponent, canActivate: [authGuard] },
 
-    { path: 'studio', component: StudioComponent, canActivate: [authGuard] },
+    { path: 'users', component: UsersComponent, canActivate: [authGuard] },
 
-    { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
+    {
+        path: 'settings',
+        canActivate: [authGuard], canDeactivate: [CanDeactivateSettingsGuard]
+    },
 
 
     { path: '', pathMatch: 'full', redirectTo: 'home' },

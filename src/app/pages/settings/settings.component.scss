@@ -331,3 +331,222 @@
     display: block;
     height: 70px;
 }
+
+/* === Desktop: aria tra i campi del form === */
+@media (min-width: 1025px) {
+
+    /* griglia dei campi più ariosa: più spazio tra le 2 colonne */
+    .panels .panel .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 40px;
+        /* spazio orizzontale tra Nome | Cognome */
+        row-gap: 16px;
+        /* spazio verticale tra le righe */
+        align-items: start;
+    }
+
+    /* assicura che i contenuti non “spingano” la colonna */
+    .panels .panel .field {
+        min-width: 0;
+    }
+}
+
+/* Riga impostazione con testo a sinistra e bottone a destra */
+.row-setting {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px dashed #e5eaf3;
+}
+
+.row-setting:last-child {
+    border-bottom: 0;
+}
+
+.row-text {
+    display: grid;
+    gap: 2px;
+}
+
+.row-text small {
+    color: var(--muted, #6b7280);
+}
+
+/* Bottone stato (toggle) */
+.toggle-btn {
+    --on: linear-gradient(135deg, #16a34a, #059669);
+    --off: linear-gradient(135deg, #dc2626, #b91c1c);
+
+    appearance: none;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-weight: 700;
+    cursor: pointer;
+    min-width: 130px;
+    text-align: center;
+    transition: transform .12s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease, color .2s ease;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .15);
+}
+
+.toggle-btn.on {
+    background: var(--on);
+}
+
+.toggle-btn.off {
+    background: var(--off);
+}
+
+.toggle-btn:hover {
+    transform: translateY(-1px);
+}
+
+.toggle-btn:active {
+    transform: translateY(1px);
+}
+
+/* Stati disabilitato da backend (se mai servisse) */
+.toggle-btn[disabled] {
+    opacity: .6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Mobile: piena larghezza se serve */
+@media (max-width: 640px) {
+    .row-setting {
+        grid-template-columns: 1fr;
+    }
+
+    .toggle-btn {
+        width: 100%;
+    }
+}
+
+/* Overlay delle modali sopra sidebar/topbar */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2400;
+    /* > di sidebar/topbar */
+    background: rgba(15, 23, 42, .45);
+    display: grid;
+    place-items: center;
+}
+
+/* Card modale */
+.modal {
+    width: min(560px, calc(100vw - 32px));
+    border-radius: 14px;
+    background: #fff;
+    padding: 16px;
+    box-shadow: 0 22px 60px rgba(0, 0, 0, .28);
+}
+
+/* azioni modale */
+.modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* Riga setting con selettore tempo + bottone a destra */
+.row-setting {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    gap: 12px;
+    align-items: center;
+}
+
+.row-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.logout-time {
+    border: 1px solid #cfd6e3;
+    border-radius: 10px;
+    padding: 8px 10px;
+    background: #fff;
+}
+
+/* Mobile: elementi su due righe */
+@media (max-width: 640px) {
+    .row-setting {
+        grid-template-columns: 1fr;
+    }
+
+    .row-actions {
+        justify-content: flex-start;
+    }
+
+    .logout-time {
+        width: 100%;
+    }
+}
+
+/* ==== Mobile: centrata e un po’ più stretta (no bottom sheet) ==== */
+@media (max-width: 640px) {
+    .modal-overlay {
+        display: grid;
+        place-items: center;
+        /* niente allineamento in basso */
+    }
+
+    .modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        /* centrata */
+        width: 88vw;
+        /* leggermente più stretta */
+        max-width: 400px;
+        /* limite tablet piccoli */
+        max-height: 80vh;
+        /* contenuto scrollabile */
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+
+        border-radius: 16px;
+        padding: 14px 16px 12px;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, .28);
+
+        /* ingresso elegante */
+        transform-origin: center;
+        animation: modalIn .18s ease-out;
+    }
+
+    /* nessuna “maniglietta”, nessun footer sticky */
+}
+
+/* Animazione ingresso */
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -48%) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.tab {
+    position: relative;
+}
+
+.tab__dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef4444;
+    /* rosso acceso */
+    margin-left: 6px;
+}

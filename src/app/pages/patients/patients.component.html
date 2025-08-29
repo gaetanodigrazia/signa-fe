@@ -167,14 +167,14 @@
 
 <!-- MODALE CONFERMA ELIMINA -->
 <div class="modal-overlay" *ngIf="confirmVisible" (click)="confirmVisible=false">
-    <div class="modal" (click)="$event.stopPropagation()">
+    <<div class="modal modal--details" (click)="$event.stopPropagation()">
         <h3>Elimina paziente</h3>
         <p>Sei sicuro di voler eliminare <strong>{{ toDelete?.firstname }} {{ toDelete?.lastname }}</strong>?</p>
         <div class="modal-actions">
             <button class="btn danger" (click)="confirmDelete()">Elimina</button>
             <button class="btn" (click)="confirmVisible=false; toDelete=null">Annulla</button>
         </div>
-    </div>
+</div>
 </div>
 
 <!-- Overlay caricamento globale (centrato e sopra la tabella) -->
