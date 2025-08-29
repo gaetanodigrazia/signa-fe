@@ -373,7 +373,7 @@
     inset: 60px 0 auto 0;
     /* sotto la topbar */
     width: 100vw;
-    height: min(60svh, calc(100dvh - 60px));
+    height: min(70svh, calc(100dvh - 50px));
     transform: translateY(-100%);
     /* nascosta sopra */
     transition: transform .28s ease;
