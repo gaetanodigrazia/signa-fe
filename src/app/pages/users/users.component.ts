@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsersService } from 'src/app/service/user.service';
 import { User } from 'src/app/model/user.model';
+import { StudioMembersService, StudioMemberInputDto, StudioRole, StudioMemberDto } from 'src/app/service/studiomembers.service';
 
-type StudioRole = 'OWNER' | 'DOCTOR' | 'BACKOFFICE' | 'NURSE' | 'STAFF';
 interface MembershipForm { studioId: string | null; role: StudioRole; active: boolean; }
 interface Studio { id: string; name: string; }
 
@@ -25,6 +25,8 @@ export class UsersComponent implements OnInit {
   modalVisible = false;
   detailsVisible = false;
   confirmVisible = false;
+  saving: boolean = false;   // per create/update
+  loading: boolean = false;  // <-- AGGIUNTO: per caricamento lista
 
   // Wizard
   step: 0 | 1 | 2 = 0;
@@ -34,8 +36,8 @@ export class UsersComponent implements OnInit {
   viewing: User | null = null;
   toDelete: User | null = null;
 
-  // Lookup per studi e ruoli (sostituisci con service se li hai)
-  studioRoles: StudioRole[] = ['OWNER', 'DOCTOR', 'BACKOFFICE', 'NURSE', 'STAFF'];
+  // Lookup per studi e ruoli (ora dal service)
+  studioRoles: StudioRole[] = ['OWNER', 'DOCTOR', 'BACKOFFICE', 'ADMIN'];
   studios: Studio[] = [
     { id: 'studio-1', name: 'Studio Dentistico Sorriso' },
     { id: 'studio-2', name: 'Centro Oculistico Vista Chiara' },
@@ -52,24 +54,41 @@ export class UsersComponent implements OnInit {
     memberships: MembershipForm[];
   } = this.blankForm();
 
-  constructor(private svc: UsersService) { }
+  constructor(private svc: UsersService, private membersSvc: StudioMembersService) { }
 
   ngOnInit(): void {
-    // seed di esempio se vuoto
-    if (this.svc.list().length === 0) {
-      this.svc.add({ firstName: 'Mario', lastName: 'Rossi', email: 'mario.rossi@example.com', phone: '3401234567', active: true } as any);
-      this.svc.add({ firstName: 'Luisa', lastName: 'Bianchi', email: 'luisa.bianchi@example.com', phone: '3407654321', active: true } as any);
-      this.svc.add({ firstName: 'Paolo', lastName: 'Verdi', email: 'paolo.verdi@example.com', phone: '3400000000', active: false } as any);
-    }
-    this.reload();
+    this.load();
   }
 
-  // ---------- tabella ----------
+  /** Carica i membri dal backend e popola la tabella */
+  load(): void {
+    this.loading = true;              // <-- ON
+    this.membersSvc.listMembers().subscribe({
+      next: (members: StudioMemberDto[]) => {
+        this.users = members.map(m => ({
+          id: m.user.id,
+          firstName: m.user.firstName,
+          lastName: m.user.lastName,
+          email: m.user.email,
+          active: (m.user as any).active ?? true
+        })) as unknown as User[];
+
+        this.applyFilter();
+        this.loading = false;         // <-- OFF
+      },
+      error: (err) => {
+        console.error('Errore nel caricamento dei membri', err);
+        this.users = [];
+        this.filtered = [];
+        this.loading = false;         // <-- OFF
+      }
+    });
+  }
+
   trackById(_: number, u: User): number { return u.id; }
 
   reload(): void {
-    this.users = this.svc.list();
-    this.applyFilter();
+    this.load();
   }
 
   applyFilter(): void {
@@ -85,7 +104,6 @@ export class UsersComponent implements OnInit {
       );
   }
 
-  /* ------------ Azioni tabella ------------ */
   openNew(): void {
     this.editing = null;
     this.form = this.blankForm();
@@ -106,7 +124,7 @@ export class UsersComponent implements OnInit {
       email: u.email,
       phone: (u as any).phone ?? '',
       active: u.active,
-      memberships: [] // se le carichi da backend mappale qui
+      memberships: []
     };
     if (this.form.memberships.length === 0) this.addMembership();
     this.modalVisible = true;
@@ -126,7 +144,6 @@ export class UsersComponent implements OnInit {
     this.reload();
   }
 
-  /* ------------ Wizard ------------ */
   next(): void {
     if (!this.isStepValid(this.step)) return;
     if (this.step < 2) this.step++;
@@ -143,16 +160,13 @@ export class UsersComponent implements OnInit {
       return !!f.firstName.trim() && !!f.lastName.trim() && !!f.email.trim() && emailOk;
     }
     if (s === 1) {
-      // Se uno studio è selezionato deve esserci un ruolo; righe vuote sono consentite
       return this.form.memberships.every(m => !m.studioId || !!m.role);
     }
     return true;
   }
 
-  /* ------------ Modale create/update ------------ */
   save(): void {
     if (!this.isStepValid(2)) return;
-
     const f = this.form;
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email);
     if (!emailOk) return;
@@ -160,19 +174,36 @@ export class UsersComponent implements OnInit {
     const membershipsClean = f.memberships.filter(m => !!m.studioId);
 
     if (this.editing) {
-      // NB: il tuo UsersService potrebbe non supportare memberships: nessun problema
       const updated: any = { ...this.editing, ...f, memberships: membershipsClean };
-      // Mantieni anche nome completo se il model legacy lo usa
       if (!(this.editing as any).firstName && !(this.editing as any).lastName) {
         updated.name = `${f.firstName} ${f.lastName}`.trim();
       }
       this.svc.update(updated);
       this.editing = null;
     } else {
-      const payload: any = { ...f, memberships: membershipsClean };
-      // Compatibilità con eventuale model legacy { name: string }
-      payload.name = `${f.firstName} ${f.lastName}`.trim();
-      this.svc.add(payload);
+      const firstMembership = membershipsClean[0];
+      const input: StudioMemberInputDto = {
+        user: {
+          firstName: f.firstName,
+          lastName: f.lastName,
+          email: f.email,
+          password: (f as any).password ?? ''
+        },
+        role: (firstMembership?.role as StudioRole) ?? 'BACKOFFICE'
+      };
+
+      this.saving = true;
+      this.membersSvc.createMember(input).subscribe({
+        next: _resp => {
+          this.saving = false;
+          this.detailsVisible = false;
+          this.reload();
+        },
+        error: _err => {
+          this.saving = false;
+          console.error('Errore durante la creazione del membro', _err);
+        }
+      });
     }
 
     this.modalVisible = false;
@@ -189,9 +220,8 @@ export class UsersComponent implements OnInit {
     this.viewing = null;
   }
 
-  /* ------------ Membership helpers ------------ */
   addMembership(): void {
-    this.form.memberships.push({ studioId: null, role: 'STAFF', active: true });
+    this.form.memberships.push({ studioId: null, role: 'BACKOFFICE', active: true }); // <-- il default che usavi
   }
 
   removeMembership(i: number): void {
@@ -201,7 +231,6 @@ export class UsersComponent implements OnInit {
 
   trackByMembership = (_: number, m: MembershipForm) => m.studioId ?? _;
 
-  /* ------------ Helpers ------------ */
   private blankForm() {
     return {
       firstName: '',
@@ -219,10 +248,10 @@ export class UsersComponent implements OnInit {
     const [first, ...rest] = s.split(/\s+/);
     return { first, last: rest.join(' ') };
   }
+
   studioName(id: string | null): string {
     if (!id) return '';
     const s = this.studios.find(x => x.id === id);
     return s ? s.name : '';
   }
-
 }
