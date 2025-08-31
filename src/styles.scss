@@ -48,3 +48,13 @@ app-root {
 .card * {
   min-width: 0;
 }
+
+:root {
+  --app-bg: #EEF3FF;
+}
+
+html,
+body {
+  height: 100%;
+  background: var(--app-bg);
+}
