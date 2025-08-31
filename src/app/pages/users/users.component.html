@@ -6,7 +6,7 @@
         <div class="right">
             <input class="search" type="search" placeholder="Cerca utente…" [(ngModel)]="search"
                 (ngModelChange)="applyFilter()" />
-            <button class="btn primary" (click)="openNew()">＋ Nuovo utente</button>
+            <button type="button" class="btn primary" (click)="openNew()">＋ Nuovo utente</button>
         </div>
     </div>
 
@@ -23,9 +23,9 @@
             </thead>
 
             <tbody>
-                <tr *ngFor="let u of filtered; trackBy: trackById">
+                <tr *ngFor="let u of filtered; trackBy: trackById" [attr.data-member-id]="u.id || 'NO-ID'">
                     <td>
-                        <button class="linklike" (click)="view(u)">
+                        <button type="button" class="linklike" (click)="view(u)">
                             {{ u.firstName || (u['name'] ? u['name'].split(' ')[0] : '') }}
                             {{ u.lastName || (u['name'] ? u['name'].split(' ').slice(1).join(' ') : '') }}
                         </button>
@@ -36,11 +36,24 @@
                             {{ u.active ? 'Attivo' : 'Sospeso' }}
                         </span>
                     </td>
-                    <td>{{ u.createdAt | date: 'd MMM y' }}</td>
+                    <td>
+                        <ng-container *ngIf="u.createdAt; else noDate">
+                            {{ u.createdAt | date:'d MMM y' }}
+                        </ng-container>
+                        <ng-template #noDate>—</ng-template>
+                    </td>
+
                     <td class="actions">
-                        <button class="icon" title="Vedi" (click)="view(u)">👁️</button>
-                        <button class="icon" title="Modifica" (click)="edit(u)">✏️</button>
-                        <button class="icon danger" title="Elimina" (click)="askDelete(u)">🗑️</button>
+                        <button type="button" class="icon" title="Vedi" (click)="view(u)">👁️</button>
+                        <button type="button" class="icon" title="Modifica" (click)="edit(u)">✏️</button>
+
+                        <!-- Se attivo → Sospendi -->
+                        <button *ngIf="u.active" type="button" class="icon warning" title="Sospendi"
+                            (click)="suspend(u)">⏸️</button>
+
+                        <!-- Se sospeso → Elimina -->
+                        <button *ngIf="!u.active" type="button" class="icon danger" title="Elimina"
+                            (click)="askDelete(u)">🗑️</button>
                     </td>
                 </tr>
 
@@ -148,7 +161,6 @@
                             <li *ngFor="let m of form.memberships | slice:0">
                                 <ng-container *ngIf="m.studioId; else empty">
                                     {{ studioName(m.studioId) }} — {{ m.role }}
-
                                     <span class="badge small" [class.ok]="m.active" [class.off]="!m.active">
                                         {{ m.active ? 'Attiva' : 'Sospesa' }}
                                     </span>
@@ -183,26 +195,40 @@
         <h3>Dettagli utente</h3>
 
         <div class="details" *ngIf="viewing as v">
-            <div><strong>Nome:</strong>
-                {{ v.firstName || (v['name'] ? v['name'].split(' ')[0] : '') }}
-                {{ v.lastName || (v['name'] ? v['name'].split(' ').slice(1).join(' ') : '') }}
-            </div>
-            <div><strong>Email:</strong> {{ v.email }}</div>
+            <div><strong>Nome:</strong> {{ v.user?.firstName }} {{ v.user?.lastName }}</div>
+            <div><strong>Email:</strong> {{ v.user?.email }}</div>
+            <div><strong>Ruolo:</strong> {{ v.role }}</div>
+
             <div>
                 <strong>Stato:</strong>
                 <span class="badge" [class.ok]="v.active" [class.off]="!v.active">
                     {{ v.active ? 'Attivo' : 'Sospeso' }}
                 </span>
             </div>
-            <div><strong>Creato:</strong> {{ v.createdAt | date: 'EEE d MMM y, HH:mm' }}</div>
-            <div *ngIf="v.updatedAt"><strong>Aggiornato:</strong> {{ v.updatedAt | date: 'EEE d MMM y, HH:mm' }}</div>
+
+            <div *ngIf="v.user?.createdAt as created">
+                <strong>Creato:</strong> {{ created | date:'EEE d MMM y, HH:mm' }}
+            </div>
+
+            <div *ngIf="v.user?.updatedAt as updated">
+                <strong>Aggiornato:</strong> {{ updated | date:'EEE d MMM y, HH:mm' }}
+            </div>
         </div>
 
-        <div class="modal-actions">
-            <button class="btn" (click)="edit(v)">Modifica</button>
-            <button class="btn danger" (click)="askDelete(v)">Elimina</button>
-            <button class="btn" (click)="closeDetails()">Chiudi</button>
+        <!-- IMPORTANTE: qui estendiamo lo scope di v -->
+        <div class="modal-actions" *ngIf="viewing as v">
+            <button type="button" class="btn" (click)="editFromDetails(v)">Modifica</button>
+
+            <!-- Se attivo → pulsante Sospendi -->
+            <button *ngIf="v.active" type="button" class="btn warning" (click)="suspendFromDetails(v)">Sospendi</button>
+
+            <!-- Se sospeso → pulsante Elimina -->
+            <button *ngIf="!v.active" type="button" class="btn danger"
+                (click)="askDeleteFromDetails(v)">Elimina</button>
+
+            <button type="button" class="btn" (click)="closeDetails()">Chiudi</button>
         </div>
+
     </div>
 </div>
 
@@ -212,20 +238,17 @@
         <h3>Eliminare questo utente?</h3>
         <p *ngIf="toDelete as d">
             Questa azione non è reversibile.
-            <strong>
-                {{ d.firstName || (d['name'] ? d['name'].split(' ')[0] : '') }}
-                {{ d.lastName || (d['name'] ? d['name'].split(' ').slice(1).join(' ') : '') }}
-            </strong>
+            <strong>{{ d.firstName }} {{ d.lastName }}</strong>
         </p>
         <div class="modal-actions">
-            <button class="btn danger" (click)="confirmDelete()">Elimina</button>
-            <button class="btn" (click)="confirmVisible = false">Annulla</button>
+            <button type="button" class="btn danger" (click)="confirmDelete()">Elimina</button>
+            <button type="button" class="btn" (click)="confirmVisible = false">Annulla</button>
         </div>
     </div>
 </div>
 
-<!-- Overlay caricamento globale (centrato e sopra la tabella) -->
-<div class="page-loading-overlay" *ngIf="loading" role="status" aria-live="polite" aria-busy="true">
+<!-- Overlay caricamento globale -->
+<div class="page-loading-overlay" *ngIf="loading" role="status" aria-live="polite">
     <span class="spinner spinner--big" aria-hidden="true"></span>
     <span class="sr-only">Caricamento pazienti…</span>
 </div>

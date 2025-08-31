@@ -16,8 +16,8 @@ interface Studio { id: string; name: string; }
   styleUrls: ['./users.component.scss'],
 })
 export class UsersComponent implements OnInit {
-  users: User[] = [];
-  filtered: User[] = [];
+  users: (User & { memberId?: string })[] = [];   // <-- tengo anche lo studioMemberId
+  filtered: (User & { memberId?: string })[] = [];
 
   search = '';
 
@@ -25,18 +25,17 @@ export class UsersComponent implements OnInit {
   modalVisible = false;
   detailsVisible = false;
   confirmVisible = false;
-  saving: boolean = false;   // per create/update
-  loading: boolean = false;  // <-- AGGIUNTO: per caricamento lista
+  saving = false;
+  loading = false;
 
   // Wizard
   step: 0 | 1 | 2 = 0;
 
   // Stato corrente
-  editing: User | null = null;
-  viewing: User | null = null;
-  toDelete: User | null = null;
+  editing: (User & { memberId?: string }) | null = null;
+  viewing: StudioMemberDto | null = null;        // <-- ora mostriamo il DTO reale
+  toDelete: (User & { memberId?: string }) | null = null;
 
-  // Lookup per studi e ruoli (ora dal service)
   studioRoles: StudioRole[] = ['OWNER', 'DOCTOR', 'BACKOFFICE', 'ADMIN'];
   studios: Studio[] = [
     { id: 'studio-1', name: 'Studio Dentistico Sorriso' },
@@ -44,7 +43,6 @@ export class UsersComponent implements OnInit {
     { id: 'studio-3', name: 'Studio di Nutrizione Sana Vita' },
   ];
 
-  // Modello form
   form: {
     firstName: string;
     lastName: string;
@@ -60,36 +58,37 @@ export class UsersComponent implements OnInit {
     this.load();
   }
 
-  /** Carica i membri dal backend e popola la tabella */
+  /** Carica membri e memorizza anche lo studioMemberId */
   load(): void {
-    this.loading = true;              // <-- ON
+    this.loading = true;
     this.membersSvc.listMembers().subscribe({
       next: (members: StudioMemberDto[]) => {
         this.users = members.map(m => ({
-          id: m.user.id,
+          id: m.id,                 // <-- studioMemberId (UUID) usato dalla view()
+          userId: m.user.id,        // (se ti serve per update/delete utente)
           firstName: m.user.firstName,
           lastName: m.user.lastName,
           email: m.user.email,
-          active: (m.user as any).active ?? true
-        })) as unknown as User[];
-
+          active: m.active,
+          createdAt: (m.user as any)?.createdAt
+        })) as any;
         this.applyFilter();
-        this.loading = false;         // <-- OFF
+        this.loading = false;
       },
-      error: (err) => {
+      error: err => {
         console.error('Errore nel caricamento dei membri', err);
         this.users = [];
         this.filtered = [];
-        this.loading = false;         // <-- OFF
+        this.loading = false;
       }
     });
   }
 
-  trackById(_: number, u: User): number { return u.id; }
-
-  reload(): void {
-    this.load();
+  trackById(_: number, u: User & { memberId?: string }): number | string {
+    return (u as any).memberId || u.id;
   }
+
+  reload(): void { this.load(); }
 
   applyFilter(): void {
     const q = this.search.trim().toLowerCase();
@@ -97,10 +96,7 @@ export class UsersComponent implements OnInit {
       ? [...this.users]
       : this.users.filter(u =>
         [u.firstName, u.lastName, u.email, (u as any).phone, u.active ? 'attivo' : 'sospeso']
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase()
-          .includes(q),
+          .filter(Boolean).join(' ').toLowerCase().includes(q)
       );
   }
 
@@ -111,19 +107,40 @@ export class UsersComponent implements OnInit {
     this.step = 0;
   }
 
-  view(u: User): void {
-    this.viewing = u;
-    this.detailsVisible = true;
+  /** DETTAGLIO: chiama l'API GET /members/{id} dove id è lo studioMemberId (UUID) */
+  view(u: { id?: string }): void {
+    if (!u?.id) {
+      console.warn('[Users] view(): manca studioMemberId nella riga', u);
+      return;
+    }
+    this.loading = true;
+    this.membersSvc.getMember(u.id).subscribe({
+      next: (dto) => {
+        this.viewing = dto;          // StudioMemberDto dal backend
+        this.detailsVisible = true;  // apro la modale
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('[Users] getMember errore', err);
+        this.loading = false;
+      }
+    });
   }
 
-  edit(u: User): void {
+
+  closeDetails(): void {
+    this.detailsVisible = false;
+    this.viewing = null;
+  }
+
+  edit(u: User & { memberId?: string }): void {
     this.editing = u;
     this.form = {
-      firstName: (u as any).firstName ?? u.firstName,
-      lastName: (u as any).lastName ?? u.lastName,
+      firstName: (u as any).firstName ?? (u as any).firstName,
+      lastName: (u as any).lastName ?? (u as any).lastName,
       email: u.email,
       phone: (u as any).phone ?? '',
-      active: u.active,
+      active: (u as any).active,
       memberships: []
     };
     if (this.form.memberships.length === 0) this.addMembership();
@@ -131,27 +148,21 @@ export class UsersComponent implements OnInit {
     this.step = 0;
   }
 
-  askDelete(u: User): void {
+  askDelete(u: User & { memberId?: string }): void {
     this.toDelete = u;
     this.confirmVisible = true;
   }
 
   confirmDelete(): void {
     if (!this.toDelete) return;
-    this.svc.remove(this.toDelete.id);
+    this.svc.remove(this.toDelete.id as any);
     this.toDelete = null;
     this.confirmVisible = false;
     this.reload();
   }
 
-  next(): void {
-    if (!this.isStepValid(this.step)) return;
-    if (this.step < 2) this.step++;
-  }
-
-  prev(): void {
-    if (this.step > 0) this.step--;
-  }
+  next(): void { if (this.isStepValid(this.step) && this.step < 2) this.step++; }
+  prev(): void { if (this.step > 0) this.step--; }
 
   isStepValid(s: number): boolean {
     if (s === 0) {
@@ -159,9 +170,7 @@ export class UsersComponent implements OnInit {
       const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email);
       return !!f.firstName.trim() && !!f.lastName.trim() && !!f.email.trim() && emailOk;
     }
-    if (s === 1) {
-      return this.form.memberships.every(m => !m.studioId || !!m.role);
-    }
+    if (s === 1) { return this.form.memberships.every(m => !m.studioId || !!m.role); }
     return true;
   }
 
@@ -183,26 +192,13 @@ export class UsersComponent implements OnInit {
     } else {
       const firstMembership = membershipsClean[0];
       const input: StudioMemberInputDto = {
-        user: {
-          firstName: f.firstName,
-          lastName: f.lastName,
-          email: f.email,
-          password: (f as any).password ?? ''
-        },
+        user: { firstName: f.firstName, lastName: f.lastName, email: f.email, password: (f as any).password ?? '' },
         role: (firstMembership?.role as StudioRole) ?? 'BACKOFFICE'
       };
-
       this.saving = true;
       this.membersSvc.createMember(input).subscribe({
-        next: _resp => {
-          this.saving = false;
-          this.detailsVisible = false;
-          this.reload();
-        },
-        error: _err => {
-          this.saving = false;
-          console.error('Errore durante la creazione del membro', _err);
-        }
+        next: _ => { this.saving = false; this.detailsVisible = false; this.reload(); },
+        error: e => { this.saving = false; console.error('Errore durante la creazione del membro', e); }
       });
     }
 
@@ -210,43 +206,12 @@ export class UsersComponent implements OnInit {
     this.reload();
   }
 
-  cancelModal(): void {
-    this.modalVisible = false;
-    this.editing = null;
-  }
-
-  closeDetails(): void {
-    this.detailsVisible = false;
-    this.viewing = null;
-  }
-
-  addMembership(): void {
-    this.form.memberships.push({ studioId: null, role: 'BACKOFFICE', active: true }); // <-- il default che usavi
-  }
-
-  removeMembership(i: number): void {
-    this.form.memberships.splice(i, 1);
-    if (this.form.memberships.length === 0) this.addMembership();
-  }
-
+  addMembership(): void { this.form.memberships.push({ studioId: null, role: 'BACKOFFICE', active: true }); }
+  removeMembership(i: number): void { this.form.memberships.splice(i, 1); if (this.form.memberships.length === 0) this.addMembership(); }
   trackByMembership = (_: number, m: MembershipForm) => m.studioId ?? _;
 
   private blankForm() {
-    return {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      active: true,
-      memberships: [] as MembershipForm[],
-    };
-  }
-
-  private splitName(full: string | undefined) {
-    const s = (full || '').trim();
-    if (!s) return { first: '', last: '' };
-    const [first, ...rest] = s.split(/\s+/);
-    return { first, last: rest.join(' ') };
+    return { firstName: '', lastName: '', email: '', phone: '', active: true, memberships: [] as MembershipForm[] };
   }
 
   studioName(id: string | null): string {

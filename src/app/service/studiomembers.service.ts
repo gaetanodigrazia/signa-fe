@@ -18,15 +18,19 @@ export interface StudioMemberInputDto {
 }
 
 export interface StudioMemberDto {
-    id: number;
+    id: string; // UUID dello studio member, quindi string
+    role: StudioRole;
     user: {
-        id: number;
+        id: string;   // dipende dal tuo backend: se `users.id` è SERIAL → number, se è UUID → string
         firstName: string;
         lastName: string;
         email: string;
+        phone?: string;
     };
-    role: StudioRole;
+    active?: boolean;
+    // eventuali altri campi
 }
+
 
 @Injectable({ providedIn: 'root' })
 export class StudioMembersService {
@@ -38,8 +42,11 @@ export class StudioMembersService {
         return this.http.post<StudioMemberDto>(this.baseUrl, input);
     }
 
-    /** LISTA tutti i membri */
     listMembers(): Observable<StudioMemberDto[]> {
         return this.http.get<StudioMemberDto[]>(this.baseUrl);
+    }
+
+    getMember(studioMemberId: string): Observable<StudioMemberDto> {
+        return this.http.get<StudioMemberDto>(`${this.baseUrl}/${studioMemberId}`);
     }
 }
