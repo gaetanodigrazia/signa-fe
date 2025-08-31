@@ -49,4 +49,14 @@ export class StudioMembersService {
     getMember(studioMemberId: string): Observable<StudioMemberDto> {
         return this.http.get<StudioMemberDto>(`${this.baseUrl}/${studioMemberId}`);
     }
+    changeStatus(studioMemberId: string, status: boolean): Observable<void> {
+        return this.http.get<void>(`${this.baseUrl}/status/${studioMemberId}`, {
+            params: { status }
+        });
+    }
+    deleteMember(studioMemberId: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${studioMemberId}`);
+    }
+
+
 }

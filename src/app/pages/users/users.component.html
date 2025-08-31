@@ -46,14 +46,18 @@
                     <td class="actions">
                         <button type="button" class="icon" title="Vedi" (click)="view(u)">👁️</button>
                         <button type="button" class="icon" title="Modifica" (click)="edit(u)">✏️</button>
-
                         <!-- Se attivo → Sospendi -->
                         <button *ngIf="u.active" type="button" class="icon warning" title="Sospendi"
-                            (click)="suspend(u)">⏸️</button>
+                            (click)="deactivate(u)">⏸️</button>
 
-                        <!-- Se sospeso → Elimina -->
+                        <!-- Se sospeso → Attiva -->
+                        <button *ngIf="!u.active" type="button" class="icon success" title="Attiva"
+                            (click)="activate(u)">✔️</button>
+
+                        <!-- opzionale: se sospeso mostra anche Elimina -->
                         <button *ngIf="!u.active" type="button" class="icon danger" title="Elimina"
                             (click)="askDelete(u)">🗑️</button>
+
                     </td>
                 </tr>
 
@@ -218,14 +222,16 @@
         <!-- IMPORTANTE: qui estendiamo lo scope di v -->
         <div class="modal-actions" *ngIf="viewing as v">
             <button type="button" class="btn" (click)="editFromDetails(v)">Modifica</button>
+            <!-- Se attivo → Sospendi -->
+            <button *ngIf="v.active" type="button" class="btn warning"
+                (click)="deactivateFromDetails(v)">Sospendi</button>
 
-            <!-- Se attivo → pulsante Sospendi -->
-            <button *ngIf="v.active" type="button" class="btn warning" (click)="suspendFromDetails(v)">Sospendi</button>
+            <!-- Se sospeso → Attiva -->
+            <button *ngIf="!v.active" type="button" class="btn success" (click)="activateFromDetails(v)">Attiva</button>
 
-            <!-- Se sospeso → pulsante Elimina -->
+            <!-- Se sospeso → opzionale Elimina -->
             <button *ngIf="!v.active" type="button" class="btn danger"
                 (click)="askDeleteFromDetails(v)">Elimina</button>
-
             <button type="button" class="btn" (click)="closeDetails()">Chiudi</button>
         </div>
 

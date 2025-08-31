@@ -128,6 +128,10 @@ export class UsersComponent implements OnInit {
   }
 
 
+  suspend(u: { id?: string }): void {
+    console.log("A");
+  }
+
   closeDetails(): void {
     this.detailsVisible = false;
     this.viewing = null;
@@ -155,10 +159,16 @@ export class UsersComponent implements OnInit {
 
   confirmDelete(): void {
     if (!this.toDelete) return;
-    this.svc.remove(this.toDelete.id as any);
-    this.toDelete = null;
-    this.confirmVisible = false;
-    this.reload();
+    this.membersSvc.deleteMember(this.toDelete.id as any).subscribe({
+      next: () => {
+        this.toDelete = null;
+        this.confirmVisible = false;
+        this.reload();
+      },
+      error: err => {
+        console.error('Errore durante la cancellazione del membro', err);
+      }
+    });
   }
 
   next(): void { if (this.isStepValid(this.step) && this.step < 2) this.step++; }
@@ -219,4 +229,43 @@ export class UsersComponent implements OnInit {
     const s = this.studios.find(x => x.id === id);
     return s ? s.name : '';
   }
+  deactivate(u: any): void {
+    if (!u?.id) return;
+    this.membersSvc.changeStatus(u.id, false).subscribe({
+      next: () => this.reload(),
+      error: err => console.error('Errore durante la disattivazione', err)
+    });
+  }
+
+  deactivateFromDetails(v: any): void {
+    if (!v?.id) return;
+    this.membersSvc.changeStatus(v.id, false).subscribe({
+      next: () => {
+        this.closeDetails();
+        this.reload();
+      },
+      error: err => console.error('Errore durante la disattivazione', err)
+    });
+  }
+
+  activate(u: any): void {
+    if (!u?.id) return;
+    this.membersSvc.changeStatus(u.id, true).subscribe({
+      next: () => this.reload(),
+      error: err => console.error('Errore durante l’attivazione', err)
+    });
+  }
+
+  activateFromDetails(v: any): void {
+    if (!v?.id) return;
+    this.membersSvc.changeStatus(v.id, true).subscribe({
+      next: () => {
+        this.closeDetails();
+        this.reload();
+      },
+      error: err => console.error('Errore durante l’attivazione', err)
+    });
+  }
+
+
 }
