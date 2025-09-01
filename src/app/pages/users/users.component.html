@@ -116,21 +116,13 @@
             <!-- TAB: APPARTENENZE / RUOLO -->
             <div *ngIf="(!editingId && step===1) || (editingId && editMode==='role')" class="tab-content">
                 <h4>Appartenenze agli studi</h4>
-                <div class="hint">Seleziona lo studio e il ruolo.</div>
+                <div class="hint">Seleziona il nuovo ruolo</div>
 
                 <div class="studio-memberships">
                     <div class="membership-row"
                         *ngFor="let m of form.memberships; let i = index; trackBy: trackByMembership">
-                        <label>
-                            <span>Studio</span>
-                            <select [(ngModel)]="m.studioId" name="studio-{{i}}">
-                                <option [ngValue]="null" disabled>Seleziona…</option>
-                                <option *ngFor="let s of studios" [ngValue]="s.id">{{ s.name }}</option>
-                            </select>
-                        </label>
 
                         <label>
-                            <span>Ruolo nello studio</span>
                             <select [(ngModel)]="m.role" name="studio-role-{{i}}">
                                 <option *ngFor="let r of studioRoles" [ngValue]="r">{{ r }}</option>
                             </select>

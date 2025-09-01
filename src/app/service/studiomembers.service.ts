@@ -10,7 +10,7 @@ export interface UserInputDto {
     password: string;
 }
 
-export type StudioRole = 'OWNER' | 'DOCTOR' | 'BACKOFFICE' | 'ADMIN';
+export type StudioRole = 'OWNER' | 'DOCTOR' | 'BACKOFFICE' | 'NURSE' | 'STAFF';
 
 export interface StudioMemberInputDto {
     user: UserInputDto;
@@ -18,17 +18,18 @@ export interface StudioMemberInputDto {
 }
 
 export interface StudioMemberDto {
-    id: string; // UUID dello studio member, quindi string
+    id: string; // UUID
     role: StudioRole;
     user: {
-        id: string;   // dipende dal tuo backend: se `users.id` è SERIAL → number, se è UUID → string
+        id: string;
         firstName: string;
         lastName: string;
         email: string;
         phone?: string;
+        createdAt?: string;
+        updatedAt?: string;
     };
     active?: boolean;
-    // eventuali altri campi
 }
 
 @Injectable({ providedIn: 'root' })
@@ -48,21 +49,34 @@ export class StudioMembersService {
     getMember(studioMemberId: string): Observable<StudioMemberDto> {
         return this.http.get<StudioMemberDto>(`${this.baseUrl}/${studioMemberId}`);
     }
+
+    // ✅ Query param “status=true|false”
     changeStatus(studioMemberId: string, status: boolean): Observable<void> {
         return this.http.put<void>(
             `${this.baseUrl}/status/${studioMemberId}`,
             {},
-            { params: { status: status } }
+            { params: { status: String(status) } } // <-- stringa, nelle HttpOptions
         );
     }
 
-    updateMember(studioMemberId: string, studioMemberInputDto: StudioMemberInputDto): Observable<StudioMemberDto> {
-        return this.http.patch<StudioMemberDto>(`${this.baseUrl}/${studioMemberId}`, studioMemberInputDto);
+    // ✅ NUOVO: aggiorna SOLO il ruolo (lo studio non cambia)
+    updateRole(studioMemberId: string, role: StudioRole): Observable<StudioMemberDto> {
+        return this.http.put<StudioMemberDto>(
+            `${this.baseUrl}/role/${studioMemberId}`,
+            {},
+            { params: { role: role } } // se backend si aspetta DTO in body, cambia a { role } nel body
+        );
+    }
+
+    // ✅ NUOVO: aggiorna SOLO i dati personali/account
+    updatePersonalInformation(studioMemberId: string, user: UserInputDto): Observable<StudioMemberDto> {
+        return this.http.put<StudioMemberDto>(
+            `${this.baseUrl}/account/${studioMemberId}`,
+            user
+        );
     }
 
     deleteMember(studioMemberId: string): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/${studioMemberId}`);
     }
-
-
 }
