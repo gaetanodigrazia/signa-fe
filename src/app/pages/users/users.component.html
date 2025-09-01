@@ -21,7 +21,6 @@
                     <th class="actions">Azioni</th>
                 </tr>
             </thead>
-
             <tbody>
                 <tr *ngFor="let u of filtered; trackBy: trackById" [attr.data-member-id]="u.id || 'NO-ID'">
                     <td>
@@ -42,10 +41,10 @@
                         </ng-container>
                         <ng-template #noDate>—</ng-template>
                     </td>
-
                     <td class="actions">
                         <button type="button" class="icon" title="Vedi" (click)="view(u)">👁️</button>
                         <button type="button" class="icon" title="Modifica" (click)="edit(u)">✏️</button>
+
                         <!-- Se attivo → Sospendi -->
                         <button *ngIf="u.active" type="button" class="icon warning" title="Sospendi"
                             (click)="deactivate(u)">⏸️</button>
@@ -57,7 +56,6 @@
                         <!-- opzionale: se sospeso mostra anche Elimina -->
                         <button *ngIf="!u.active" type="button" class="icon danger" title="Elimina"
                             (click)="askDelete(u)">🗑️</button>
-
                     </td>
                 </tr>
 
@@ -69,51 +67,56 @@
     </div>
 </div>
 
-<!-- MODALE CREA/MODIFICA (wizard) -->
+<!-- MODALE CREA / MODIFICA -->
 <div class="modal-overlay" *ngIf="modalVisible" (click)="cancelModal()">
     <div class="modal" (click)="$event.stopPropagation()">
-        <h3>{{ editing ? 'Modifica utente' : 'Nuovo utente' }}</h3>
+        <h3>{{ editingId ? 'Modifica utente' : 'Nuovo utente' }}</h3>
 
-        <!-- Stepper -->
-        <ol class="stepper">
+        <!-- CREAZIONE: stepper a 3 step -->
+        <ol class="stepper" *ngIf="!editingId">
             <li [class.done]="step>0" [class.active]="step===0">Utente</li>
             <li [class.done]="step>1" [class.active]="step===1">Appartenenze</li>
             <li [class.active]="step===2">Riepilogo</li>
         </ol>
 
-        <form (ngSubmit)="save()" #userForm="ngForm" novalidate>
-            <!-- STEP 0: Dati utente -->
-            <div *ngIf="step===0" class="tab-content">
+        <form #userForm="ngForm" novalidate>
+
+            <!-- MODIFICA: scelta iniziale (prima di mostrare la tab) -->
+            <div *ngIf="editingId && editMode==='none'" class="tab-content">
+                <h4>Cosa vuoi modificare?</h4>
+                <div class="actions">
+                    <button type="button" class="btn" (click)="chooseEdit('personal')">Dati anagrafici</button>
+                    <button type="button" class="btn" (click)="chooseEdit('role')">Ruolo</button>
+                </div>
+            </div>
+
+            <!-- =================== TABS =================== -->
+
+            <!-- TAB: DATI ANAGRAFICI -->
+            <div *ngIf="(!editingId && step===0) || (editingId && editMode==='personal')" class="tab-content">
                 <label>
                     <span>Nome</span>
                     <input [(ngModel)]="form.firstName" name="firstName" required />
                 </label>
-
                 <label>
                     <span>Cognome</span>
                     <input [(ngModel)]="form.lastName" name="lastName" required />
                 </label>
-
                 <label>
                     <span>Email</span>
                     <input type="email" [(ngModel)]="form.email" name="email" required />
                 </label>
-
                 <label>
                     <span>Telefono</span>
                     <input type="tel" [(ngModel)]="form.phone" name="phone" />
                 </label>
-
-                <label class="row">
-                    <input type="checkbox" [(ngModel)]="form.active" name="active" />
-                    <span>Attivo</span>
-                </label>
+                <!-- RIMOSSO: switch Attivo/Inattivo in modifica -->
             </div>
 
-            <!-- STEP 1: Appartenenze -->
-            <div *ngIf="step===1" class="tab-content">
+            <!-- TAB: APPARTENENZE / RUOLO -->
+            <div *ngIf="(!editingId && step===1) || (editingId && editMode==='role')" class="tab-content">
                 <h4>Appartenenze agli studi</h4>
-                <div class="hint">Aggiungi gli studi e il ruolo dell’utente.</div>
+                <div class="hint">Seleziona lo studio e il ruolo.</div>
 
                 <div class="studio-memberships">
                     <div class="membership-row"
@@ -133,31 +136,28 @@
                             </select>
                         </label>
 
-                        <label class="row">
+                        <!-- In creazione puoi gestire attivo/aggiungi/rimuovi; in modifica nascondo -->
+                        <label class="row" *ngIf="!editingId">
                             <input type="checkbox" [(ngModel)]="m.active" name="studio-active-{{i}}" />
                             <span>Attivo</span>
                         </label>
 
-                        <button type="button" class="icon danger" (click)="removeMembership(i)">🗑️</button>
+                        <button *ngIf="!editingId" type="button" class="icon danger"
+                            (click)="removeMembership(i)">🗑️</button>
                     </div>
 
-                    <button type="button" class="btn" (click)="addMembership()">＋ Aggiungi studio</button>
+                    <button *ngIf="!editingId" type="button" class="btn" (click)="addMembership()">＋ Aggiungi
+                        studio</button>
                 </div>
             </div>
 
-            <!-- STEP 2: Riepilogo -->
-            <div *ngIf="step===2" class="tab-content">
+            <!-- TAB: RIEPILOGO (SOLO CREAZIONE) -->
+            <div *ngIf="!editingId && step===2" class="tab-content">
                 <h4>Riepilogo</h4>
                 <div class="summary">
                     <div><strong>Nome:</strong> {{ form.firstName }} {{ form.lastName }}</div>
                     <div><strong>Email:</strong> {{ form.email }}</div>
                     <div><strong>Telefono:</strong> {{ form.phone || '—' }}</div>
-                    <div>
-                        <strong>Stato:</strong>
-                        <span class="badge" [class.ok]="form.active" [class.off]="!form.active">
-                            {{ form.active ? 'Attivo' : 'Sospeso' }}
-                        </span>
-                    </div>
 
                     <div class="mt">
                         <strong>Appartenenze:</strong>
@@ -177,16 +177,26 @@
                 </div>
             </div>
 
-            <!-- Footer azioni wizard -->
+            <!-- =================== FOOTER =================== -->
             <div class="modal-actions between">
                 <div class="left">
                     <button type="button" class="btn" (click)="cancelModal()">Annulla</button>
                 </div>
-                <div class="right">
+
+                <!-- CREAZIONE: wizard a 3 step -->
+                <div class="right" *ngIf="!editingId">
                     <button *ngIf="step>0" type="button" class="btn" (click)="prev()">Indietro</button>
                     <button *ngIf="step<2" type="button" class="btn primary" [disabled]="!isStepValid(step)"
                         (click)="next()">Avanti</button>
-                    <button *ngIf="step===2" class="btn primary" type="submit">Conferma</button>
+
+                    <button *ngIf="step===2" class="btn primary" type="button" [disabled]="saving || !isStepValid(2)"
+                        (click)="save()">Crea</button>
+                </div>
+
+                <!-- MODIFICA: mostra solo “Modifica” dopo la scelta -->
+                <div class="right" *ngIf="editingId && editMode!=='none'">
+                    <button class="btn primary" type="button" [disabled]="saving || !isEditValid()"
+                        (click)="confirmEdit()">Modifica</button>
                 </div>
             </div>
         </form>
@@ -219,25 +229,30 @@
             </div>
         </div>
 
-        <!-- IMPORTANTE: qui estendiamo lo scope di v -->
         <div class="modal-actions" *ngIf="viewing as v">
             <button type="button" class="btn" (click)="editFromDetails(v)">Modifica</button>
-            <!-- Se attivo → Sospendi -->
+
             <button *ngIf="v.active" type="button" class="btn warning"
                 (click)="deactivateFromDetails(v)">Sospendi</button>
-
-            <!-- Se sospeso → Attiva -->
             <button *ngIf="!v.active" type="button" class="btn success" (click)="activateFromDetails(v)">Attiva</button>
-
-            <!-- Se sospeso → opzionale Elimina -->
             <button *ngIf="!v.active" type="button" class="btn danger"
                 (click)="askDeleteFromDetails(v)">Elimina</button>
+
             <button type="button" class="btn" (click)="closeDetails()">Chiudi</button>
         </div>
-
     </div>
 </div>
 
+<!-- OVERLAY CARICAMENTO -->
+<div class="page-loading-overlay" *ngIf="loading" role="status" aria-live="polite">
+    <span class="spinner spinner--big" aria-hidden="true"></span>
+    <span class="sr-only">Caricamento…</span>
+</div>
+
+<div class="page-loading-overlay" *ngIf="loading || saving" role="status" aria-live="polite" aria-busy="true">
+    <span class="spinner spinner--big" aria-hidden="true"></span>
+    <span class="sr-only">Caricamento…</span>
+</div>
 <!-- MODALE CONFERMA DELETE -->
 <div class="modal-overlay" *ngIf="confirmVisible" (click)="confirmVisible = false">
     <div class="modal small" (click)="$event.stopPropagation()">
@@ -251,10 +266,4 @@
             <button type="button" class="btn" (click)="confirmVisible = false">Annulla</button>
         </div>
     </div>
-</div>
-
-<!-- Overlay caricamento globale -->
-<div class="page-loading-overlay" *ngIf="loading" role="status" aria-live="polite">
-    <span class="spinner spinner--big" aria-hidden="true"></span>
-    <span class="sr-only">Caricamento pazienti…</span>
 </div>

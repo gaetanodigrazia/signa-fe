@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UsersService } from 'src/app/service/user.service';
 import { User } from 'src/app/model/user.model';
 import { StudioMembersService, StudioMemberInputDto, StudioRole, StudioMemberDto } from 'src/app/service/studiomembers.service';
 
 interface MembershipForm { studioId: string | null; role: StudioRole; active: boolean; }
 interface Studio { id: string; name: string; }
+type EditMode = 'none' | 'personal' | 'role';
 
 @Component({
   selector: 'app-users',
@@ -16,24 +16,25 @@ interface Studio { id: string; name: string; }
   styleUrls: ['./users.component.scss'],
 })
 export class UsersComponent implements OnInit {
-  users: (User & { memberId?: string })[] = [];   // <-- tengo anche lo studioMemberId
+  // Lista & filtro
+  users: (User & { memberId?: string })[] = [];
   filtered: (User & { memberId?: string })[] = [];
-
   search = '';
 
-  // Modali
+  // Modali & stato UI
   modalVisible = false;
   detailsVisible = false;
   confirmVisible = false;
   saving = false;
   loading = false;
 
-  // Wizard
+  // Creazione: wizard 3 step (0 = anagrafica, 1 = ruolo, 2 = riepilogo)
   step: 0 | 1 | 2 = 0;
 
-  // Stato corrente
-  editing: (User & { memberId?: string }) | null = null;
-  viewing: StudioMemberDto | null = null;        // <-- ora mostriamo il DTO reale
+  // Modifica
+  editingId: string | null = null;   // studioMemberId (UUID) in modifica
+  editMode: EditMode = 'none';       // scelta cosa modificare
+  viewing: StudioMemberDto | null = null;
   toDelete: (User & { memberId?: string }) | null = null;
 
   studioRoles: StudioRole[] = ['OWNER', 'DOCTOR', 'BACKOFFICE', 'ADMIN'];
@@ -48,24 +49,26 @@ export class UsersComponent implements OnInit {
     lastName: string;
     email: string;
     phone: string;
-    active: boolean;
     memberships: MembershipForm[];
   } = this.blankForm();
 
-  constructor(private svc: UsersService, private membersSvc: StudioMembersService) { }
+  constructor(
+    private membersSvc: StudioMembersService
+  ) { }
 
   ngOnInit(): void {
     this.load();
   }
 
-  /** Carica membri e memorizza anche lo studioMemberId */
+  /* ---------- Lista ---------- */
+
   load(): void {
     this.loading = true;
     this.membersSvc.listMembers().subscribe({
       next: (members: StudioMemberDto[]) => {
         this.users = members.map(m => ({
-          id: m.id,                 // <-- studioMemberId (UUID) usato dalla view()
-          userId: m.user.id,        // (se ti serve per update/delete utente)
+          id: m.id,                     // studioMemberId (UUID)
+          userId: m.user.id,            // id utente
           firstName: m.user.firstName,
           lastName: m.user.lastName,
           email: m.user.email,
@@ -84,8 +87,8 @@ export class UsersComponent implements OnInit {
     });
   }
 
-  trackById(_: number, u: User & { memberId?: string }): number | string {
-    return (u as any).memberId || u.id;
+  trackById(_: number, u: any): string | number {
+    return u?.id ?? _;
   }
 
   reload(): void { this.load(); }
@@ -100,75 +103,15 @@ export class UsersComponent implements OnInit {
       );
   }
 
+  /* ---------- Creazione ---------- */
+
   openNew(): void {
-    this.editing = null;
+    this.editingId = null;
+    this.viewing = null;
+    this.editMode = 'none';
     this.form = this.blankForm();
     this.modalVisible = true;
     this.step = 0;
-  }
-
-  /** DETTAGLIO: chiama l'API GET /members/{id} dove id è lo studioMemberId (UUID) */
-  view(u: { id?: string }): void {
-    if (!u?.id) {
-      console.warn('[Users] view(): manca studioMemberId nella riga', u);
-      return;
-    }
-    this.loading = true;
-    this.membersSvc.getMember(u.id).subscribe({
-      next: (dto) => {
-        this.viewing = dto;          // StudioMemberDto dal backend
-        this.detailsVisible = true;  // apro la modale
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('[Users] getMember errore', err);
-        this.loading = false;
-      }
-    });
-  }
-
-
-  suspend(u: { id?: string }): void {
-    console.log("A");
-  }
-
-  closeDetails(): void {
-    this.detailsVisible = false;
-    this.viewing = null;
-  }
-
-  edit(u: User & { memberId?: string }): void {
-    this.editing = u;
-    this.form = {
-      firstName: (u as any).firstName ?? (u as any).firstName,
-      lastName: (u as any).lastName ?? (u as any).lastName,
-      email: u.email,
-      phone: (u as any).phone ?? '',
-      active: (u as any).active,
-      memberships: []
-    };
-    if (this.form.memberships.length === 0) this.addMembership();
-    this.modalVisible = true;
-    this.step = 0;
-  }
-
-  askDelete(u: User & { memberId?: string }): void {
-    this.toDelete = u;
-    this.confirmVisible = true;
-  }
-
-  confirmDelete(): void {
-    if (!this.toDelete) return;
-    this.membersSvc.deleteMember(this.toDelete.id as any).subscribe({
-      next: () => {
-        this.toDelete = null;
-        this.confirmVisible = false;
-        this.reload();
-      },
-      error: err => {
-        console.error('Errore durante la cancellazione del membro', err);
-      }
-    });
   }
 
   next(): void { if (this.isStepValid(this.step) && this.step < 2) this.step++; }
@@ -180,55 +123,163 @@ export class UsersComponent implements OnInit {
       const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email);
       return !!f.firstName.trim() && !!f.lastName.trim() && !!f.email.trim() && emailOk;
     }
-    if (s === 1) { return this.form.memberships.every(m => !m.studioId || !!m.role); }
+    if (s === 1) {
+      // almeno se presente studioId deve esserci un ruolo
+      return this.form.memberships.every(m => !m.studioId || !!m.role);
+    }
+    if (s === 2) {
+      // riepilogo: niente validazioni ulteriori
+      return true;
+    }
     return true;
   }
 
   save(): void {
     if (!this.isStepValid(2)) return;
     const f = this.form;
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email);
-    if (!emailOk) return;
 
-    const membershipsClean = f.memberships.filter(m => !!m.studioId);
+    const firstMembership = f.memberships[0];
+    const input: StudioMemberInputDto = {
+      user: {
+        firstName: f.firstName,
+        lastName: f.lastName,
+        email: f.email,
+        password: (f as any).password ?? ''
+      },
+      role: (firstMembership?.role as StudioRole) ?? 'BACKOFFICE'
+    };
 
-    if (this.editing) {
-      const updated: any = { ...this.editing, ...f, memberships: membershipsClean };
-      if (!(this.editing as any).firstName && !(this.editing as any).lastName) {
-        updated.name = `${f.firstName} ${f.lastName}`.trim();
+    this.saving = true;
+    this.membersSvc.createMember(input).subscribe({
+      next: _ => {
+        this.saving = false;
+        this.modalVisible = false;
+        this.reload();
+      },
+      error: e => {
+        console.error('Errore durante la creazione del membro', e);
+        this.saving = false;
       }
-      this.svc.update(updated);
-      this.editing = null;
-    } else {
-      const firstMembership = membershipsClean[0];
-      const input: StudioMemberInputDto = {
-        user: { firstName: f.firstName, lastName: f.lastName, email: f.email, password: (f as any).password ?? '' },
-        role: (firstMembership?.role as StudioRole) ?? 'BACKOFFICE'
+    });
+  }
+
+  /* ---------- Dettaglio ---------- */
+
+  view(u: { id?: string }): void {
+    if (!u?.id) {
+      console.warn('[Users] view(): manca studioMemberId nella riga', u);
+      return;
+    }
+    this.loading = true;
+    this.membersSvc.getMember(u.id).subscribe({
+      next: (dto) => {
+        this.viewing = dto;
+        this.detailsVisible = true;  // apre la modale dettagli
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('[Users] getMember errore', err);
+        this.loading = false;
+      }
+    });
+  }
+
+  closeDetails(): void {
+    this.detailsVisible = false;
+    this.viewing = null;
+  }
+
+  /* ---------- Modifica ---------- */
+
+  edit(u: { id?: string }): void {
+    if (!u?.id) {
+      console.warn('[Users] edit(): manca studioMemberId nella riga', u);
+      return;
+    }
+    this.loading = true;
+    this.membersSvc.getMember(u.id).subscribe({
+      next: (dto: StudioMemberDto) => {
+        this.editingId = dto.id;         // salvo l'id del member
+        this.fillFormFromDto(dto);       // pre-compilo form
+        this.modalVisible = true;        // apro modale
+        this.editMode = 'none';          // chiedo la scelta
+        this.loading = false;
+      },
+      error: err => {
+        console.error('[Users] getMember (per edit) errore', err);
+        this.loading = false;
+      }
+    });
+  }
+
+  editFromDetails(dto: StudioMemberDto | null): void {
+    if (!dto?.id) return;
+    this.editingId = dto.id;
+    this.fillFormFromDto(dto);
+    this.modalVisible = true;
+    this.editMode = 'none';
+    this.step = 0;
+    this.closeDetails();
+  }
+
+  chooseEdit(mode: EditMode) {
+    this.editMode = mode;
+  }
+
+  isEditValid(): boolean {
+    if (!this.editingId || this.editMode === 'none') return false;
+    return this.editMode === 'personal' ? this.isStepValid(0) : this.isStepValid(1);
+  }
+
+  confirmEdit(): void {
+    if (!this.editingId || !this.isEditValid()) return;
+
+    const f = this.form;
+    let payload: StudioMemberInputDto;
+
+    if (this.editMode === 'personal') {
+      // Aggiorna solo anagrafica; ruolo resta quello attuale
+      payload = {
+        user: { firstName: f.firstName, lastName: f.lastName, email: f.email, password: '' },
+        role: (this.viewing?.role ?? f.memberships?.[0]?.role ?? 'BACKOFFICE') as StudioRole
       };
-      this.saving = true;
-      this.membersSvc.createMember(input).subscribe({
-        next: _ => { this.saving = false; this.detailsVisible = false; this.reload(); },
-        error: e => { this.saving = false; console.error('Errore durante la creazione del membro', e); }
-      });
+    } else {
+      // Aggiorna solo ruolo; anagrafica resta quella corrente
+      payload = {
+        user: {
+          firstName: this.viewing?.user.firstName ?? f.firstName,
+          lastName: this.viewing?.user.lastName ?? f.lastName,
+          email: this.viewing?.user.email ?? f.email,
+          password: ''
+        },
+        role: (f.memberships?.[0]?.role as StudioRole) ?? (this.viewing?.role as StudioRole) ?? 'BACKOFFICE'
+      };
     }
 
+    this.saving = true;
+    this.membersSvc.updateMember(String(this.editingId), payload).subscribe({
+      next: () => {
+        this.saving = false;
+        this.modalVisible = false;
+        this.editingId = null;
+        this.editMode = 'none';
+        this.load();
+      },
+      error: err => {
+        console.error('[Users] updateMember error', err);
+        this.saving = false;
+      }
+    });
+  }
+
+  cancelModal(): void {
     this.modalVisible = false;
-    this.reload();
+    this.editingId = null;
+    this.editMode = 'none';
   }
 
-  addMembership(): void { this.form.memberships.push({ studioId: null, role: 'BACKOFFICE', active: true }); }
-  removeMembership(i: number): void { this.form.memberships.splice(i, 1); if (this.form.memberships.length === 0) this.addMembership(); }
-  trackByMembership = (_: number, m: MembershipForm) => m.studioId ?? _;
+  /* ---------- Stato attivo/sospeso ---------- */
 
-  private blankForm() {
-    return { firstName: '', lastName: '', email: '', phone: '', active: true, memberships: [] as MembershipForm[] };
-  }
-
-  studioName(id: string | null): string {
-    if (!id) return '';
-    const s = this.studios.find(x => x.id === id);
-    return s ? s.name : '';
-  }
   deactivate(u: any): void {
     if (!u?.id) return;
     this.membersSvc.changeStatus(u.id, false).subscribe({
@@ -240,15 +291,13 @@ export class UsersComponent implements OnInit {
   deactivateFromDetails(v: any): void {
     if (!v?.id) return;
     this.membersSvc.changeStatus(v.id, false).subscribe({
-      next: () => {
-        this.closeDetails();
-        this.reload();
-      },
+      next: () => { this.closeDetails(); this.reload(); },
       error: err => console.error('Errore durante la disattivazione', err)
     });
   }
 
   activate(u: any): void {
+    console.log("Called this");
     if (!u?.id) return;
     this.membersSvc.changeStatus(u.id, true).subscribe({
       next: () => this.reload(),
@@ -257,15 +306,92 @@ export class UsersComponent implements OnInit {
   }
 
   activateFromDetails(v: any): void {
+    console.log("Or Called this");
     if (!v?.id) return;
     this.membersSvc.changeStatus(v.id, true).subscribe({
-      next: () => {
-        this.closeDetails();
-        this.reload();
-      },
+      next: () => { this.closeDetails(); this.reload(); },
       error: err => console.error('Errore durante l’attivazione', err)
     });
   }
 
+  /* ---------- Utilità ---------- */
+
+  private blankForm() {
+    return {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      memberships: [] as MembershipForm[]
+    };
+  }
+
+  private fillFormFromDto(dto: StudioMemberDto): void {
+    this.form = {
+      firstName: dto.user.firstName || '',
+      lastName: dto.user.lastName || '',
+      email: dto.user.email || '',
+      phone: (dto.user as any).phone || '',
+      memberships: [{
+        studioId: (dto as any).studioId ?? null,
+        role: dto.role,
+        active: dto.active === true
+      }]
+    };
+  }
+
+  addMembership(): void {
+    this.form.memberships.push({ studioId: null, role: 'BACKOFFICE', active: true });
+  }
+
+  removeMembership(i: number): void {
+    this.form.memberships.splice(i, 1);
+    if (this.form.memberships.length === 0) this.addMembership();
+  }
+
+  trackByMembership = (_: number, m: MembershipForm) => m.studioId ?? _;
+
+  studioName(id: string | null): string {
+    if (!id) return '';
+    const s = this.studios.find(x => x.id === id);
+    return s ? s.name : '';
+  }
+
+  askDelete(u: { id?: string; firstName?: string; lastName?: string }): void {
+    if (!u?.id) return;
+    this.toDelete = u as any;
+    this.confirmVisible = true;
+  }
+
+  askDeleteFromDetails(v: StudioMemberDto): void {
+    if (!v?.id) return;
+    // preparo un oggetto "compatibile" con la conferma
+    this.toDelete = {
+      id: v.id,
+      firstName: v.user?.firstName,
+      lastName: v.user?.lastName
+    } as any;
+    this.confirmVisible = true;
+  }
+
+  confirmDelete(): void {
+    if (!this.toDelete?.id) return;
+    this.saving = true;
+    this.membersSvc.deleteMember(String(this.toDelete.id)).subscribe({
+      next: () => {
+        this.saving = false;
+        this.confirmVisible = false;
+        this.toDelete = null;
+        // chiudi eventuale modale dettagli aperta
+        this.detailsVisible = false;
+        this.viewing = null;
+        this.reload();
+      },
+      error: (err) => {
+        console.error('Errore durante la cancellazione del membro', err);
+        this.saving = false;
+      }
+    });
+  }
 
 }

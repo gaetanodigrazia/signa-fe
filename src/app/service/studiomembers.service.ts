@@ -31,7 +31,6 @@ export interface StudioMemberDto {
     // eventuali altri campi
 }
 
-
 @Injectable({ providedIn: 'root' })
 export class StudioMembersService {
     private readonly baseUrl = `${API_BASE_URL}/members`;
@@ -50,10 +49,17 @@ export class StudioMembersService {
         return this.http.get<StudioMemberDto>(`${this.baseUrl}/${studioMemberId}`);
     }
     changeStatus(studioMemberId: string, status: boolean): Observable<void> {
-        return this.http.get<void>(`${this.baseUrl}/status/${studioMemberId}`, {
-            params: { status }
-        });
+        return this.http.put<void>(
+            `${this.baseUrl}/status/${studioMemberId}`,
+            {},
+            { params: { status: status } }
+        );
     }
+
+    updateMember(studioMemberId: string, studioMemberInputDto: StudioMemberInputDto): Observable<StudioMemberDto> {
+        return this.http.patch<StudioMemberDto>(`${this.baseUrl}/${studioMemberId}`, studioMemberInputDto);
+    }
+
     deleteMember(studioMemberId: string): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/${studioMemberId}`);
     }

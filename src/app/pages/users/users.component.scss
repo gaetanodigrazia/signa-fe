@@ -908,3 +908,53 @@ label.row input[type='checkbox']:checked::after {
     display: flex;
     gap: 8px;
 }
+
+/* Stepper base (se non l’hai già) */
+.stepper {
+    display: flex;
+    gap: .75rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+}
+
+.stepper li {
+    padding: .4rem .75rem;
+    border-radius: 999px;
+    background: var(--surface-2, #f3f4f6);
+    font-weight: 500;
+}
+
+/* Stato attivo/completato (se non presenti) */
+.stepper li.active {
+    outline: 2px solid var(--primary, #3b82f6);
+}
+
+.stepper li.done {
+    background: var(--surface-3, #e5e7eb);
+}
+
+/* === Nuovo: stato bloccato === */
+.stepper li.locked {
+    opacity: .5;
+    position: relative;
+}
+
+/* Badge "bloccato" opzionale */
+.stepper li.locked::after {
+    content: "bloccato";
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    font-size: .65rem;
+    padding: .15rem .4rem;
+    border-radius: .4rem;
+    background: #9ca3af;
+    /* neutro */
+    color: white;
+}
+
+/* Cursor e interazioni */
+.stepper li.locked {
+    cursor: not-allowed;
+}
