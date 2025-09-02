@@ -1,0 +1,31 @@
+<div #wrap class="user-input-wrap" role="combobox" [attr.aria-expanded]="listOpen" aria-haspopup="listbox">
+    <label class="picker-label" for="doc-input">Dottore</label>
+
+    <div class="picker-row">
+        <input id="doc-input" type="text" [placeholder]="placeholder" [disabled]="disabled" [(ngModel)]="search"
+            (focus)="openList()" (ngModelChange)="onSearchChange($event)" (keydown)="onKeydown($event)"
+            (blur)="closeListSoon()" autocomplete="off" aria-autocomplete="list" [attr.aria-controls]="'doc-listbox'" />
+
+
+        <button *ngIf="showAdd" type="button" class="btn-inline plus" [disabled]="disabled" (click)="requestAdd()"
+            title="Aggiungi dottore" aria-label="Aggiungi dottore">
+            <span aria-hidden="true">＋</span>
+        </button>
+    </div>
+
+    <div class="user-results" *ngIf="listOpen" [class.open-up]="listOpenUp" [ngStyle]="{ 'max-height.px': listMaxH }"
+        id="doc-listbox" role="listbox">
+        <button *ngFor="let d of results; let i = index" class="user-option" [class.active]="i === highlight"
+            (mousedown)="$event.preventDefault()" (click)="pick(d)" role="option">
+            <span class="avatar" aria-hidden="true">
+                {{ (d.user?.firstName?.[0] || '') + (d.user?.lastName?.[0] || '') || (d.user?.email?.[0] || '?') }}
+            </span>
+            <span class="meta">
+                <strong class="name">{{ d.user?.firstName || '?' }} {{ d.user?.lastName || '?' }}</strong>
+                <small class="email">{{ d.user?.email || 'n/d' }}</small>
+            </span>
+        </button>
+
+        <div class="empty" *ngIf="results.length === 0">Nessun risultato</div>
+    </div>
+</div>

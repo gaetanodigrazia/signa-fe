@@ -1,0 +1,201 @@
+// ===== Design tokens leggeri
+$radius: 12px;
+$radius-lg: 999px;
+$shadow: 0 6px 24px rgba(16, 24, 40, .08), 0 2px 6px rgba(16, 24, 40, .06);
+$ring: 0 0 0 3px rgba(37, 99, 235, .25);
+
+$user-bg: #fff;
+$user-border: #e5e7eb; // gray-200
+$user-text: #111827; // gray-900
+$muted: #6b7280; // gray-500
+$muted-2: #9ca3af; // gray-400
+$hover: #f3f4f6; // gray-100
+$primary: #2563eb; // blue-600
+$success: #059669; // emerald-600
+$danger: #dc2626; // red-600
+
+.user-input-wrap {
+    display: block;
+    position: relative;
+    font: inherit;
+    color: $user-text;
+
+    .picker-label {
+        display: inline-block;
+        margin-bottom: .5rem;
+        font-weight: 600;
+    }
+
+    .picker-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: .5rem;
+        align-items: center;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: .65rem .9rem;
+        border: 1px solid $user-border;
+        border-radius: $radius;
+        background: $user-bg;
+        outline: none;
+        transition: box-shadow .2s ease, border-color .2s ease, background-color .2s ease;
+
+        &::placeholder {
+            color: $muted-2;
+        }
+
+        &:hover {
+            background: #fafafa;
+        }
+
+        &:focus {
+            border-color: $primary;
+            box-shadow: $ring;
+            background: #fff;
+        }
+
+        // supporto “invalido” se vuoi:
+        &.ng-invalid.ng-touched {
+            border-color: $danger;
+        }
+    }
+
+    .btn-inline.plus {
+        display: inline-grid;
+        place-items: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: $radius-lg;
+        border: none;
+        background: $primary; // blu
+        color: #fff;
+        font-size: 1.1rem;
+        line-height: 1;
+        cursor: pointer;
+        transition: transform .06s ease,
+            box-shadow .15s ease,
+            background-color .2s ease;
+        user-select: none;
+
+        &:hover {
+            background: darken($primary, 7%); // blu un po’ più scuro
+        }
+
+        &:active {
+            transform: translateY(1px);
+        }
+
+        &:focus-visible {
+            box-shadow: $ring;
+            outline: none;
+        }
+    }
+
+    // ===== Dropdown risultati
+    .user-results {
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin-top: .5rem;
+        background: #fff;
+        border: 1px solid $user-border;
+        border-radius: $radius;
+        box-shadow: $shadow;
+        overflow: auto;
+        z-index: 30;
+        padding: .25rem;
+
+        &.open-up {
+            bottom: calc(100% + .5rem);
+            top: auto;
+            margin-top: 0;
+        }
+
+        .user-option {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 2rem 1fr;
+            gap: .75rem;
+            align-items: center;
+            text-align: left;
+            padding: .5rem .6rem;
+            border: 0;
+            background: transparent;
+            border-radius: $radius - 4;
+            cursor: pointer;
+            transition: background-color .15s ease, transform .04s ease;
+
+            &:hover {
+                background: $hover;
+            }
+
+            &.active,
+            &:focus-visible {
+                background: rgba(37, 99, 235, .08);
+                outline: none;
+            }
+
+            .avatar {
+                width: 2rem;
+                height: 2rem;
+                border-radius: 50%;
+                background: #eef2ff; // indigo-50
+                display: inline-grid;
+                place-items: center;
+                font-weight: 700;
+                color: #3730a3; // indigo-800
+                border: 1px solid #e5e7eb;
+            }
+
+            .meta {
+                min-width: 0;
+
+                .name {
+                    display: block;
+                    font-weight: 600;
+                }
+
+                .email,
+                .ssn {
+                    display: inline-block;
+                    color: $muted;
+                    margin-right: .5rem;
+                }
+
+                .email,
+                .ssn {
+                    max-width: 100%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+        }
+
+        .empty {
+            color: $muted;
+            padding: .75rem;
+            text-align: center;
+        }
+    }
+
+    // mobile spacing
+    @media (max-width: 520px) {
+        .picker-row {
+            gap: .4rem;
+        }
+
+        .user-results {
+            font-size: .95rem;
+        }
+    }
+}
+
+// (opzionale) tema scuro
+:host-context(.dark) .user-input-wrap {
+    $user-bg: #0f172a; // slate-900
+    $user-border: #334155; // slate-700
+    $hover: #1f2937; // gray-800
+}

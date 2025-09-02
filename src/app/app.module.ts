@@ -18,6 +18,7 @@ import { AppRoutingModule } from './config/app-routing.module';
 import { ErrorModalComponent } from './components/shared/error-modal/error-modal.component';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { PatientPickerComponent } from './components/shared/patient-picker/patient-picker.component';
+import { DoctorPickerComponent } from './components/shared/doctor-picker/doctor-picker.component';
 
 
 
@@ -27,7 +28,8 @@ import { PatientPickerComponent } from './components/shared/patient-picker/patie
     SidebarComponent,
     AppointmentCalendarComponent,
     LoginComponent,
-    PatientPickerComponent],
+    PatientPickerComponent,
+    DoctorPickerComponent],
   imports: [
     ErrorModalComponent,
     BrowserModule,
