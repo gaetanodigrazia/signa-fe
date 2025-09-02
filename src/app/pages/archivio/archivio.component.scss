@@ -22,6 +22,12 @@
     overflow-x: hidden;
 }
 
+.users-page::after {
+    content: "";
+    display: block;
+    height: 70px;
+}
+
 /* contenitori “card” senza ombra */
 .surface {
     background: var(--card-bg);
