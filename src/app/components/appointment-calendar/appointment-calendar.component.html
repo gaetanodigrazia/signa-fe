@@ -100,6 +100,17 @@
     <app-patient-picker [(model)]="modalData.patientId" (addRequested)="openNewPatientModal()">
     </app-patient-picker>
 
+    <!-- Dottore -->
+    <label for="doctor">Dottore</label>
+    <select id="doctor" [(ngModel)]="selectedDoctorId" [disabled]="saving || doctorsLoading">
+      <option [ngValue]="undefined" disabled selected>Seleziona un dottore…</option>
+      <option *ngFor="let d of doctors" [ngValue]="d.id">
+        {{ d.user.firstName }} {{ d.user.lastName }}
+      </option>
+    </select>
+    <div *ngIf="doctorsLoading" class="hint">Caricamento dottori…</div>
+
+
     <div class="actions">
       <button class="btn primary" [disabled]="saving" (click)="saveAppointment()">
         {{ editingRef ? 'Salva' : 'Crea appuntamento' }}
@@ -126,6 +137,10 @@
     <div class="assigned" *ngIf="selectedEvent?.meta?.patientId as pid">
       👤 <strong>{{ getPatientLabel(pid) }}</strong>
     </div>
+    <div class="assigned" *ngIf="selectedEvent?.meta?.doctorId as did">
+      🩺 <strong>{{ getDoctorLabel(did) }}</strong>
+    </div>
+
 
     <!-- Stato appuntamento (PATCH) -->
     <div class="status-inline">

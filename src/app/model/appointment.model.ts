@@ -103,10 +103,12 @@ export interface HistoryItem {
 }
 
 export interface DoctorDto {
-    id: string;
-    firstname: string;
-    lastname: string;
-    email?: string; // opzionale se nel JSON futuro
+    id: string
+    bio: string,
+    licenseNumber: string,
+    licenseStatus: string,
+    speciality: string,
+    user: UserDTO
 }
 
 export interface StudioDto {

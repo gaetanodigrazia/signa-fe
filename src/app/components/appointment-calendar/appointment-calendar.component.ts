@@ -14,6 +14,7 @@ import { CreatePatientDto, PatientDto } from 'src/app/model/patient.model';
 import { PatientService } from 'src/app/service/patient.service';
 import { AppointmentService } from 'src/app/service/appointment.service';
 import { Utils } from 'src/app/common/utilis';
+import { StudioMemberDto, StudioMembersService } from 'src/app/service/studiomembers.service';
 
 @Component({
   selector: 'app-appointment-calendar',
@@ -21,6 +22,10 @@ import { Utils } from 'src/app/common/utilis';
   styleUrls: ['./appointment-calendar.component.scss'],
 })
 export class AppointmentCalendarComponent implements OnInit {
+  /* ====== Dottori ====== */
+  doctors: StudioMemberDto[] = [];
+  doctorsLoading = false;
+
   /* ====== Vista calendario ====== */
   view: CalendarView = CalendarView.Month;
   CalendarView = CalendarView;
@@ -88,15 +93,46 @@ export class AppointmentCalendarComponent implements OnInit {
 
   constructor(
     private patientsSvc: PatientService,
-    private apptSvc: AppointmentService
+    private apptSvc: AppointmentService,
+    private membersSvc: StudioMembersService
   ) { }
+
 
   /* ===========================
    *         LIFECYCLE
    * =========================== */
   ngOnInit(): void {
     this.loadPatients();
+    this.loadDoctors();
     this.fetchAppointmentsForVisibleRange();
+  }
+
+  /* ===========================
+ *        DOTTORI
+ * =========================== */
+  getDoctorLabel(id: string | null | undefined): string {
+    const d = this.doctors.find(x => x.user?.id === id);
+    if (d) {
+      const fullName = [d.user.firstName, d.user.lastName].filter(Boolean).join(' ');
+      return fullName || d.user.email || '-';
+    }
+    return '-';
+  }
+
+
+  private loadDoctors(): void {
+    this.doctorsLoading = true;
+    this.membersSvc.listMembers().subscribe({
+      next: (items) => {
+        this.doctors = (items ?? []).filter(m => m.role === 'DOCTOR' && m.active !== false);
+        this.doctorsLoading = false;
+      },
+      error: (err) => {
+        console.error('Errore nel recupero dottori', err);
+        this.doctors = [];
+        this.doctorsLoading = false;
+      }
+    });
   }
 
   /* ===========================
@@ -234,6 +270,7 @@ export class AppointmentCalendarComponent implements OnInit {
   }
 
   openEventDetails(event: CalendarEvent): void {
+    console.log("REMOVE - CALLED THIS ", event)
     this.selectedEvent = event;
     // inizializza il selettore stato con lo stato corrente dell’evento
     const cur = (event.meta as any)?.status as AppointmentStatus | undefined;
@@ -384,8 +421,8 @@ export class AppointmentCalendarComponent implements OnInit {
     const filtered = this.statusFilter === 'ALL'
       ? this.apptsCache
       : this.apptsCache.filter(a => a.status === this.statusFilter);
-
     this.events = filtered.map((a) => ({
+
       id: a.id,
       title: a.reason || a.kind || 'Appuntamento',
       start: new Date(a.startAt),
@@ -394,11 +431,12 @@ export class AppointmentCalendarComponent implements OnInit {
       meta: {
         description: a.notes,
         patientId: a.patient?.id,
-        doctorId: a.doctor?.id,
+        doctorId: a.doctor?.user.id,
         status: a.status,
         kind: a.kind,
       },
     }));
+
     this.refresh.next();
   }
 
