@@ -36,10 +36,28 @@
 
     </div>
 
-    <a routerLink="/calendar">
-      <span class="icon">📆</span>
-      <span class="text" *ngIf="!isCollapsed">Calendario</span>
-    </a>
+    <!-- Gruppo: Appuntamenti (DESKTOP) -->
+    <div class="menu-group" [class.open]="appointmentsOpen">
+      <button class="menu-parent" (click)="toggleAppointments()" [attr.aria-expanded]="appointmentsOpen"
+        aria-controls="appointments-submenu">
+        <span class="icon">📆</span>
+        <span class="text" *ngIf="!isCollapsed">Appuntamenti</span>
+        <span class="chevron" *ngIf="!isCollapsed" [class.rot]="appointmentsOpen">▾</span>
+      </button>
+
+      <!-- Submenu visibile solo quando la sidebar non è collassata -->
+      <div id="appointments-submenu" class="submenu" *ngIf="appointmentsOpen && !isCollapsed">
+        <a [routerLink]="['/calendar']" [class.active]="(section$ | async) === 'calendar'" (click)="closeSubmenus()">
+          Calendario
+        </a>
+
+        <a [routerLink]="['/appointments']" [class.active]="(section$ | async) === 'appointments'"
+          (click)="closeSubmenus()">
+          Lista appuntamenti
+        </a>
+      </div>
+    </div>
+
     <a routerLink="/archive">
       <span class="icon">🗃️​</span>
       <span class="text" *ngIf="!isCollapsed">​Archivio</span>
@@ -85,7 +103,22 @@
       </div>
 
     </div>
-    <a routerLink="/calendar" (click)="menuOpen = false">📆 Calendario</a>
+    <!-- Gruppo: Appuntamenti (MOBILE) -->
+    <div class="menu-group" [class.open]="appointmentsOpenMobile">
+      <button class="menu-parent" (click)="appointmentsOpenMobile = !appointmentsOpenMobile"
+        [attr.aria-expanded]="appointmentsOpenMobile" aria-controls="appointments-submenu-m">
+        📆 Appuntamenti
+        <span class="chevron" [class.rot]="appointmentsOpenMobile">▾</span>
+      </button>
+
+      <div id="appointments-submenu-m" class="submenu" *ngIf="appointmentsOpenMobile">
+        <a [routerLink]="['/calendar']" [class.active]="(section$ | async) === 'calendar'"
+          (click)="closeMobileMenu()">Calendario</a>
+
+        <a [routerLink]="['/appointments']" [class.active]="(section$ | async) === 'appointments'"
+          (click)="closeMobileMenu()">Lista appuntamenti</a>
+      </div>
+    </div>
     <a routerLink="/archive" (click)="menuOpen = false">🗃️​ Archivio</a>
 
 
