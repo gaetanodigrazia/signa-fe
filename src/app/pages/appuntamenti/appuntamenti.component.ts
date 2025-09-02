@@ -8,13 +8,14 @@ import { Subscription } from 'rxjs';
 import { map, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-patients',
+  selector: 'app-appuntamenti',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './patients.component.html',
-  styleUrls: ['./patients.component.scss']
+  templateUrl: './appuntamenti.component.html',
+  styleUrl: './appuntamenti.component.scss'
 })
-export class PatientsComponent implements OnInit, OnDestroy {
+export class AppuntamentiComponent {
+
 
   /* UI state */
   loading = false;
@@ -149,38 +150,6 @@ export class PatientsComponent implements OnInit, OnDestroy {
 
   /* ===== Modali ===== */
 
-  openNew(): void {
-    this.editing = null;
-    this.form = {
-      firstname: '',
-      lastname: '',
-      email: '',
-      address: '',
-      phone: '',
-      ssn: '',
-      dateOfBirth: '',
-      active: true
-    };
-    this.submitted = false;
-    this.modalVisible = true;
-  }
-
-  edit(p: PatientDto): void {
-    this.editing = p;
-    this.form = {
-      id: p.id,
-      firstname: p.firstname ?? '',
-      lastname: p.lastname ?? '',
-      email: p.email ?? '',
-      address: p.address ?? '',
-      phone: p.phone ?? '',
-      ssn: (p as any).ssn ?? (p as any).SSN ?? '',
-      dateOfBirth: p.dateOfBirth ?? '',
-      active: p.active !== false
-    };
-    this.submitted = false;
-    this.modalVisible = true;
-  }
 
   view(p: PatientDto): void {
     this.viewing = p;
@@ -277,41 +246,6 @@ export class PatientsComponent implements OnInit, OnDestroy {
     });
   }
 
-  /* ===== Attiva/Disattiva ===== */
-
-  activate(p: PatientDto): void {
-    if (this.changingStatus) return;
-    this.changingStatus = true;
-
-    this.patientSvc.setActive(p.id, true).subscribe({
-      next: () => {
-        this.changingStatus = false;
-        this.load();
-      },
-      error: (err) => {
-        console.error('activate patient error', err);
-        this.error = this.readError(err, 'Errore durante l’attivazione del paziente');
-        this.changingStatus = false;
-      }
-    });
-  }
-
-  deactivate(p: PatientDto): void {
-    if (this.changingStatus) return;
-    this.changingStatus = true;
-
-    this.patientSvc.setActive(p.id, false).subscribe({
-      next: () => {
-        this.changingStatus = false;
-        this.load();
-      },
-      error: (err) => {
-        console.error('deactivate patient error', err);
-        this.error = this.readError(err, 'Errore durante la disattivazione del paziente');
-        this.changingStatus = false;
-      }
-    });
-  }
 
   /* ===== Utils ===== */
 

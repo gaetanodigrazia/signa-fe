@@ -213,12 +213,10 @@ export class SettingsComponent {
 
   /* ---------- Guard canDeactivate ---------- */
   canDeactivate(): Promise<boolean> | boolean {
-    console.log('[Settings] canDeactivate invocato. dirty=', this.form.dirty);
     if (!this.form.dirty) return true;
     this.showLeaveModal = true;
     return new Promise<boolean>((resolve) => {
       this.leaveResolve = (ok: boolean) => {
-        console.log('[Settings] decisione utente =', ok);
         resolve(ok);
       };
     });

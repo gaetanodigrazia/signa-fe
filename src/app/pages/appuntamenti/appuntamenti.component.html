@@ -1,12 +1,11 @@
 <div class="users-page">
     <div class="toolbar surface">
         <div class="left">
-            <h2>Pazienti</h2>
+            <h2>Appuntamenti</h2>
         </div>
         <div class="right">
             <input class="search" type="search" placeholder="Cerca paziente…" [(ngModel)]="search"
                 (ngModelChange)="applyFilter()" />
-            <button class="btn primary" (click)="openNew()">＋ Nuovo paziente</button>
         </div>
     </div>
 
@@ -34,20 +33,10 @@
                     <td class="actions">
                         <!-- Azioni per lista "active" -->
                         <ng-container *ngIf="status === 'active'; else actionsInactive">
-                            <button class="icon" title="Vedi" (click)="view(p)">👁️</button>
-                            <button class="icon" title="Modifica" (click)="edit(p)">✏️</button>
-                            <button class="icon" title="Disattiva" [disabled]="changingStatus"
-                                (click)="deactivate(p)">🛑</button>
+                            <button class="icon" title="Vedi" (click)="view(p)">➕</button>
+                            <button class="icon" title="Vedi" (click)="view(p)">📆</button>
                         </ng-container>
 
-                        <!-- Azioni per lista "inactive" -->
-                        <ng-template #actionsInactive>
-                            <button class="icon" title="Vedi" (click)="view(p)">👁️</button>
-                            <button class="icon" title="Attiva" [disabled]="changingStatus"
-                                (click)="activate(p)">✅</button>
-                            <button class="icon danger" title="Elimina" [disabled]="deleting"
-                                (click)="askDelete(p)">🗑️</button>
-                        </ng-template>
                     </td>
 
 

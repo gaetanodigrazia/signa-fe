@@ -273,7 +273,6 @@ export class AppointmentCalendarComponent implements OnInit {
   }
 
   openEventDetails(event: CalendarEvent): void {
-    console.log("REMOVE - CALLED THIS ", event)
     this.selectedEvent = event;
     // inizializza il selettore stato con lo stato corrente dell’evento
     const cur = (event.meta as any)?.status as AppointmentStatus | undefined;
@@ -283,7 +282,7 @@ export class AppointmentCalendarComponent implements OnInit {
   closeDetails(): void { this.detailsVisible = false; this.selectedEvent = null; }
 
   editSelected(): void {
-    if (!this.selectedEvent) return;
+    if (!this.selectedEvent) return;;
     const ev = this.selectedEvent;
     const date = ev.start ? new Date(ev.start) : new Date();
     const pid = (ev.meta as any)?.patientId ?? null;
@@ -336,7 +335,7 @@ export class AppointmentCalendarComponent implements OnInit {
     // usa statusEdit sia in create che in update (puoi anche esporre un select nello stesso form)
     const payload: AppointmentInputDTO = {
       patient: { id: patientId },
-      doctor: this.selectedDoctorId ? { id: this.selectedDoctorId } : undefined,
+      doctor: this.selectedDoctorId ? { user: { id: this.selectedDoctorId } } : undefined,
       startAt: Utils.toLocalOffsetISOString(startDate),
       endAt: Utils.toLocalOffsetISOString(endDate),
       kind,
@@ -348,7 +347,6 @@ export class AppointmentCalendarComponent implements OnInit {
     this.saving = true;
 
     if (this.editingRef?.id) {
-      // UPDATE completo (PUT)
       const id = String(this.editingRef.id);
       this.apptSvc.update(id, payload).subscribe({
         next: () => {

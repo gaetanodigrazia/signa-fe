@@ -9,6 +9,7 @@ import { ArchivioComponent } from '../pages/archivio/archivio.component';
 import { AppointmentCalendarComponent } from '../components/appointment-calendar/appointment-calendar.component';
 import { SettingsComponent } from '../pages/settings/settings.component';
 import { CanDeactivateSettingsGuard } from './can-deactivate-settings.guard';
+import { AppuntamentiComponent } from '../pages/appuntamenti/appuntamenti.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -21,6 +22,8 @@ export const routes: Routes = [
     { path: 'archive', component: ArchivioComponent, canActivate: [authGuard] },
 
     { path: 'calendar', component: AppointmentCalendarComponent, canActivate: [authGuard] },
+
+    { path: 'appointments', component: AppuntamentiComponent, canActivate: [authGuard] },
 
     { path: 'users', component: UsersComponent, canActivate: [authGuard] },
 

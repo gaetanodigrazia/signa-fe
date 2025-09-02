@@ -1,6 +1,6 @@
 export type AppointmentKind = 'VISIT' | 'FOLLOW_UP' | 'SURGERY' | 'CONSULT' | 'OTHER';
 export type AppointmentStatus = 'BOOKED' | 'CONFIRMED' | 'CLOSED' | 'CANCELLED';
-
+export interface UserRef { user: RefId; }
 export interface RefId { id: string; }
 
 export interface UserDTO {
@@ -62,7 +62,7 @@ export interface AppointmentDTO {
 export interface AppointmentInputDTO {
     // studio?: RefId;      // <- se vuoi, lascialo opzionale; altrimenti rimuovi proprio la riga
     patient: RefId;
-    doctor?: RefId;
+    doctor?: UserRef;
     startAt: string;
     endAt: string;
     kind?: AppointmentKind;
@@ -71,7 +71,7 @@ export interface AppointmentInputDTO {
     notes?: string;
 }
 
-// appointment.dto.ts
+
 
 export interface AppointmentHistoryDTO {
     id: string;

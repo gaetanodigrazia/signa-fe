@@ -64,7 +64,7 @@ export class DoctorPickerComponent implements OnChanges {
   requestAdd(): void { if (!this.disabled) this.addRequested.emit(); }
 
   pick(d: StudioMemberDto): void {
-    const id = d?.id ?? null;                // <— usa l’ID del membro
+    const id = d?.user?.id ?? null;
     this.model = id;
     this.modelChange.emit(id);
     this.search = this.labelOf(d);
