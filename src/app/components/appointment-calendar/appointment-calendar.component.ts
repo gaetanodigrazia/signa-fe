@@ -111,12 +111,14 @@ export class AppointmentCalendarComponent implements OnInit {
  *        DOTTORI
  * =========================== */
   getDoctorLabel(id: string | null | undefined): string {
-    if (!id) return '—';
-    const d = this.doctors.find(x => x.id === id);
-    if (!d) return '—';
-    const fullName = [d.user.firstName, d.user.lastName].filter(Boolean).join(' ');
-    return fullName || d.user.email || 'Senza nome';
+    const d = this.doctors.find(x => x.user?.id === id);
+    if (d) {
+      const fullName = [d.user.firstName, d.user.lastName].filter(Boolean).join(' ');
+      return fullName || d.user.email || '-';
+    }
+    return '-';
   }
+
 
   private loadDoctors(): void {
     this.doctorsLoading = true;
@@ -268,6 +270,7 @@ export class AppointmentCalendarComponent implements OnInit {
   }
 
   openEventDetails(event: CalendarEvent): void {
+    console.log("REMOVE - CALLED THIS ", event)
     this.selectedEvent = event;
     // inizializza il selettore stato con lo stato corrente dell’evento
     const cur = (event.meta as any)?.status as AppointmentStatus | undefined;
@@ -418,8 +421,8 @@ export class AppointmentCalendarComponent implements OnInit {
     const filtered = this.statusFilter === 'ALL'
       ? this.apptsCache
       : this.apptsCache.filter(a => a.status === this.statusFilter);
-
     this.events = filtered.map((a) => ({
+
       id: a.id,
       title: a.reason || a.kind || 'Appuntamento',
       start: new Date(a.startAt),
@@ -428,11 +431,12 @@ export class AppointmentCalendarComponent implements OnInit {
       meta: {
         description: a.notes,
         patientId: a.patient?.id,
-        doctorId: a.doctor?.id,
+        doctorId: a.doctor?.user.id,
         status: a.status,
         kind: a.kind,
       },
     }));
+
     this.refresh.next();
   }
 

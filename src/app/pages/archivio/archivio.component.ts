@@ -86,8 +86,6 @@ export class ArchivioComponent implements OnInit {
 
     this.archiveSvc.getHistory(p.id).subscribe({
       next: (items: AppointmentHistoryDTO[]) => {
-        console.log("Result", items);
-
         this.history = (items ?? []).map(a => ({
           id: a.id,
           date: new Date(a.startAt),
