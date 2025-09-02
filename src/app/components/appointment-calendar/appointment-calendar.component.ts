@@ -177,9 +177,12 @@ export class AppointmentCalendarComponent implements OnInit {
       active: true,
     }).subscribe({
       next: (created) => {
-        this.loadPatients();
+        this.patients = [created, ...this.patients];
+        // seleziona il nuovo paziente nel form corrente
         this.modalData.patientId = created.id;
         this.newPatientModalVisible = false;
+
+        this.loadPatients();
       },
       error: (err) => {
         console.error('Errore nella creazione paziente', err);
