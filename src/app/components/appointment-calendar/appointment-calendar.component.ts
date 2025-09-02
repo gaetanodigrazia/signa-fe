@@ -14,6 +14,7 @@ import { CreatePatientDto, PatientDto } from 'src/app/model/patient.model';
 import { PatientService } from 'src/app/service/patient.service';
 import { AppointmentService } from 'src/app/service/appointment.service';
 import { Utils } from 'src/app/common/utilis';
+import { StudioMemberDto, StudioMembersService } from 'src/app/service/studiomembers.service';
 
 @Component({
   selector: 'app-appointment-calendar',
@@ -21,6 +22,10 @@ import { Utils } from 'src/app/common/utilis';
   styleUrls: ['./appointment-calendar.component.scss'],
 })
 export class AppointmentCalendarComponent implements OnInit {
+  /* ====== Dottori ====== */
+  doctors: StudioMemberDto[] = [];
+  doctorsLoading = false;
+
   /* ====== Vista calendario ====== */
   view: CalendarView = CalendarView.Month;
   CalendarView = CalendarView;
@@ -88,15 +93,44 @@ export class AppointmentCalendarComponent implements OnInit {
 
   constructor(
     private patientsSvc: PatientService,
-    private apptSvc: AppointmentService
+    private apptSvc: AppointmentService,
+    private membersSvc: StudioMembersService
   ) { }
+
 
   /* ===========================
    *         LIFECYCLE
    * =========================== */
   ngOnInit(): void {
     this.loadPatients();
+    this.loadDoctors();
     this.fetchAppointmentsForVisibleRange();
+  }
+
+  /* ===========================
+ *        DOTTORI
+ * =========================== */
+  getDoctorLabel(id: string | null | undefined): string {
+    if (!id) return '—';
+    const d = this.doctors.find(x => x.id === id);
+    if (!d) return '—';
+    const fullName = [d.user.firstName, d.user.lastName].filter(Boolean).join(' ');
+    return fullName || d.user.email || 'Senza nome';
+  }
+
+  private loadDoctors(): void {
+    this.doctorsLoading = true;
+    this.membersSvc.listMembers().subscribe({
+      next: (items) => {
+        this.doctors = (items ?? []).filter(m => m.role === 'DOCTOR' && m.active !== false);
+        this.doctorsLoading = false;
+      },
+      error: (err) => {
+        console.error('Errore nel recupero dottori', err);
+        this.doctors = [];
+        this.doctorsLoading = false;
+      }
+    });
   }
 
   /* ===========================
