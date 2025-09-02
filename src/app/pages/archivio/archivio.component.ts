@@ -93,7 +93,7 @@ export class ArchivioComponent implements OnInit {
           date: new Date(a.startAt),
           description: a.reason,
           studioName: a.studio?.name,
-          doctorName: `${a.doctor?.firstname} ${a.doctor?.lastname}`,
+          doctorName: `${a.doctor?.user?.firstName} ${a.doctor?.user?.lastName}`,
           patientName: `${a.patient?.firstname} ${a.patient?.lastname}`,
           status: a.status
         } as HistoryItem));
