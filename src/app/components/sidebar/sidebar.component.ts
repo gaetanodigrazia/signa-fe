@@ -93,15 +93,31 @@ export class SidebarComponent implements OnInit {
     }
     this.patientsOpen = !this.patientsOpen;
   }
+  // stato desktop
+  appointmentsOpen = false;
 
-  closeSubmenus() {
+  // stato mobile
+  appointmentsOpenMobile = false;
+
+  // toggle desktop
+  toggleAppointments(): void {
+    this.appointmentsOpen = !this.appointmentsOpen;
+  }
+
+  // se già hai closeSubmenus(), assicurati che chiuda anche Appuntamenti
+  closeSubmenus(): void {
     this.patientsOpen = false;
+    this.appointmentsOpen = false;
+    // ... lascia invariato il resto se ne hai altri
   }
 
-  closeMobileMenu() {
+  // per mobile hai già closeMobileMenu(); se vuoi richiudere anche i sub:
+  closeMobileMenu(): void {
+    this.menuOpen = false;
     this.patientsOpenMobile = false;
-    this.menuOpen = false; // già presente nel tuo componente
+    this.appointmentsOpenMobile = false;
   }
+
 
 
 }

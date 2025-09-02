@@ -1,68 +1,70 @@
 import {
-  Component, Input, Output, EventEmitter, OnInit, ViewChild, ElementRef, HostListener
+  Component, Input, Output, EventEmitter,
+  ChangeDetectionStrategy, ChangeDetectorRef, OnChanges, SimpleChanges, ViewChild, ElementRef, HostListener
 } from '@angular/core';
-import { PatientsFacade } from 'src/app/service/patient.facade';
 import { PatientDto } from 'src/app/model/patient.model';
 
 @Component({
   selector: 'app-patient-picker',
   templateUrl: './patient-picker.component.html',
   styleUrls: ['./patient-picker.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PatientPickerComponent implements OnInit {
-  /** Two-way binding: [(model)] */
-  @Input() model: string | null = null;
+export class PatientPickerComponent implements OnChanges {
+  /* ==== API ==== */
+  @Input() patients: PatientDto[] = [];
+  @Input() placeholder = 'Cerca paziente…';
+  @Input() model: string | null = null;             // id paziente selezionato
   @Output() modelChange = new EventEmitter<string | null>();
-
-  /** Quando clicchi “+” per creare un nuovo paziente */
   @Output() addRequested = new EventEmitter<void>();
 
-  /** Placeholder input */
-  @Input() placeholder = 'Cerca nome o email…';
+  /* ==== Stato UI (coerente con l’HTML) ==== */
+  @ViewChild('wrap', { static: true }) wrapRef!: ElementRef<HTMLDivElement>;
 
-  /** UI state */
-  @ViewChild('wrap', { static: false }) wrapRef?: ElementRef<HTMLDivElement>;
   userSearch = '';
   listOpen = false;
   listOpenUp = false;
-  listMaxH = 240;
   results: PatientDto[] = [];
   highlight = -1;
+  listMaxH = 240;
 
-  private all: PatientDto[] = [];
+  constructor(private cdr: ChangeDetectorRef) { }
 
-  constructor(private facade: PatientsFacade) { }
+  /* ===== Lifecycle ===== */
+  ngOnChanges(ch: SimpleChanges): void {
+    // 1) Se cambia la lista pazienti, ricalcola i risultati
+    if (ch['patients']) {
+      this.recomputeResults(this.userSearch);
+    }
 
-  ngOnInit(): void {
-    this.facade.items$.subscribe(items => {
-      this.all = items ?? [];
-      this.applyFilter(this.userSearch);
-      // se ho già un model, sincronizzo label
-      if (this.model) this.userSearch = this.formatLabel(this.model) || '';
-    });
+    // 2) Se cambia il modello selezionato (es. padre imposta l’id appena creato),
+    // aggiorna l’etichetta mostrata nell’input.
+    if (ch['model']) {
+      this.syncUserSearchWithModel();
+    }
+
+    this.cdr.markForCheck(); // necessario con OnPush
   }
 
-  /* ---------- Public API ---------- */
-  writeValue(id: string | null): void {
-    this.model = id;
-    this.modelChange.emit(this.model);
-    this.userSearch = this.formatLabel(id) || '';
-  }
-
-  /* ---------- UI handlers ---------- */
+  /* ===== Eventi dal template ===== */
   openList(): void {
     this.listOpen = true;
-    this.applyFilter(this.userSearch);
+    this.recomputeResults(this.userSearch);
     this.recomputeListPosition();
   }
+
   closeListSoon(): void {
-    setTimeout(() => (this.listOpen = false), 120);
+    setTimeout(() => {
+      this.listOpen = false;
+      this.cdr.markForCheck();
+    }, 120);
   }
+
   onSearchChange(q: string): void {
-    this.applyFilter(q);
-    this.listOpen = true;
-    this.recomputeListPosition();
+    this.userSearch = q || '';
+    this.recomputeResults(this.userSearch);
   }
+
   onKeydown(ev: KeyboardEvent): void {
     if (!this.listOpen || !this.results.length) return;
     if (ev.key === 'ArrowDown') {
@@ -79,36 +81,57 @@ export class PatientPickerComponent implements OnInit {
     } else if (ev.key === 'Escape') {
       this.listOpen = false;
     }
-  }
-
-  pick(p: PatientDto): void {
-    this.writeValue(p.id);
-    this.listOpen = false;
+    this.cdr.markForCheck();
   }
 
   requestAdd(): void {
-    this.addRequested.emit();
+    this.addRequested.emit(); // il padre aprirà la modale "Nuovo paziente"
   }
 
-  /* ---------- Utils ---------- */
-  private applyFilter(q: string): void {
+  pick(p: PatientDto): void {
+    const id = p?.id ?? null;
+    this.model = id;
+    this.modelChange.emit(id);
+    this.userSearch = this.formatLabel(p);
+    this.listOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  /* ===== Logica ===== */
+  private recomputeResults(q: string): void {
     const s = (q || '').trim().toLowerCase();
-    const base = this.all;
-    this.results = s
-      ? base.filter(p =>
+
+    const base = this.patients ?? [];
+    let next = base;
+
+    if (s) {
+      next = base.filter(p =>
         (p.firstname && p.firstname.toLowerCase().includes(s)) ||
         (p.lastname && p.lastname.toLowerCase().includes(s)) ||
-        (p.email && p.email.toLowerCase().includes(s)))
-      : [...base];
-    this.results = this.results.slice(0, 20);
+        (p.email && p.email.toLowerCase().includes(s)) ||
+        (p.SSN && p.SSN.toLowerCase().includes(s))
+      );
+    }
+
+    this.results = next.slice(0, 50);
     this.highlight = this.results.length ? 0 : -1;
+    this.cdr.markForCheck();
   }
 
-  private formatLabel(id: string | null | undefined): string | null {
-    const p = this.facade.findByIdSync(id || null);
-    if (!p) return null;
-    const name = [p.firstname, p.lastname].filter(Boolean).join(' ');
-    return `${name || 'Senza nome'} — ${p.email || 'n/d'}`;
+  private syncUserSearchWithModel(): void {
+    const p = this.patients?.find(x => x.id === this.model);
+    if (p) {
+      // Mostra il nome selezionato nell’input
+      this.userSearch = this.formatLabel(p);
+    } else if (!this.model) {
+      // nessuna selezione
+      this.userSearch = '';
+    }
+  }
+
+  private formatLabel(p: PatientDto): string {
+    const full = [p.firstname, p.lastname].filter(Boolean).join(' ').trim();
+    return full || p.email || '—';
   }
 
   private recomputeListPosition(): void {
@@ -116,21 +139,21 @@ export class PatientPickerComponent implements OnInit {
     if (!el) return;
     const rect = el.getBoundingClientRect();
     const margin = 16;
-    const below = window.innerHeight - rect.bottom - margin;
-    const above = rect.top - margin;
+    const spaceBelow = window.innerHeight - rect.bottom - margin;
+    const spaceAbove = rect.top - margin;
     const desired = 320;
 
-    if (below < 220 && above > below) {
+    if (spaceBelow < 220 && spaceAbove > spaceBelow) {
       this.listOpenUp = true;
-      this.listMaxH = Math.max(180, Math.min(desired, above - 8));
+      this.listMaxH = Math.max(180, Math.min(desired, spaceAbove - 8));
     } else {
       this.listOpenUp = false;
-      this.listMaxH = Math.max(180, Math.min(desired, below - 8));
+      this.listMaxH = Math.max(180, Math.min(desired, spaceBelow - 8));
     }
   }
 
   @HostListener('window:resize')
-  onResize(): void {
+  onWindowResize(): void {
     if (this.listOpen) this.recomputeListPosition();
   }
 }

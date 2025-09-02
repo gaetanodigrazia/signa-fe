@@ -1,25 +1,31 @@
-<div #wrap class="user-input-wrap">
-    <label class="picker-label">Paziente</label>
-    <div class="picker-row">
-        <input type="text" [placeholder]="placeholder" [(ngModel)]="userSearch" (focus)="openList()"
-            (input)="onSearchChange(userSearch)" (keydown)="onKeydown($event)" (blur)="closeListSoon()"
-            autocomplete="off" />
+<div #wrap class="user-input-wrap" role="combobox" [attr.aria-expanded]="listOpen" aria-haspopup="listbox">
+    <label class="picker-label" for="pp-input">Paziente</label>
 
-        <button type="button" class="btn-inline" (click)="requestAdd()" title="Crea nuovo paziente">＋</button>
+    <div class="picker-row">
+        <input id="pp-input" type="text" [placeholder]="placeholder" [(ngModel)]="userSearch" (focus)="openList()"
+            (input)="onSearchChange(userSearch)" (keydown)="onKeydown($event)" (blur)="closeListSoon()"
+            autocomplete="off" aria-autocomplete="list" aria-controls="pp-listbox" />
+
+        <button type="button" class="btn-inline plus" (click)="requestAdd()" title="Crea nuovo paziente"
+            aria-label="Crea nuovo paziente">
+            <span aria-hidden="true">＋</span>
+        </button>
     </div>
 
-    <div class="user-results" *ngIf="listOpen" [class.open-up]="listOpenUp" [ngStyle]="{ 'max-height.px': listMaxH }">
+    <div class="user-results" *ngIf="listOpen" [class.open-up]="listOpenUp" [ngStyle]="{ 'max-height.px': listMaxH }"
+        id="pp-listbox" role="listbox">
         <button *ngFor="let p of results; let i = index" class="user-option" [class.active]="i === highlight"
-            (mousedown)="$event.preventDefault()" (click)="pick(p)">
-            <span class="avatar">
+            (mousedown)="$event.preventDefault()" (click)="pick(p)" role="option">
+            <span class="avatar" aria-hidden="true">
                 {{ (p.firstname?.[0] || '') + (p.lastname?.[0] || '') || (p.email?.[0] || '?') }}
             </span>
             <span class="meta">
-                <strong>{{ p.firstname || '?' }} {{ p.lastname || '?' }}</strong>
-                <small>{{ p.email || 'n/d' }}</small>
-                <small>{{ p.SSN || 'CF n/d' }}</small>
+                <strong class="name">{{ p.firstname || '?' }} {{ p.lastname || '?' }}</strong>
+                <small class="email">{{ p.email || 'n/d' }}</small>
+                <small class="ssn">{{ p.SSN || 'CF n/d' }}</small>
             </span>
         </button>
+
         <div class="empty" *ngIf="results.length === 0">Nessun risultato</div>
     </div>
 </div>

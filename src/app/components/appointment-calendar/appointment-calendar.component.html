@@ -97,18 +97,13 @@
     </div>
 
     <!-- Paziente -->
-    <app-patient-picker [(model)]="modalData.patientId" (addRequested)="openNewPatientModal()">
+    <app-patient-picker [patients]="patients" [(model)]="modalData.patientId" (addRequested)="openNewPatientModal()">
     </app-patient-picker>
-
     <!-- Dottore -->
-    <label for="doctor">Dottore</label>
-    <select id="doctor" [(ngModel)]="selectedDoctorId" [disabled]="saving || doctorsLoading">
-      <option [ngValue]="undefined" disabled selected>Seleziona un dottore…</option>
-      <option *ngFor="let d of doctors" [ngValue]="d.id">
-        {{ d.user.firstName }} {{ d.user.lastName }}
-      </option>
-    </select>
+    <app-doctor-picker [doctors]="doctors" [(model)]="selectedDoctorId" [disabled]="saving || doctorsLoading"
+      [showAdd]="false"></app-doctor-picker>
     <div *ngIf="doctorsLoading" class="hint">Caricamento dottori…</div>
+
 
 
     <div class="actions">
