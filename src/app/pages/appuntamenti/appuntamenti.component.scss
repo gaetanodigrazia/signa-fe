@@ -63,12 +63,39 @@
 }
 
 .search {
-    background: #f9fafb;
-    border: 1px solid var(--card-border);
-    border-radius: 10px;
-    padding: 10px 12px;
-    min-width: 220px;
+    // Base styles aligned with the Material & page aesthetic
+    background-color: var(--card-bg); // Use a variable for background color
+    border: 1px solid var(--card-border); // Use a variable for the border
+    border-radius: 14px; // More rounded to match the other surfaces
+    padding: 10px 16px; // Increase padding for a more spacious feel
+    min-width: 280px;
+    font-family: inherit;
+    font-size: 1rem;
+    color: #111827; // Dark text for readability
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); // Material-style cubic-bezier transition
+
+    // Remove default outline
     outline: none;
+
+    // Placeholder styling
+    &::placeholder {
+        color: #6b7280; // A darker, more readable gray
+        opacity: 1;
+    }
+
+    // Hover state: subtle elevation effect
+    &:hover {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); // A gentle shadow on hover
+    }
+
+    // Focus state: a colorful, more prominent visual cue
+    &:focus {
+        // A border color from your title card for harmony
+        border-color: var(--title-card-border);
+        // A glow that matches the title card's background color
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--title-card-bg) 70%, transparent);
+        background-color: #ffffff; // Keep background white for clarity
+    }
 }
 
 .search:focus {
@@ -547,5 +574,153 @@ input.ng-invalid.ng-touched {
     to {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+
+
+// Media query for smaller screens
+@media (max-width: 768px) {
+    .search {
+        min-width: unset;
+        width: 100%;
+        padding: 10px 14px;
+    }
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    .right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        input[type="date"],
+        input[type="text"],
+        select {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            background-color: #fff;
+            color: #333;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+            &:focus {
+                outline: none;
+                border-color: #0077cc;
+                box-shadow: 0 0 0 2px rgba(0, 119, 204, 0.2);
+            }
+        }
+
+        input[type="text"] {
+            min-width: 180px;
+        }
+
+        select {
+            cursor: pointer;
+
+            option {
+                color: #333;
+            }
+        }
+    }
+}
+
+/* Migliora compatibilità mobile */
+@media (max-width: 600px) {
+    .toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .right {
+            flex-wrap: wrap;
+            width: 100%;
+
+            input,
+            select {
+                flex: 1 1 auto;
+                width: 100%;
+            }
+        }
+    }
+}
+
+input[type="date"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        filter: invert(40%) sepia(60%) saturate(500%) hue-rotate(190deg);
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: #0077cc;
+        box-shadow: 0 0 0 2px rgba(0, 119, 204, 0.2);
+    }
+
+    &:hover::-webkit-calendar-picker-indicator {
+        opacity: 1;
+    }
+}
+
+.group-date {
+    margin: 0;
+    padding: 10px 14px;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #0077cc;
+    background: #f5f9fc;
+    border-left: 4px solid #0077cc;
+    border-radius: 6px;
+    margin-bottom: 6px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 300;
+    text-transform: capitalize;
+    color: #fff;
+    min-width: 90px;
+    text-align: center;
+
+    &.BOOKED {
+        background-color: #999; // grigio neutro
+    }
+
+    &.CONFIRMED {
+        background-color: #28a745; // verde
+    }
+
+    &.CLOSED {
+        background-color: #6c757d; // grigio scuro
+    }
+
+    &.CANCELLED {
+        background-color: #dc3545; // rosso
     }
 }
