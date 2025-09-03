@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AppointmentService } from 'src/app/service/appointment.service';
@@ -14,6 +14,19 @@ import { PatientDto } from 'src/app/model/patient.model';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
+  // ====== Stato modali ======
+  appointmentDetailsVisible = false;
+  patientDetailsVisible = false;
+  resultVisible = false;
+
+  // elementi per focus quando si apre la modale
+  @ViewChild('closeApptBtn') closeApptBtn?: any;
+  @ViewChild('closePatientBtn') closePatientBtn?: any;
+
+  // selezioni correnti
+  viewingAppointment: any | null = null; // tipizza con il tuo AppointmentDTO se importato qui
+  viewingPatient: any | null = null;     // tipizza con il tuo PatientDto se importato qui
+
   // stato globale
   loadingAll = false;
 
@@ -134,13 +147,81 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  /* ===== azioni UI ===== */
-  openPatient(p: PatientDto): void {
-    // vai ai pazienti con query precompilata
-    const q = p.id;
-    this.router.navigate(['/patients'], { queryParams: { q } });
+  // ====== Apertura/chiusura paziente ======
+  openPatient(p: any) {
+    // se prima navigavi col router, ora apri modale
+    this.viewingPatient = p;
+    this.patientDetailsVisible = true;
+    document.body.classList.add('body--lock');
+    setTimeout(() => this.closePatientBtn?.nativeElement?.focus?.(), 0);
   }
 
   trackByAppt = (_: number, a: AppointmentDTO) => a.id;
   trackByPatient = (_: number, p: PatientDto) => p.id;
+
+
+
+
+
+
+  // ====== Apertura/chiusura appuntamento ======
+  openAppointment(a: any) {
+    this.viewingAppointment = a;
+    this.appointmentDetailsVisible = true;
+    document.body.classList.add('body--lock');
+    setTimeout(() => this.closeApptBtn?.nativeElement?.focus?.(), 0);
+  }
+
+  closeAppointment() {
+    this.viewingAppointment = null;
+    this.appointmentDetailsVisible = false;
+    document.body.classList.remove('body--lock');
+  }
+
+  // ====== Esito (modale separata) ======
+  openResult() {
+    this.resultVisible = true;
+    document.body.classList.add('body--lock');
+  }
+  closeResult() {
+    this.resultVisible = false;
+    document.body.classList.remove('body--lock');
+  }
+
+
+
+  closePatient() {
+    this.viewingPatient = null;
+    this.patientDetailsVisible = false;
+    document.body.classList.remove('body--lock');
+  }
+
+  // Chiudi con ESC anche se il focus non è dentro la modale
+  @HostListener('document:keydown.escape', ['$event'])
+  onEsc(_evt: KeyboardEvent) {
+    if (this.resultVisible) return this.closeResult();
+    if (this.appointmentDetailsVisible) return this.closeAppointment();
+    if (this.patientDetailsVisible) return this.closePatient();
+  }
+  fmtPatientName(v: any): string {
+    if (!v?.patient) return '—';
+    const first = v.patient.firstname || '';
+    const last = v.patient.lastname || '';
+    const full = `${first} ${last}`.trim();
+    return full || '—';
+  }
+
+  fmtDoctorName(v: any): string {
+    const u = v?.doctor?.user;
+    if (!u) return '—';
+    const first = u.firstName || '';
+    const last = u.lastName || '';
+    const full = `${first} ${last}`.trim();
+    return full || '—';
+  }
+
+  fmtStudioName(v: any): string {
+    return v?.studio?.name || '—';
+  }
+
 }

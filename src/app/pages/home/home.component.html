@@ -83,7 +83,7 @@
                         </span>
                     </div>
                     <div class="actions">
-                        <button class="btn-outline" type="button" routerLink="/calendar">Apri</button>
+                        <button class="btn-outline" type="button" (click)="openAppointment(a)">Apri</button>
                     </div>
                 </li>
             </ul>
@@ -127,5 +127,74 @@
     <div class="page-loading-overlay" *ngIf="loadingAll" role="status" aria-live="polite" aria-busy="true">
         <span class="spinner spinner--big" aria-hidden="true"></span>
         <span class="sr-only">Caricamento dashboard…</span>
+    </div>
+</div>
+
+<!-- Modale: Dettagli appuntamento -->
+<div class="modal-overlay" *ngIf="appointmentDetailsVisible" (click)="closeAppointment()" role="dialog"
+    aria-modal="true" aria-labelledby="appt-dialog-title">
+    <div class="modal" (click)="$event.stopPropagation()" (keydown.escape)="closeAppointment()" tabindex="-1">
+        <h3 id="appt-dialog-title">Dettagli appuntamento</h3>
+
+        <div class="details" *ngIf="viewingAppointment as v">
+            <div><strong>Paziente:</strong> {{ fmtPatientName(v) }}</div>
+            <div><strong>Dottore:</strong> {{ fmtDoctorName(v) }}</div>
+            <div><strong>Studio:</strong> {{ fmtStudioName(v) }}</div>
+
+            <div><strong>Tipo:</strong> {{ v.kind || '—' }}</div>
+            <div><strong>Stato:</strong> {{ v.status || '—' }}</div>
+
+            <div><strong>Data:</strong> {{ v.startAt | date:'d MMMM y' }}</div>
+            <div><strong>Orario:</strong> {{ v.startAt | date:'HH:mm' }} – {{ v.endAt | date:'HH:mm' }}</div>
+
+            <div><strong>Motivo:</strong> {{ v.reason || '—' }}</div>
+            <div><strong>Note:</strong> {{ v.notes || '—' }}</div>
+
+            <div *ngIf="v.result !== undefined">
+                <strong>Esito:</strong>
+                <button class="btn small" (click)="openResult()">Apri esito</button>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn" #closeApptBtn (click)="closeAppointment()">Chiudi</button>
+            <button class="btn-outline" type="button" routerLink="/calendar">Vai al calendario</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modale: Esito appuntamento (testo lungo) -->
+<div class="modal-overlay" *ngIf="resultVisible" (click)="closeResult()" role="dialog" aria-modal="true"
+    aria-labelledby="result-dialog-title">
+    <div class="modal large" (click)="$event.stopPropagation()" (keydown.escape)="closeResult()" tabindex="-1">
+        <h3 id="result-dialog-title">Esito appuntamento</h3>
+        <div class="result-text multiline">
+            {{ viewingAppointment?.result || 'Nessun esito inserito.' }}
+        </div>
+        <div class="modal-actions">
+            <button class="btn" (click)="closeResult()">Chiudi</button>
+        </div>
+    </div>
+</div>
+<!-- Modale: Dettagli paziente -->
+<div class="modal-overlay" *ngIf="patientDetailsVisible" (click)="closePatient()" role="dialog" aria-modal="true"
+    aria-labelledby="patient-dialog-title">
+
+    <div class="modal" (click)="$event.stopPropagation()" (keydown.escape)="closePatient()" tabindex="-1">
+        <h3 id="patient-dialog-title">Dettagli paziente</h3>
+
+        <div class="details" *ngIf="viewingPatient as p">
+            <div><strong>Nome:</strong> {{ (p.firstname || '') + ' ' + (p.lastname || '') || '—' }}</div>
+            <div><strong>Email:</strong> {{ p.email || '—' }}</div>
+            <div><strong>Telefono:</strong> {{ p.phone || '—' }}</div>
+            <div><strong>SSN:</strong> {{ p.SSN || '—' }}</div>
+            <div><strong>Data di nascita:</strong> {{ p.dateOfBirth ? (p.dateOfBirth | date:'d MMM y') : '—' }}</div>
+            <!-- aggiungi altri campi se li hai -->
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn" #closePatientBtn (click)="closePatient()">Chiudi</button>
+            <button class="btn-outline" type="button" routerLink="/patients">Vai ai pazienti</button>
+        </div>
     </div>
 </div>
