@@ -70,6 +70,7 @@ export interface AppointmentInputDTO {
     status?: AppointmentStatus;
     reason?: string;
     notes?: string;
+    result?: string;
 }
 
 

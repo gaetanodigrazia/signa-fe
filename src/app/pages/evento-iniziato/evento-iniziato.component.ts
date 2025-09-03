@@ -30,10 +30,10 @@ export class EventoIniziatoComponent {
     endAt: [{ value: '', disabled: true }],
     reason: [''],
     notes: [''],
-    esito: ['', Validators.required],
+    result: ['', Validators.required], // <-- qui
   });
 
-  constructor(private router: Router, private route: ActivatedRoute) {
+  constructor(private router: Router, private route: ActivatedRoute, private apptSvc: AppointmentService) {
     // Durante la navigazione “calda”
     const navAppt = this.router.getCurrentNavigation()?.extras?.state?.['appt'] as AppointmentDTO | undefined;
     // Fallback: history.state (vale subito dopo la nav, ma NON su refresh)
@@ -74,7 +74,7 @@ export class EventoIniziatoComponent {
       endAt: appt.endAt,
       reason: appt.reason ?? '',
       notes: appt.notes ?? '',
-      esito: ''
+      result: ''
     });
 
     this.loading = false;
@@ -94,7 +94,7 @@ export class EventoIniziatoComponent {
       patient: { id: this.appt.patient.id },
 
       // doctor è opzionale ma il tipo è UserRef -> { user: { id } }
-      ...(this.appt.doctor?.id ? { doctor: { user: { id: this.appt.doctor.id } } } : {}),
+      ...(this.appt.doctor?.id ? { doctor: { user: { id: this.appt.doctor.user.id } } } : {}),
 
       startAt: this.appt.startAt,
       endAt: this.appt.endAt,
@@ -104,9 +104,11 @@ export class EventoIniziatoComponent {
       status: 'CLOSED', // se vuoi chiudere la visita al salvataggio; altrimenti togli
       reason: this.form.getRawValue().reason || undefined,
       notes: this.form.getRawValue().notes || undefined,
+      result: this.form.getRawValue().result || undefined, // <-- invio result
+
     };
 
-    this.api.update(this.appt.id, dto).subscribe({
+    this.apptSvc.update(this.appt.id, dto).subscribe({
       next: () => {
         this.saving = false;
         // vedi punto 2 per l'esito
