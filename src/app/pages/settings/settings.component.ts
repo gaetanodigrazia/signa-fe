@@ -4,14 +4,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms'; // per [(ngModel)] nella modale 2FA
 
 type TabKey =
-  | 'profile' | 'notifications' | 'agenda'
-  | 'clinic' | 'privacy' | 'security' | 'integrations';
+  | 'profile' | 'digitale' | 'agenda'
+  | 'clinic' | 'security' | 'integrations';
 
 type ToggleKey =
-  | 'notifyEmail' | 'patientReminders'
-  | 'gdprConsentRequired' | 'allowPatientPortal'
-  | 'enableAutoLogout'
-  | 'googleSync' | 'outlookSync';
+  | 'patientReminders'
+  | 'allowPatientPortal'
+  | 'enableAutoLogout';
 
 @Component({
   selector: 'app-settings',
@@ -39,22 +38,19 @@ export class SettingsComponent {
   }
   tabs: { key: TabKey; label: string; icon: string }[] = [
     { key: 'profile', label: 'Profilo', icon: '👤' },
-    { key: 'notifications', label: 'Notifiche', icon: '🔔' },
+    { key: 'digitale', label: 'Digitale', icon: '🖥️' },
     { key: 'agenda', label: 'Agenda', icon: '📅' },
     { key: 'clinic', label: 'Studio', icon: '🏥' },
-    { key: 'privacy', label: 'Privacy', icon: '🔏' },
     { key: 'security', label: 'Sicurezza', icon: '🛡️' },
-    { key: 'integrations', label: 'Integrazioni', icon: '🔌' },
   ];
   currentTab: TabKey = 'profile';
   indicatorTransform = 'translateX(0)';
 
   tabFields: Record<TabKey, string[]> = {
     profile: ['firstName', 'lastName', 'title', 'email', 'locale', 'timeFormat'],
-    notifications: ['notifyEmail', 'patientReminders', 'emailSignature'],
+    digitale: ['patientReminders', 'emailSignature', 'allowPatientPortal'],
     agenda: ['slotDuration', 'slotBuffer', 'workingDays'],
-    clinic: ['clinicName', 'clinicPhone', 'clinicAddress', 'vatId', 'iban', 'payments'],
-    privacy: ['gdprConsentRequired', 'allowPatientPortal'],
+    clinic: ['clinicName', 'clinicPhone', 'clinicAddress', 'vatId', 'iban',],
     security: ['enable2fa', 'enableAutoLogout', 'autoLogoutMinutes'],
     integrations: ['googleSync', 'outlookSync'],
   };
@@ -83,7 +79,6 @@ export class SettingsComponent {
     timeFormat: ['24h'],
 
     // Notifiche
-    notifyEmail: [true],
     patientReminders: [true],
     emailSignature: [''],
 
@@ -98,20 +93,13 @@ export class SettingsComponent {
     clinicAddress: [''],
     vatId: [''],
     iban: [''],
-    payments: this.fb.control<string[] | null>(['card', 'cash']),
-
-    // Privacy
-    gdprConsentRequired: [true],
     allowPatientPortal: [false],
 
     // Sicurezza
     enable2fa: [false],
     enableAutoLogout: [true],
-    autoLogoutMinutes: [15],
+    autoLogoutMinutes: [15]
 
-    // Integrazioni
-    googleSync: [false],
-    outlookSync: [false],
   });
 
   // Modale conferma per disabilitazioni
@@ -184,13 +172,9 @@ export class SettingsComponent {
 
   private labelFor(key: ToggleKey): string {
     switch (key) {
-      case 'notifyEmail': return 'Notifiche email personali';
       case 'patientReminders': return 'Promemoria ai pazienti';
-      case 'gdprConsentRequired': return 'Consenso privacy';
       case 'allowPatientPortal': return 'Portale paziente';
       case 'enableAutoLogout': return 'Logout automatico';
-      case 'googleSync': return 'Google Calendar';
-      case 'outlookSync': return 'Outlook Calendar';
     }
   }
 

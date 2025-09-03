@@ -76,24 +76,12 @@
             </div>
         </section>
 
-        <!-- NOTIFICHE -->
-        <section class="panel surface" role="tabpanel" id="notifications-panel" aria-labelledby="notifications-tab"
-            [hidden]="currentTab !== 'notifications'">
+        <!-- Digitale -->
+        <section class="panel surface" role="tabpanel" id="digitale-panel" aria-labelledby="digitale-tab"
+            [hidden]="currentTab !== 'digitale'">
             <header class="card-header">
-                <h3 class="card__title">Notifiche</h3>
+                <h3 class="card__title">Digitale</h3>
             </header>
-
-            <div class="row-setting">
-                <div class="row-text">
-                    <strong>Notifiche email personali</strong>
-                    <small>Invia aggiornamenti sul tuo account</small>
-                </div>
-                <button type="button" class="toggle-btn" [class.on]="form.value.notifyEmail"
-                    [class.off]="!form.value.notifyEmail" [attr.aria-pressed]="form.value.notifyEmail"
-                    (click)="onToggle('notifyEmail')">
-                    {{ form.value.notifyEmail ? 'Abilitato' : 'Disabilitato' }}
-                </button>
-            </div>
 
             <div class="row-setting">
                 <div class="row-text">
@@ -112,6 +100,15 @@
                 <textarea rows="3" formControlName="emailSignature"
                     placeholder="Cordiali saluti, Dr./Dott.ssa …"></textarea>
             </label>
+
+            <div class="row-setting">
+                <div class="row-text"><strong>Portale paziente</strong></div>
+                <button type="button" class="toggle-btn" [class.on]="form.value.allowPatientPortal"
+                    [class.off]="!form.value.allowPatientPortal" [attr.aria-pressed]="form.value.allowPatientPortal"
+                    (click)="onToggle('allowPatientPortal')">
+                    {{ form.value.allowPatientPortal ? 'Abilitato' : 'Disabilitato' }}
+                </button>
+            </div>
         </section>
 
         <!-- AGENDA -->
@@ -184,44 +181,9 @@
                     <span>IBAN</span>
                     <input type="text" formControlName="iban" placeholder="IT00 A000 0000 0000 0000 0000 000" />
                 </label>
-
-                <label class="field">
-                    <span>Metodi di pagamento</span>
-                    <select formControlName="payments" multiple size="4">
-                        <option value="cash">Contanti</option>
-                        <option value="card">Carta</option>
-                        <option value="bank">Bonifico</option>
-                        <option value="online">Online</option>
-                    </select>
-                </label>
             </div>
         </section>
 
-        <!-- PRIVACY -->
-        <section class="panel surface" role="tabpanel" id="privacy-panel" aria-labelledby="privacy-tab"
-            [hidden]="currentTab !== 'privacy'">
-            <header class="card-header">
-                <h3 class="card__title">Privacy e pazienti</h3>
-            </header>
-
-            <div class="row-setting">
-                <div class="row-text"><strong>Consenso privacy alla prima visita</strong></div>
-                <button type="button" class="toggle-btn" [class.on]="form.value.gdprConsentRequired"
-                    [class.off]="!form.value.gdprConsentRequired" [attr.aria-pressed]="form.value.gdprConsentRequired"
-                    (click)="onToggle('gdprConsentRequired')">
-                    {{ form.value.gdprConsentRequired ? 'Abilitato' : 'Disabilitato' }}
-                </button>
-            </div>
-
-            <div class="row-setting">
-                <div class="row-text"><strong>Portale paziente</strong></div>
-                <button type="button" class="toggle-btn" [class.on]="form.value.allowPatientPortal"
-                    [class.off]="!form.value.allowPatientPortal" [attr.aria-pressed]="form.value.allowPatientPortal"
-                    (click)="onToggle('allowPatientPortal')">
-                    {{ form.value.allowPatientPortal ? 'Abilitato' : 'Disabilitato' }}
-                </button>
-            </div>
-        </section>
 
         <!-- SICUREZZA -->
         <section class="panel surface" role="tabpanel" id="security-panel" aria-labelledby="security-tab"
@@ -268,33 +230,6 @@
                 <button type="button" class="btn-outline" (click)="downloadActivityLog()">Scarica log attività</button>
             </div>
         </section>
-
-        <!-- INTEGRAZIONI -->
-        <section class="panel surface" role="tabpanel" id="integrations-panel" aria-labelledby="integrations-tab"
-            [hidden]="currentTab !== 'integrations'">
-            <header class="card-header">
-                <h3 class="card__title">Integrazioni</h3>
-            </header>
-
-            <div class="row-setting">
-                <div class="row-text"><strong>Google Calendar</strong></div>
-                <button type="button" class="toggle-btn" [class.on]="form.value.googleSync"
-                    [class.off]="!form.value.googleSync" [attr.aria-pressed]="form.value.googleSync"
-                    (click)="onToggle('googleSync')">
-                    {{ form.value.googleSync ? 'Connesso' : 'Disconnesso' }}
-                </button>
-            </div>
-
-            <div class="row-setting">
-                <div class="row-text"><strong>Outlook Calendar</strong></div>
-                <button type="button" class="toggle-btn" [class.on]="form.value.outlookSync"
-                    [class.off]="!form.value.outlookSync" [attr.aria-pressed]="form.value.outlookSync"
-                    (click)="onToggle('outlookSync')">
-                    {{ form.value.outlookSync ? 'Connesso' : 'Disconnesso' }}
-                </button>
-            </div>
-        </section>
-
     </form>
 </div>
 
