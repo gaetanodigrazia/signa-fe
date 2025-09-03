@@ -49,7 +49,8 @@
 
                         </td>
                         <td class="actions">
-                            <button class="icon" title="Vedi dettagli" (click)="view(appt)">➕</button>
+                            <button class="icon" title="Vedi dettagli" (click)="view(appt)">👁️</button>
+                            <button class="icon" title="Cambia stato" (click)="view(appt)">▶️</button>
                         </td>
                     </tr>
                 </tbody>
@@ -60,25 +61,60 @@
     <div *ngIf="error" class="error" style="padding:12px;">{{ error }}</div>
 </div>
 
-<div class="modal-overlay" *ngIf="detailsVisible" (click)="closeDetails()">
-    <div class="modal" (click)="$event.stopPropagation()">
-        <h3>Dettagli appuntamento</h3>
+<div class="modal-overlay" *ngIf="detailsVisible" (click)="closeDetails()" role="dialog" aria-modal="true"
+    aria-labelledby="appt-dialog-title">
+
+    <div class="modal" (click)="$event.stopPropagation()" (keydown.escape)="closeDetails()" tabindex="-1">
+
+        <h3 id="appt-dialog-title">Dettagli appuntamento</h3>
+
         <div class="details" *ngIf="viewing as v">
-            <div><strong>Paziente:</strong> {{ v.patient?.firstname }} {{ v.patient?.lastname }}</div>
+            <div><strong>Paziente:</strong> {{ fmtPatientName(v) }}</div>
+            <div><strong>Dottore:</strong> {{ fmtDoctorName(v) }}</div>
+            <div><strong>Studio:</strong> {{ fmtStudioName(v) }}</div>
+
+            <div><strong>Tipo:</strong> {{ fmtKind(v.kind) }}</div>
+            <div><strong>Stato:</strong> {{ fmtStatus(v.status) }}</div>
+            <div><strong>Motivo:</strong> {{ v.reason || '—' }}</div>
+            <div><strong>Note:</strong> {{ v.notes || '—' }}</div>
+
             <div><strong>Data:</strong> {{ v.startAt | date:'d MMMM y' }}</div>
             <div><strong>Ora:</strong> {{ v.startAt | date:'shortTime' }} - {{ v.endAt | date:'shortTime' }}</div>
-            <div><strong>Stato:</strong> {{ v.status }}</div>
-            <div *ngIf="v.kind"><strong>Tipo:</strong> {{ v.kind }}</div>
-            <div *ngIf="v.reason"><strong>Motivo:</strong> {{ v.reason }}</div>
-            <div *ngIf="v.notes"><strong>Note:</strong> {{ v.notes }}</div>
-            <div *ngIf="v.doctor"><strong>Dottore:</strong> {{ v.doctor.firstname }} {{ v.doctor.lastname }}</div>
-            <div *ngIf="v.studio"><strong>Studio:</strong> {{ v.studio.name }}</div>
+
+            <div><strong>Creato da:</strong> {{ fmtCreatedBy(v) }}</div>
+            <div><strong>Creato il:</strong> {{ v.createdAt ? (v.createdAt | date:'d MMM y, HH:mm') : '—' }}</div>
+
+            <div><strong>Cancellato il:</strong> {{ v.canceledAt ? (v.canceledAt | date:'d MMM y, HH:mm') : '—' }}</div>
+            <div><strong>Motivo cancellazione:</strong> {{ v.cancelReason || '—' }}</div>
+
+            <div><strong>Esito:</strong>
+                <button class="btn small" (click)="openResult()">Apri esito</button>
+            </div>
         </div>
+
+
         <div class="modal-actions">
-            <button class="btn" (click)="closeDetails()">Chiudi</button>
+            <button class="btn" #closeBtn (click)="closeDetails()">Chiudi</button>
         </div>
     </div>
 </div>
+<div class="modal-overlay" *ngIf="resultVisible" (click)="closeResult()" role="dialog" aria-modal="true"
+    aria-labelledby="result-dialog-title">
+
+    <div class="modal large" (click)="$event.stopPropagation()" (keydown.escape)="closeResult()" tabindex="-1">
+
+        <h3 id="result-dialog-title">Esito appuntamento</h3>
+
+        <div class="result-text">
+            {{ viewing?.result || 'Nessun esito inserito.' }}
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn" (click)="closeResult()">Chiudi</button>
+        </div>
+    </div>
+</div>
+
 
 <div class="page-loading-overlay" *ngIf="loading" role="status" aria-live="polite" aria-busy="true">
     <span class="spinner spinner--big" aria-hidden="true"></span>

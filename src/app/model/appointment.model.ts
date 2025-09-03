@@ -56,6 +56,7 @@ export interface AppointmentDTO {
 
     createdAt?: string;
     updatedAt?: string;
+    result?: string;
 }
 
 /** INPUT: niente studio obbligatorio */
