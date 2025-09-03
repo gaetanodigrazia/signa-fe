@@ -573,3 +573,86 @@
         opacity: 1
     }
 }
+
+/* Variante compatta e coerente per bottoni */
+.btn,
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    line-height: 1;
+    border-radius: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: box-shadow .15s ease, transform .05s ease;
+}
+
+.btn-outline {
+    background: #fff;
+    border: 1px solid #cfd6e3;
+    color: #111827;
+}
+
+.btn:hover,
+.btn-outline:hover {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+}
+
+.btn:active,
+.btn-outline:active {
+    transform: translateY(1px);
+}
+
+/* Dimensione small per azioni “secondarie” (es. Apri esito) */
+.btn.small,
+.btn-outline.small {
+    padding: 6px 10px;
+    font-size: 0.875rem;
+    /* 14px */
+    border-radius: 10px;
+}
+
+/* Accessorio: allinea meglio l’emoji/icona */
+.btn> :first-child,
+.btn-outline> :first-child {
+    display: inline-block;
+    transform: translateY(1px);
+}
+
+/* styles.scss o home.component.scss (meglio globale se lo riusi) */
+.btn,
+.btn-outline,
+.btn-success {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    line-height: 1;
+    border-radius: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: box-shadow .15s ease, transform .05s ease;
+}
+
+.btn-success {
+    background: #16a34a;
+    /* green-600 */
+    color: #fff;
+    border: 1px solid #148f41;
+}
+
+.btn-success:hover {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+}
+
+.btn-success:active {
+    transform: translateY(1px);
+}
+
+.btn-success.small,
+.btn-outline.small {
+    padding: 6px 10px;
+    font-size: .875rem;
+    border-radius: 10px;
+}

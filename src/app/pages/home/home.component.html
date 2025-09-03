@@ -151,9 +151,18 @@
             <div><strong>Note:</strong> {{ v.notes || '—' }}</div>
 
             <div *ngIf="v.result !== undefined">
-                <strong>Esito:</strong>
-                <button class="btn small" (click)="openResult()">Apri esito</button>
+                <div *ngIf="v.result !== undefined">
+                    <strong>Esito:</strong>
+                    <button class="btn-outline small" (click)="openResult()" aria-label="Apri esito appuntamento">
+                        📄 Apri esito
+                    </button>
+                </div>
             </div>
+            <button *ngIf="v?.id && (v.status === 'BOOKED' || v.status === 'CONFIRMED')" class="btn-success small"
+                [routerLink]="['/evento-iniziato', v.id]" [state]="{ appt: v }" type="button">
+                ▶️ Inizia visita
+            </button>
+
         </div>
 
         <div class="modal-actions">

@@ -1,0 +1,47 @@
+<div class="page">
+    <h1>Visita in corso</h1>
+
+    <ng-container *ngIf="loading; else ready">
+        <div class="page-loading-overlay">
+            <div class="spinner"></div>
+        </div>
+    </ng-container>
+
+    <ng-template #ready>
+        <form [formGroup]="form" (ngSubmit)="salva()" class="form">
+            <section class="card">
+                <h2>Dati appuntamento</h2>
+
+                <div class="grid">
+                    <label>Studio</label><input type="text" formControlName="studio" readonly>
+                    <label>Paziente</label><input type="text" formControlName="patient" readonly>
+                    <label>Medico</label><input type="text" formControlName="doctor" readonly>
+                    <label>Tipo</label><input type="text" formControlName="kind" readonly>
+                    <label>Stato</label><input type="text" formControlName="status" readonly>
+                    <label>Inizio</label><input type="text" formControlName="startAt" readonly>
+                    <label>Fine</label><input type="text" formControlName="endAt" readonly>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Dettagli visita</h2>
+                <label>Motivo</label>
+                <input type="text" formControlName="reason" placeholder="Motivo della visita">
+                <label>Note</label>
+                <textarea rows="4" formControlName="notes" placeholder="Note interne (opzionale)"></textarea>
+                <label>Esito (referto)</label>
+                <textarea rows="6" formControlName="esito" placeholder="Inserisci l'esito della visita"
+                    required></textarea>
+            </section>
+
+            <div class="actions">
+                <div class="actions">
+                    <button type="submit" class="btn-primary" [disabled]="saving">
+                        💾 {{ saving ? 'Salvataggio...' : 'Salva' }}
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </ng-template>
+</div>

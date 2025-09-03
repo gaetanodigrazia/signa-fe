@@ -224,4 +224,5 @@ export class HomeComponent implements OnInit {
     return v?.studio?.name || '—';
   }
 
+
 }

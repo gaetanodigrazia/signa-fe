@@ -3,14 +3,14 @@ import { CommonModule, KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AppointmentService } from 'src/app/service/appointment.service';
 import { AppointmentDTO, AppointmentStatus, AppointmentKind } from 'src/app/model/appointment.model';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { map, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-appuntamenti',
   standalone: true,
-  imports: [CommonModule, FormsModule, KeyValuePipe],
+  imports: [CommonModule, FormsModule, KeyValuePipe, RouterModule],
   templateUrl: './appuntamenti.component.html',
   styleUrl: './appuntamenti.component.scss'
 })

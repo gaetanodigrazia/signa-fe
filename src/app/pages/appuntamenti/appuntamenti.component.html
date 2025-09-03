@@ -50,7 +50,11 @@
                         </td>
                         <td class="actions">
                             <button class="icon" title="Vedi dettagli" (click)="view(appt)">👁️</button>
-                            <button class="icon" title="Cambia stato" (click)="view(appt)">▶️</button>
+                            <button class="icon"
+                                *ngIf="appt?.id && (appt.status === 'BOOKED' || appt.status === 'CONFIRMED')"
+                                [routerLink]="['/evento-iniziato', appt.id]" [state]="{ appt: appt }" type="button">
+                                ▶️
+                            </button>
                         </td>
                     </tr>
                 </tbody>

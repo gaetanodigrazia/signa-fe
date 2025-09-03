@@ -10,10 +10,12 @@ import { AppointmentCalendarComponent } from '../components/appointment-calendar
 import { SettingsComponent } from '../pages/settings/settings.component';
 import { CanDeactivateSettingsGuard } from './can-deactivate-settings.guard';
 import { AppuntamentiComponent } from '../pages/appuntamenti/appuntamenti.component';
+import { EventoIniziatoComponent } from '../pages/evento-iniziato/evento-iniziato.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'home', component: HomeComponent, canActivate: [authGuard] },
+    { path: 'evento-iniziato/:id', component: EventoIniziatoComponent, canActivate: [authGuard] },
 
     { path: 'patients', component: PatientsComponent, canActivate: [authGuard] },
 
