@@ -58,3 +58,22 @@ body {
   height: 100%;
   background: var(--app-bg);
 }
+
+/* styles.scss */
+:root {
+  --app-bg: #0b0b0b;
+}
+
+/* o il colore che vuoi davvero */
+:root {
+  --app-bg: #f3f2ff;
+  /* grigio uniforme */
+}
+
+html,
+body,
+app-root {
+  height: 100%;
+  margin: 0;
+  background: var(--app-bg) !important;
+}
