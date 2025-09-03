@@ -2,10 +2,11 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } fro
 import { CommonModule, KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AppointmentService } from 'src/app/service/appointment.service';
-import { AppointmentDTO, AppointmentStatus, AppointmentKind } from 'src/app/model/appointment.model';
+import { AppointmentDTO, AppointmentStatus, AppointmentKind, AppointmentInputDTO } from 'src/app/model/appointment.model';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { map, distinctUntilChanged } from 'rxjs/operators';
+import { Utils } from 'src/app/common/utilis';
 
 @Component({
   selector: 'app-appuntamenti',
@@ -66,6 +67,8 @@ export class AppuntamentiComponent implements OnInit, OnDestroy {
   @HostListener('document:keydown.escape', ['$event'])
   onEsc(_evt: KeyboardEvent) {
     if (this.detailsVisible) this.closeDetails();
+    if (this.editVisible) this.closeEdit();
+    if (this.resultVisible) this.closeResult();
   }
 
   /** Loads appointments from the server and groups them by day */
@@ -199,6 +202,105 @@ export class AppuntamentiComponent implements OnInit, OnDestroy {
   closeResult(): void {
     this.resultVisible = false;
     document.body.classList.remove('body--lock');
+  }
+
+  /* ===== Modale modifica (lista) ===== */
+  editVisible = false;
+  editing: AppointmentDTO | null = null;
+
+  editModel = {
+    date: '',         // yyyy-MM-dd
+    startTime: '',    // HH:mm
+    endTime: '',      // HH:mm
+    reason: '',
+    notes: '',
+    status: 'BOOKED' as AppointmentStatus
+  };
+
+  openEdit(appt: AppointmentDTO): void {
+    this.editing = appt;
+
+    const start = new Date(appt.startAt);
+    const end = new Date(appt.endAt);
+
+    this.editModel = {
+      date: start.toISOString().slice(0, 10),
+      startTime: Utils.formatTime(start),
+      endTime: Utils.formatTime(end),
+      reason: appt.reason || '',
+      notes: appt.notes || '',
+      status: appt.status
+    };
+
+    this.editVisible = true;
+    document.body.classList.add('body--lock');
+  }
+
+  closeEdit(): void {
+    this.editVisible = false;
+    this.editing = null;
+    document.body.classList.remove('body--lock');
+  }
+
+  saveEdit(): void {
+    if (!this.editing) return;
+
+    const { date, startTime, endTime, reason, notes, status } = this.editModel;
+    if (!date || !startTime || !endTime) {
+      alert('Compila data e orari.');
+      return;
+    }
+
+    const startDate = Utils.combineDateAndTime(new Date(date), startTime);
+    const endDate = Utils.combineDateAndTime(new Date(date), endTime);
+    if (startDate >= endDate) {
+      alert("L'ora di fine deve essere successiva a quella di inizio.");
+      return;
+    }
+
+    const payload: AppointmentInputDTO = {
+      patient: { id: this.editing.patient.id },
+      doctor: this.editing.doctor?.user?.id ? { user: { id: this.editing.doctor.user.id } } : undefined,
+      startAt: Utils.toLocalOffsetISOString(startDate),
+      endAt: Utils.toLocalOffsetISOString(endDate),
+      kind: this.editing.kind,     // non lo editi qui
+      status,                      // cambiabile dalla modale
+      reason: reason?.trim() || undefined,
+      notes: notes?.trim() || undefined,
+    };
+
+    this.loading = true;
+    this.appointmentSvc.update(this.editing.id, payload).subscribe({
+      next: () => {
+        this.loading = false;
+        this.closeEdit();
+        this.load(); // ricarica elenco
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Errore update', err);
+        alert('Errore durante il salvataggio.');
+      }
+    });
+  }
+
+  deleteEditing(): void {
+    if (!this.editing) return;
+    if (!confirm('Eliminare questo appuntamento?')) return;
+
+    this.loading = true;
+    this.appointmentSvc.delete(this.editing.id).subscribe({
+      next: () => {
+        this.loading = false;
+        this.closeEdit();
+        this.load();
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Errore delete', err);
+        alert('Impossibile eliminare l’appuntamento.');
+      }
+    });
   }
 
 }

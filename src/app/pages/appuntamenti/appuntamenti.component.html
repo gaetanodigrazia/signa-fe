@@ -48,8 +48,11 @@
                             </span>
 
                         </td>
+
                         <td class="actions">
                             <button class="icon" title="Vedi dettagli" (click)="view(appt)">👁️</button>
+                            <button class="icon" title="Modifica" (click)="openEdit(appt)">✏️</button>
+
                             <button class="icon"
                                 *ngIf="appt?.id && (appt.status === 'BOOKED' || appt.status === 'CONFIRMED')"
                                 [routerLink]="['/evento-iniziato', appt.id]" [state]="{ appt: appt }" type="button">
@@ -123,4 +126,43 @@
 <div class="page-loading-overlay" *ngIf="loading" role="status" aria-live="polite" aria-busy="true">
     <span class="spinner spinner--big" aria-hidden="true"></span>
     <span class="sr-only">Caricamento appuntamenti…</span>
+</div>
+<!-- Modale: Modifica appuntamento (lista) -->
+<div class="modal-overlay" *ngIf="editVisible" (click)="closeEdit()" role="dialog" aria-modal="true"
+    aria-labelledby="edit-dialog-title">
+
+    <div class="modal" (click)="$event.stopPropagation()" (keydown.escape)="closeEdit()" tabindex="-1">
+        <h3 id="edit-dialog-title">Modifica appuntamento</h3>
+
+        <form class="form-grid" (submit)="$event.preventDefault(); saveEdit()">
+            <label>Data</label>
+            <input type="date" [(ngModel)]="editModel.date" name="date" required>
+
+            <label>Inizio</label>
+            <input type="time" [(ngModel)]="editModel.startTime" name="startTime" required>
+
+            <label>Fine</label>
+            <input type="time" [(ngModel)]="editModel.endTime" name="endTime" required>
+
+            <label>Stato</label>
+            <select [(ngModel)]="editModel.status" name="status">
+                <option value="BOOKED">Prenotato</option>
+                <option value="CONFIRMED">Confermato</option>
+                <option value="CLOSED">Concluso</option>
+                <option value="CANCELLED">Cancellato</option>
+            </select>
+
+            <label>Motivo</label>
+            <input type="text" [(ngModel)]="editModel.reason" name="reason" placeholder="Motivo (titolo)">
+
+            <label>Note</label>
+            <textarea rows="4" [(ngModel)]="editModel.notes" name="notes" placeholder="Note (opzionale)"></textarea>
+        </form>
+
+        <div class="modal-actions">
+            <button class="btn" type="button" (click)="closeEdit()">Annulla</button>
+            <button class="btn-outline btn-danger" type="button" (click)="deleteEditing()">Elimina</button>
+            <button class="btn-primary" type="button" (click)="saveEdit()">Salva</button>
+        </div>
+    </div>
 </div>
