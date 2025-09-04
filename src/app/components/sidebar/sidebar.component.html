@@ -37,7 +37,7 @@
     </div>
 
     <!-- Gruppo: Appuntamenti (DESKTOP) -->
-    <div class="menu-group" [class.open]="appointmentsOpen">
+    <div class="menu-group" [class.open]="appointmentsOpen" *ngIf="isBackoffice">
       <button class="menu-parent" (click)="toggleAppointments()" [attr.aria-expanded]="appointmentsOpen"
         aria-controls="appointments-submenu">
         <span class="icon">📆</span>

@@ -1,10 +1,12 @@
 import { Component, HostListener, Output, EventEmitter, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, distinctUntilChanged } from 'rxjs/operators';
+import { StudioRole } from 'src/app/service/studiomembers.service';
 
 const LS_LOCKED = 'app_locked';
 const LS_RETURN_URL = 'app_locked_return_url';
 const LS_TOKEN = 'app_token'; // cambia se usi una chiave diversa per il token
+const STUDIO_ROLE = 'studio_role'; // cambia se usi una chiave diversa per il token
 
 @Component({
   selector: 'app-sidebar',
@@ -15,6 +17,10 @@ export class SidebarComponent implements OnInit {
   isMobile = false;
   menuOpen = false;
   isCollapsed = false;
+  studioRole: StudioRole;
+  isDoctor: boolean = false;
+  isBackoffice: boolean = false;
+
   @Output() collapseChanged = new EventEmitter<boolean>();
 
   // stato selezionato dai query params (default 'active')
@@ -24,7 +30,22 @@ export class SidebarComponent implements OnInit {
   );
 
   // costruttore (aggiungi ActivatedRoute)
-  constructor(private router: Router, private route: ActivatedRoute) { }
+  constructor(private router: Router, private route: ActivatedRoute) {
+    this.studioRole = <StudioRole>localStorage.getItem(STUDIO_ROLE);
+    this.checkIfDoctor()
+    this.checkIfBackoffice()
+  }
+
+  checkIfDoctor() {
+    if (this.studioRole === 'DOCTOR') {
+      this.isDoctor = true;
+    }
+  }
+  checkIfBackoffice() {
+    if (this.studioRole === 'BACKOFFICE') {
+      this.isBackoffice = true;
+    }
+  }
   ngOnInit() {
     this.onResize();
   }
