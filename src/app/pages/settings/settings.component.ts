@@ -35,7 +35,6 @@ export class SettingsComponent {
   // Timeout di logout automatico
   autoLogoutOptions = [5, 10, 15, 20, 30, 45, 60, 90, 120];
   ngOnInit() {
-    console.log("user ", this.user());
     setTimeout(() => {
       if (typeof window.onbeforeunload === 'function') {
         console.warn('[Settings] Rilevato window.onbeforeunload attivo: questo provoca l’alert nativo.');
