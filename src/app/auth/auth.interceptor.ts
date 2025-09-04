@@ -7,6 +7,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 const LS_TOKEN = 'app_token';
+const STUDIO_ROLE = 'studio_role';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -15,8 +16,14 @@ export class AuthInterceptor implements HttpInterceptor {
         const isLogin = req.url.includes('/auth/login');
 
         const token = localStorage.getItem(LS_TOKEN);
+        const role = localStorage.getItem(STUDIO_ROLE);
         const authReq = (!isLogin && token)
-            ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+            ? req.clone({
+                setHeaders: {
+                    Authorization: `Bearer ${token}`,
+                    'studio_role': `${role}`,
+                }
+            })
             : req;
 
         return next.handle(authReq).pipe(
