@@ -6,6 +6,7 @@ import { Observable, map, tap, Subject } from 'rxjs';
 import { AUTH_BASE_URL } from 'src/app/config/api.config';
 import { PatientService } from 'src/app/service/patient.service';
 import { LoggedUserDto, LoginSimpleResponse } from '../model/auth.model';
+import { LoggedUserStore } from './logged-user.store';
 
 const LS_LOCKED = 'app_locked';
 const LS_RETURN_URL = 'app_locked_return_url';
@@ -45,10 +46,10 @@ export class AuthService {
     private router: Router,
     private http: HttpClient,
     private ngZone: NgZone,
-    private patientService: PatientService
+    private patientService: PatientService,
+    private loggedUserStore: LoggedUserStore
   ) {
     if (this.isAuthenticated()) {
-      // se l’utente è già autenticato (refresh pagina), parti con i fallback
       this.startAutoLogout();
     }
   }
@@ -57,7 +58,6 @@ export class AuthService {
   private configureAutoLogoutFromSettings(user: LoggedUserDto) {
     const us = user?.userSettings;
     if (!us) {
-      // fallback
       this.autoLogoutEnabled = true;
       this.effectiveIdleMs = this.DEFAULT_IDLE_TIMEOUT_MS;
       this.effectiveWarnMs = this.DEFAULT_WARNING_MS;
@@ -65,15 +65,12 @@ export class AuthService {
     }
 
     this.autoLogoutEnabled = us.enableAutoLogout !== false; // default: abilitato
-    // Converte minuti -> ms; se non valorizzato o <=0, usa fallback
     const mins = Number(us.autoLogoutMinutes);
     this.effectiveIdleMs = Number.isFinite(mins) && mins > 0 ? mins * 60_000 : this.DEFAULT_IDLE_TIMEOUT_MS;
 
-    // Avviso: 60s prima, oppure 10% della finestra se molto breve
     const tenPercent = Math.floor(this.effectiveIdleMs * 0.1);
     this.effectiveWarnMs = Math.max(Math.min(this.DEFAULT_WARNING_MS, tenPercent || this.DEFAULT_WARNING_MS), 5_000);
   }
-
   login(email: string, password: string): Observable<{ userId: string; studioRole: string; loggedUserDto: LoggedUserDto }> {
     const body = { email, password };
 
@@ -84,18 +81,23 @@ export class AuthService {
         loggedUserDto: resp.loggedUserDto
       })),
       tap(({ userId, studioRole, loggedUserDto }) => {
-        // salva metadati non sensibili
+        // ✅ mantieni solo metadati necessari al resto del servizio
         localStorage.setItem(LS_TOKEN, userId);
         localStorage.setItem(STUDIO_ROLE, studioRole);
-        localStorage.setItem(LOGGED_USER, JSON.stringify(loggedUserDto));
         localStorage.setItem(LS_USER_ID, userId);
 
+        // ❌ NON salviamo più l'intero loggedUser nel localStorage
+        // localStorage.setItem(LOGGED_USER, JSON.stringify(loggedUserDto));
+
+        // ✅ condividi loggedUser (incluse userSettings) in memoria per tutta l'app
+        this.loggedUserStore.setLoggedUser(loggedUserDto);
+
+        // inizializza contatori locali (per l'auto-logout già esistente)
         const now = Date.now();
         localStorage.setItem(LS_SESSION_START, String(now));
         localStorage.setItem(LS_LAST_ACTIVITY, String(now));
 
         this.configureAutoLogoutFromSettings(loggedUserDto);
-
         if (this.autoLogoutEnabled) {
           this.startAutoLogout();
         } else {
@@ -108,6 +110,8 @@ export class AuthService {
   /* ======== Logout ======== */
   logout(): void {
     this.stopAutoLogout();
+    this.loggedUserStore.clear();
+
     localStorage.removeItem(LS_TOKEN);
     localStorage.removeItem(LS_USER_ID);
     localStorage.removeItem(LS_LOCKED);

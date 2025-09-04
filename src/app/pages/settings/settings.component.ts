@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms'; // per [(ngModel)] nella modale 2FA
+import { LoggedUserStore } from 'src/app/auth/service/logged-user.store';
+import { inject, effect } from '@angular/core';
 
 type TabKey =
   | 'profile' | 'digitale' | 'agenda'
@@ -20,6 +22,10 @@ type ToggleKey =
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent {
+  private store = inject(LoggedUserStore);
+  user = this.store.user;
+  userSettings = this.store.userSettings;
+
   saving = false;
 
   // Modale conferma uscita
@@ -29,7 +35,7 @@ export class SettingsComponent {
   // Timeout di logout automatico
   autoLogoutOptions = [5, 10, 15, 20, 30, 45, 60, 90, 120];
   ngOnInit() {
-    // ...tuo codice...
+    console.log("user ", this.user());
     setTimeout(() => {
       if (typeof window.onbeforeunload === 'function') {
         console.warn('[Settings] Rilevato window.onbeforeunload attivo: questo provoca l’alert nativo.');
@@ -117,7 +123,51 @@ export class SettingsComponent {
     email: ''
   };
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder) {
+    effect(() => {
+      const u = this.store.user();              // LoggedUserDto | null
+      if (!u) return;
+
+      const us = u.userSettings;
+      const ss = u.studioSettings;
+
+      this.form.patchValue({
+        // --- Profilo ---
+        firstName: u.firstName ?? '',
+        lastName: u.lastName ?? '',
+        title: (u as any).title ?? '',
+        email: u.email ?? '',
+        locale: us?.locale ?? 'it-IT',
+        timeFormat: us?.timeFormat ?? '24h',
+
+        // --- Notifiche / Digitale ---
+        patientReminders: (us?.settings as any)?.patientReminders ?? this.form.value.patientReminders ?? true,
+        emailSignature: (us?.settings as any)?.emailSignature ?? this.form.value.emailSignature ?? '',
+        allowPatientPortal: (us?.settings as any)?.allowPatientPortal ?? this.form.value.allowPatientPortal ?? false,
+
+        // --- Agenda ---
+        // NB: nel tuo form sono stringhe: '30', '5' → manteniamole come stringhe
+        slotDuration: (us?.settings as any)?.slotDuration?.toString?.() ?? this.form.value.slotDuration ?? '30',
+        slotBuffer: (us?.settings as any)?.slotBuffer?.toString?.() ?? this.form.value.slotBuffer ?? '5',
+        workingDays: (us?.settings as any)?.workingDays ?? this.form.value.workingDays ?? ['1', '2', '3', '4', '5'],
+
+        // --- Studio/Fatturazione ---
+        clinicName: ss?.clinicName ?? '',
+        clinicPhone: ss?.clinicPhone ?? '',
+        clinicAddress: ss?.clinicAddress ?? '',
+        vatId: ss?.vatId ?? '',
+        iban: ss?.iban ?? '',
+
+        // --- Sicurezza ---
+        enable2fa: us?.enable2fa ?? this.form.value.enable2fa ?? false,
+        enableAutoLogout: us?.enableAutoLogout ?? this.form.value.enableAutoLogout ?? true,
+        autoLogoutMinutes: us?.autoLogoutMinutes ?? this.form.value.autoLogoutMinutes ?? 15,
+      }, { emitEvent: false });
+
+      // dopo il prefill il form non deve risultare "dirty"
+      this.form.markAsPristine();
+    });
+  }
 
   /* ---------- Tabs ---------- */
   setTab(key: TabKey) {
