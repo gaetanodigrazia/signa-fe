@@ -1,16 +1,15 @@
 // src/app/services/auth.service.ts
 import { Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map, tap, Subject, switchMap } from 'rxjs';
-import { API_BASE_URL, AUTH_BASE_URL } from 'src/app/config/api.config';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map, tap, Subject } from 'rxjs';
+import { AUTH_BASE_URL } from 'src/app/config/api.config';
 import { PatientService } from 'src/app/service/patient.service';
-import { StudioRole } from 'src/app/service/studiomembers.service';
 import { LoggedUserDto, LoginSimpleResponse } from '../model/auth.model';
 
 const LS_LOCKED = 'app_locked';
 const LS_RETURN_URL = 'app_locked_return_url';
-const LS_TOKEN = 'app_token';       // id utente salvato come "token" semplice (tua logica attuale)
+const LS_TOKEN = 'app_token';       // id utente salvato come "token" attualmente
 const LS_USER_ID = 'app_user_id';
 const LS_LAST_ACTIVITY = 'app_last_activity';
 const LS_LOGOUT_BROADCAST = 'app_logout_broadcast';
@@ -18,17 +17,19 @@ const LS_SESSION_START = 'app_session_start';
 const STUDIO_ROLE = 'studio_role';
 const LOGGED_USER = 'logged_user';
 
-
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // Base URL auth
   private readonly baseUrl = `${AUTH_BASE_URL}/auth`;
 
-  // === Auto-logout config ===
-  private readonly IDLE_TIMEOUT_MS = 15 * 60_000;  // 15 minuti inattività
-  private readonly WARNING_MS = 60_000;       // avviso 60s prima
-  // (opzionale) durata massima sessione; 0 = disabilitata
-  private readonly MAX_SESSION_MS = 0;
+  // === Default di fallback ===
+  private readonly DEFAULT_IDLE_TIMEOUT_MS = 15 * 60_000;  // 15 minuti
+  private readonly DEFAULT_WARNING_MS = 60_000;            // avviso 60s prima
+  private readonly MAX_SESSION_MS = 0;                     // disabilitato
+
+  // === Valori effettivi (configurati post-login) ===
+  private effectiveIdleMs = this.DEFAULT_IDLE_TIMEOUT_MS;
+  private effectiveWarnMs = this.DEFAULT_WARNING_MS;
+  private autoLogoutEnabled = true;
 
   /** Notifica (ms rimanenti) prima del logout automatico — collegala a un toast/modale se vuoi */
   readonly autoLogoutWarning$ = new Subject<number>();
@@ -46,14 +47,34 @@ export class AuthService {
     private ngZone: NgZone,
     private patientService: PatientService
   ) {
-    // se ricarichi con sessione già attiva, avvia auto-logout
     if (this.isAuthenticated()) {
+      // se l’utente è già autenticato (refresh pagina), parti con i fallback
       this.startAutoLogout();
     }
   }
 
-  /* ======== LOGIN reale ======== */
-  login(email: string, password: string): Observable<{ userId: string; studioRole: string, loggedUserDto: LoggedUserDto }> {
+  // === Configurazione post-login in base a userSettings ===
+  private configureAutoLogoutFromSettings(user: LoggedUserDto) {
+    const us = user?.userSettings;
+    if (!us) {
+      // fallback
+      this.autoLogoutEnabled = true;
+      this.effectiveIdleMs = this.DEFAULT_IDLE_TIMEOUT_MS;
+      this.effectiveWarnMs = this.DEFAULT_WARNING_MS;
+      return;
+    }
+
+    this.autoLogoutEnabled = us.enableAutoLogout !== false; // default: abilitato
+    // Converte minuti -> ms; se non valorizzato o <=0, usa fallback
+    const mins = Number(us.autoLogoutMinutes);
+    this.effectiveIdleMs = Number.isFinite(mins) && mins > 0 ? mins * 60_000 : this.DEFAULT_IDLE_TIMEOUT_MS;
+
+    // Avviso: 60s prima, oppure 10% della finestra se molto breve
+    const tenPercent = Math.floor(this.effectiveIdleMs * 0.1);
+    this.effectiveWarnMs = Math.max(Math.min(this.DEFAULT_WARNING_MS, tenPercent || this.DEFAULT_WARNING_MS), 5_000);
+  }
+
+  login(email: string, password: string): Observable<{ userId: string; studioRole: string; loggedUserDto: LoggedUserDto }> {
     const body = { email, password };
 
     return this.http.post<LoginSimpleResponse>(`${this.baseUrl}/login`, body).pipe(
@@ -63,7 +84,7 @@ export class AuthService {
         loggedUserDto: resp.loggedUserDto
       })),
       tap(({ userId, studioRole, loggedUserDto }) => {
-        // Salvo i dati nel localStorage
+        // salva metadati non sensibili
         localStorage.setItem(LS_TOKEN, userId);
         localStorage.setItem(STUDIO_ROLE, studioRole);
         localStorage.setItem(LOGGED_USER, JSON.stringify(loggedUserDto));
@@ -73,11 +94,16 @@ export class AuthService {
         localStorage.setItem(LS_SESSION_START, String(now));
         localStorage.setItem(LS_LAST_ACTIVITY, String(now));
 
-        this.startAutoLogout();
+        this.configureAutoLogoutFromSettings(loggedUserDto);
+
+        if (this.autoLogoutEnabled) {
+          this.startAutoLogout();
+        } else {
+          this.stopAutoLogout();
+        }
       })
     );
   }
-
 
   /* ======== Logout ======== */
   logout(): void {
@@ -88,30 +114,11 @@ export class AuthService {
     localStorage.removeItem(LS_RETURN_URL);
     localStorage.removeItem(LS_LAST_ACTIVITY);
     localStorage.removeItem(LS_SESSION_START);
-    // broadcast alle altre tab
-    localStorage.setItem(LS_LOGOUT_BROADCAST, String(Date.now()));
+    localStorage.setItem(LS_LOGOUT_BROADCAST, String(Date.now())); // broadcast alle altre tab
     this.router.navigateByUrl('/login');
   }
 
-  /* ======== Lock / Unlock ======== */
-  lock(): void {
-    localStorage.setItem(LS_LOCKED, 'true');
-    localStorage.setItem(LS_RETURN_URL, this.router.url || '/home');
-    this.router.navigateByUrl('/lock');
-  }
 
-  unlockSuccess(): void {
-    localStorage.removeItem(LS_LOCKED);
-    const returnUrl = localStorage.getItem(LS_RETURN_URL) || '/home';
-    localStorage.removeItem(LS_RETURN_URL);
-    this.router.navigateByUrl(returnUrl);
-  }
-
-  isLocked(): boolean {
-    return localStorage.getItem(LS_LOCKED) === 'true';
-  }
-
-  /* ======== Stato auth ======== */
   isAuthenticated(): boolean {
     return !!localStorage.getItem(LS_TOKEN);
   }
@@ -122,20 +129,16 @@ export class AuthService {
 
   // ====================== AUTO-LOGOUT (inattività + sync tra tab) ======================
 
-  /** Avvia i listener e i timer (idempotente) */
   startAutoLogout() {
-    if (this.started) return;
+    if (this.started || !this.autoLogoutEnabled) return;
     this.started = true;
 
-    // Listener attività utente
     ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'].forEach(evt =>
       window.addEventListener(evt, this.boundActivityHandler, { passive: true })
     );
 
-    // Listener storage (logout/attività da altre tab)
     window.addEventListener('storage', this.boundStorageHandler);
 
-    // init session start se mancante
     if (!localStorage.getItem(LS_SESSION_START)) {
       localStorage.setItem(LS_SESSION_START, String(Date.now()));
     }
@@ -146,7 +149,6 @@ export class AuthService {
     this.resetTimers();
   }
 
-  /** Ferma listener e timer (idempotente) */
   stopAutoLogout() {
     if (!this.started) return;
     this.started = false;
@@ -159,8 +161,8 @@ export class AuthService {
     this.clearTimers();
   }
 
-  /** Aggiorna attività (throttle ~1s) e resetta timer */
   private onActivity() {
+    if (!this.autoLogoutEnabled) return;
     const now = Date.now();
     const last = Number(localStorage.getItem(LS_LAST_ACTIVITY) || 0);
     if (now - last > 1000) {
@@ -169,31 +171,27 @@ export class AuthService {
     }
   }
 
-  /** Eventi cross-tab: logout/attività altrove */
   private onStorage(e: StorageEvent) {
-    // esci dalla zona per non causare change detection inutili
     this.ngZone.run(() => {
       if (e.key === LS_LOGOUT_BROADCAST && e.newValue) {
-        // logout avvenuto in un'altra tab → replica
         this.stopAutoLogout();
         this.router.navigateByUrl('/login');
-      } else if (e.key === LS_LAST_ACTIVITY && e.newValue) {
-        // attività in un'altra tab → resetta i timer locali
+      } else if (e.key === LS_LAST_ACTIVITY && e.newValue && this.autoLogoutEnabled) {
         this.resetTimers();
       }
     });
   }
 
-  /** Calcola il tempo residuo e programma avviso + logout */
   private resetTimers() {
     this.clearTimers();
+    if (!this.autoLogoutEnabled) return;
 
     const now = Date.now();
     const lastActivity = Number(localStorage.getItem(LS_LAST_ACTIVITY) || now);
     const sessionStart = Number(localStorage.getItem(LS_SESSION_START) || now);
 
     const idleElapsed = now - lastActivity;
-    const idleRemaining = Math.max(this.IDLE_TIMEOUT_MS - idleElapsed, 0);
+    const idleRemaining = Math.max(this.effectiveIdleMs - idleElapsed, 0);
 
     const sessionElapsed = now - sessionStart;
     const sessionRemaining = this.MAX_SESSION_MS > 0
@@ -201,14 +199,12 @@ export class AuthService {
       : Number.POSITIVE_INFINITY;
 
     const untilLogout = Math.min(idleRemaining, sessionRemaining);
-    const warnIn = Math.max(untilLogout - this.WARNING_MS, 0);
+    const warnIn = Math.max(untilLogout - this.effectiveWarnMs, 0);
 
-    // Avviso (pre-logout)
     this.warnTimer = window.setTimeout(() => {
-      this.autoLogoutWarning$.next(Math.min(this.WARNING_MS, untilLogout));
+      this.autoLogoutWarning$.next(Math.min(this.effectiveWarnMs, untilLogout));
     }, warnIn);
 
-    // Logout effettivo
     this.logoutTimer = window.setTimeout(() => {
       this.logout();
     }, untilLogout);
