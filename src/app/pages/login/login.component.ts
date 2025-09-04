@@ -22,17 +22,9 @@ export class LoginComponent {
     this.loading = true;
 
     this.auth.login(this.email, this.password).subscribe({
-      next: ({ userId, studioRole }) => {
+      next: ({ userId, studioRole, loggedUserDto }) => {
         this.loading = false;
-
-        // 👉 qui puoi già usare role se vuoi routing condizionale
-        if (studioRole === 'DOCTOR') {
-          this.router.navigateByUrl('/dashboard-doctor');
-        } else if (studioRole === 'BACKOFFICE') {
-          this.router.navigateByUrl('/dashboard-backoffice');
-        } else {
-          this.router.navigateByUrl('/dashboard');
-        }
+        this.router.navigateByUrl('/dashboard');
       },
       error: (err) => {
         this.loading = false;

@@ -6,7 +6,7 @@ import { Observable, map, tap, Subject, switchMap } from 'rxjs';
 import { API_BASE_URL, AUTH_BASE_URL } from 'src/app/config/api.config';
 import { PatientService } from 'src/app/service/patient.service';
 import { StudioRole } from 'src/app/service/studiomembers.service';
-import { LoginSimpleResponse } from '../model/auth.model';
+import { LoggedUserDto, LoginSimpleResponse } from '../model/auth.model';
 
 const LS_LOCKED = 'app_locked';
 const LS_RETURN_URL = 'app_locked_return_url';
@@ -16,6 +16,7 @@ const LS_LAST_ACTIVITY = 'app_last_activity';
 const LS_LOGOUT_BROADCAST = 'app_logout_broadcast';
 const LS_SESSION_START = 'app_session_start';
 const STUDIO_ROLE = 'studio_role';
+const LOGGED_USER = 'logged_user';
 
 
 @Injectable({ providedIn: 'root' })
@@ -52,18 +53,20 @@ export class AuthService {
   }
 
   /* ======== LOGIN reale ======== */
-  login(email: string, password: string): Observable<{ userId: string; studioRole: string }> {
+  login(email: string, password: string): Observable<{ userId: string; studioRole: string, loggedUserDto: LoggedUserDto }> {
     const body = { email, password };
 
     return this.http.post<LoginSimpleResponse>(`${this.baseUrl}/login`, body).pipe(
       map(resp => ({
         userId: resp.id,
-        studioRole: resp.studioRole
+        studioRole: resp.studioRole,
+        loggedUserDto: resp.loggedUserDto
       })),
-      tap(({ userId, studioRole }) => {
+      tap(({ userId, studioRole, loggedUserDto }) => {
         // Salvo i dati nel localStorage
         localStorage.setItem(LS_TOKEN, userId);
         localStorage.setItem(STUDIO_ROLE, studioRole);
+        localStorage.setItem(LOGGED_USER, JSON.stringify(loggedUserDto));
         localStorage.setItem(LS_USER_ID, userId);
 
         const now = Date.now();
