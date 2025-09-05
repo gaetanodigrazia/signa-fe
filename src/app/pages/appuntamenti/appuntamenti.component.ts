@@ -63,6 +63,8 @@ export class AppuntamentiComponent implements OnInit, OnDestroy {
     document.body.classList.remove('body--lock');
   }
 
+
+
   /** Chiudi modale con ESC anche se il focus non è dentro la modale */
   @HostListener('document:keydown.escape', ['$event'])
   onEsc(_evt: KeyboardEvent) {
@@ -302,5 +304,16 @@ export class AppuntamentiComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  createAppointmentForUser(patientId?: string | null) {
+    const stateBase = { create: true, date: new Date().toISOString() };
+    console.log("State base ", stateBase);
+
+    // altrimenti prefiltra col paziente
+    this.router.navigate(['/calendar'], {
+      state: { ...stateBase, patientId }
+    });
+  }
+
 
 }

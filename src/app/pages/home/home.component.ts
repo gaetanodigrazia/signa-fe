@@ -64,6 +64,16 @@ export class HomeComponent implements OnInit {
     this.loadKpis();
   }
 
+  createAppointment() {
+    this.router.navigate(['/calendar'], {
+      state: {
+        create: true,
+        // opzionale: preimposta una data/ora da “adesso”
+        date: new Date().toISOString()
+      }
+    });
+  }
+
   /* ===== helpers ===== */
   private todayRange(): { from: Date; to: Date } {
     const from = new Date();

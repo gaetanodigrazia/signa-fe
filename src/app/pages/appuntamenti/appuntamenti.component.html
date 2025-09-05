@@ -52,7 +52,8 @@
                         <td class="actions">
                             <button class="icon" title="Vedi dettagli" (click)="view(appt)">👁️</button>
                             <button class="icon" title="Modifica" (click)="openEdit(appt)">✏️</button>
-
+                            <button class="icon" title="Nuovo appuntamento"
+                                (click)="createAppointmentForUser(appt.patient?.id)">➕</button>
                             <button class="icon"
                                 *ngIf="appt?.id && (appt.status === 'BOOKED' || appt.status === 'CONFIRMED')"
                                 [routerLink]="['/evento-iniziato', appt.id]" [state]="{ appt: appt }" type="button">

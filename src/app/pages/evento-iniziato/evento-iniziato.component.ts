@@ -41,7 +41,6 @@ export class EventoIniziatoComponent {
 
     this.appt = navAppt ?? histAppt;
     // (facoltativo) debug:
-    // console.log('navAppt', navAppt, 'histAppt', histAppt);
   }
 
   ngOnInit() {
@@ -63,7 +62,6 @@ export class EventoIniziatoComponent {
 
   private initForm(appt: AppointmentDTO) {
     this.appt = appt;
-    console.log("APPT, ", appt)
     this.form.patchValue({
       studio: this.displayName(appt.studio),
       patient: appt.patient.firstname + " " + appt.patient.lastname,

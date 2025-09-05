@@ -2,6 +2,9 @@ import { Component, HostListener, Output, EventEmitter, OnInit } from '@angular/
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, distinctUntilChanged } from 'rxjs/operators';
 import { StudioRole } from 'src/app/service/studiomembers.service';
+import { inject, effect } from '@angular/core';
+import { LoggedUserStore } from 'src/app/auth/service/logged-user.store';
+import { PageKey } from 'src/app/auth/model/auth.model';
 
 const LS_LOCKED = 'app_locked';
 const LS_RETURN_URL = 'app_locked_return_url';
@@ -14,6 +17,13 @@ const STUDIO_ROLE = 'studio_role'; // cambia se usi una chiave diversa per il to
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent implements OnInit {
+  private store = inject(LoggedUserStore);
+  user = this.store.user;
+  allowedPages: PageKey[];
+  private allowedSet = new Set<PageKey>();
+
+  settingsPage: boolean = false;
+
   isMobile = false;
   menuOpen = false;
   isCollapsed = false;
@@ -32,8 +42,27 @@ export class SidebarComponent implements OnInit {
   // costruttore (aggiungi ActivatedRoute)
   constructor(private router: Router, private route: ActivatedRoute) {
     this.studioRole = <StudioRole>localStorage.getItem(STUDIO_ROLE);
-    this.checkIfDoctor()
-    this.checkIfBackoffice()
+    effect(() => {
+      const u = this.user(); // legge il signal
+      const pages = u?.permissions?.pages ?? [];
+      this.syncAllowed(pages);
+      this.settingsPage = this.can('SETTINGS');
+
+      // se il ruolo sta nello user, aggiorna anche questi flag in modo reattivo
+      const role = (u as any)?.role ?? this.studioRole;
+      this.isDoctor = role === 'DOCTOR';
+      this.isBackoffice = role === 'BACKOFFICE';
+    });
+  }
+  /** Aggiorna array e Set evitando ricreazioni inutili */
+  private syncAllowed(pages: PageKey[]) {
+    this.allowedPages = pages;
+    this.allowedSet = new Set<PageKey>(pages);
+  }
+
+  /** API comoda e veloce per il template */
+  can(page: PageKey): boolean {
+    return this.allowedSet.has(page);
   }
 
   checkIfDoctor() {

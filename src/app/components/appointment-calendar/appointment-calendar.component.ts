@@ -15,6 +15,7 @@ import { PatientService } from 'src/app/service/patient.service';
 import { AppointmentService } from 'src/app/service/appointment.service';
 import { Utils } from 'src/app/common/utilis';
 import { StudioMemberDto, StudioMembersService } from 'src/app/service/studiomembers.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-appointment-calendar',
@@ -22,6 +23,8 @@ import { StudioMemberDto, StudioMembersService } from 'src/app/service/studiomem
   styleUrls: ['./appointment-calendar.component.scss'],
 })
 export class AppointmentCalendarComponent implements OnInit {
+  private pendingCreate: { when: Date; patientId?: string } | null = null;
+
   /* ====== Dottori ====== */
   doctors: StudioMemberDto[] = [];
   doctorsLoading = false;
@@ -94,7 +97,9 @@ export class AppointmentCalendarComponent implements OnInit {
   constructor(
     private patientsSvc: PatientService,
     private apptSvc: AppointmentService,
-    private membersSvc: StudioMembersService
+    private membersSvc: StudioMembersService,
+    private router: Router,
+    private route: ActivatedRoute
   ) { }
 
 
@@ -105,6 +110,8 @@ export class AppointmentCalendarComponent implements OnInit {
     this.loadPatients();
     this.loadDoctors();
     this.fetchAppointmentsForVisibleRange();
+    this.handleRoutePrefill();
+
   }
 
   /* ===========================
@@ -140,7 +147,16 @@ export class AppointmentCalendarComponent implements OnInit {
    * =========================== */
   private loadPatients(): void {
     this.patientsSvc.findAll().subscribe({
-      next: (items) => (this.patients = items ?? []),
+      next: (items) => {
+        this.patients = items ?? [];
+
+        // ✨ se c'era una richiesta di apertura con prefill, apri ora
+        if (this.pendingCreate) {
+          const { when, patientId } = this.pendingCreate;
+          this.pendingCreate = null;
+          this.openCreateModal(when, patientId);
+        }
+      },
       error: (err) => {
         console.error('Errore nel recupero pazienti', err);
         this.patients = [];
@@ -248,6 +264,57 @@ export class AppointmentCalendarComponent implements OnInit {
     this.fetchAppointmentsForVisibleRange();
   }
 
+  private handleRoutePrefill() {
+    // Router state (prima scelta), altrimenti history.state
+    const nav = this.router.getCurrentNavigation();
+    const st: any = nav?.extras?.state || window.history.state;
+
+    // Anche i query param rimangono come fallback
+    const qp = this.route.snapshot.queryParamMap;
+
+    const shouldOpen =
+      (st && (st.create === true || st.new === true)) ||
+      (qp.get('new') === '1');
+
+    if (!shouldOpen) return;
+
+    // data/ora
+    const whenISO: string | null =
+      (typeof st?.date === 'string' && st.date) ? st.date :
+        qp.get('date');
+
+    const when = whenISO ? new Date(whenISO) : new Date();
+
+    // patientId SEMPRE string (niente Number(...))
+    const patientId: string | undefined =
+      (typeof st?.patientId === 'string' && st.patientId) ? st.patientId :
+        (qp.get('patientId') || undefined);
+
+    // porta il calendario sul giorno
+    this.viewDate = when;
+
+    // apri la modale con la firma unica
+    this.maybeOpenCreate(when, patientId);
+  }
+
+  private maybeOpenCreate(when: Date, patientId?: string) {
+    // Se NON c'è un paziente da precompilare, apri subito
+    if (!patientId) {
+      this.openCreateModal(when);
+      return;
+    }
+
+    // Se la lista pazienti è già pronta, apri subito prefillata
+    if (this.patients && this.patients.length > 0) {
+      this.openCreateModal(when, patientId);
+      return;
+    }
+
+    // Altrimenti: memorizza la richiesta e apri più tardi (quando i pazienti arrivano)
+    this.pendingCreate = { when, patientId };
+  }
+
+
   onViewChanged(): void { this.fetchAppointmentsForVisibleRange(); }
 
   goToday(): void { this.viewDate = new Date(); this.fetchAppointmentsForVisibleRange(); }
@@ -304,7 +371,7 @@ export class AppointmentCalendarComponent implements OnInit {
     this.modalVisible = true;
   }
 
-  openCreateModal(date: Date, patient?: { id: string }): void {
+  openCreateModal(date: Date, patientId?: string): void {
     this.editingRef = null;
     this.modalData = {
       title: '',
@@ -312,11 +379,12 @@ export class AppointmentCalendarComponent implements OnInit {
       startTime: Utils.formatTime(date),
       endTime: Utils.formatTime(new Date(date.getTime() + 30 * 60000)),
       date,
-      patientId: patient?.id ?? null,
+      patientId: patientId ?? null,   // <-- string | null (niente patient?.id)
     };
-    this.statusEdit = 'BOOKED'; // default
+    this.statusEdit = 'BOOKED';
     this.modalVisible = true;
   }
+
 
   closeModal(): void { this.modalVisible = false; this.editingRef = null; }
 
