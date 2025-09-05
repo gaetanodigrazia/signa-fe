@@ -16,16 +16,19 @@
     </header>
 
     <!-- Tabbar -->
-    <nav class="tabs" role="tablist" aria-label="Sezioni impostazioni">
-        <button *ngFor="let t of tabs; let i = index" class="tab" role="tab" [attr.aria-selected]="currentTab === t.key"
-            (click)="setTab(t.key)" type="button">
+    <nav #tabsBar class="tabs" role="tablist" aria-label="Sezioni impostazioni">
+        <button #tabBtn *ngFor="let t of tabs; let i = index" class="tab" role="tab"
+            [class.is-active]="currentTab === t.key" (click)="setTab(t.key)" type="button">
             <span class="tab__icon" aria-hidden="true">{{ t.icon }}</span>
             <span class="tab__label">{{ t.label }}</span>
             <span *ngIf="isTabDirty(t.key)" class="tab__dot" aria-hidden="true"></span>
         </button>
 
-        <span class="tabs__indicator" [style.transform]="indicatorTransform"></span>
+        <!-- 👇 usa pixel reali -->
+        <span class="tabs__indicator" [style.transform]="'translateX(' + indicatorLeft + 'px)'"
+            [style.width.px]="indicatorWidth"></span>
     </nav>
+
 
     <!-- Panels -->
     <form [formGroup]="form" class="panels">

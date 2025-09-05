@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms'; // per [(ngModel)] nella modale 2FA
 import { LoggedUserStore } from 'src/app/auth/service/logged-user.store';
@@ -25,6 +25,11 @@ export class SettingsComponent {
   private store = inject(LoggedUserStore);
   user = this.store.user;
   userSettings = this.store.userSettings;
+  @ViewChild('tabsBar') tabsBar!: ElementRef<HTMLElement>;
+  @ViewChildren('tabBtn') tabBtns!: QueryList<ElementRef<HTMLButtonElement>>;
+
+  indicatorLeft = 0;
+  indicatorWidth = 0;
 
 
   saving = false;
@@ -42,6 +47,44 @@ export class SettingsComponent {
       }
     });
   }
+
+  ngAfterViewInit() {
+    // quando i bottoni cambiano (ngFor) ricalcola
+    this.tabBtns.changes.subscribe(() => this.updateIndicator());
+
+    // primo layout: usa rAF e (se disponibile) attesa font
+    requestAnimationFrame(() => this.updateIndicator());
+    (document as any).fonts?.ready?.then?.(() => this.updateIndicator());
+  }
+
+  /* ---------- Tabs ---------- */
+  setTab(key: TabKey) {
+    this.currentTab = key;
+    this.cdr.detectChanges();   // assicura DOM aggiornato
+    this.updateIndicator();
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.updateIndicator();
+  }
+
+  private updateIndicator() {
+    if (!this.tabBtns?.length || !this.tabsBar) return;
+
+    const idx = this.tabs.findIndex(t => t.key === this.currentTab);
+    const btn = this.tabBtns.get(idx)?.nativeElement;
+    const bar = this.tabsBar.nativeElement;
+    if (!btn) return;
+
+    // misura robusta anche con padding/scroll
+    const b = btn.getBoundingClientRect();
+    const c = bar.getBoundingClientRect();
+
+    this.indicatorLeft = Math.round(b.left - c.left + bar.scrollLeft);
+    this.indicatorWidth = Math.round(b.width);
+  }
+
   tabs: { key: TabKey; label: string; icon: string }[] = [
     { key: 'profile', label: 'Profilo', icon: '👤' },
     { key: 'digitale', label: 'Digitale', icon: '🖥️' },
@@ -123,7 +166,7 @@ export class SettingsComponent {
     email: ''
   };
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private cdr: ChangeDetectorRef) {
     effect(() => {
       const u = this.store.user();              // LoggedUserDto | null
       if (!u) return;
@@ -167,19 +210,6 @@ export class SettingsComponent {
       // dopo il prefill il form non deve risultare "dirty"
       this.form.markAsPristine();
     });
-  }
-
-  /* ---------- Tabs ---------- */
-  setTab(key: TabKey) {
-    this.currentTab = key;
-    const idx = this.tabs.findIndex(t => t.key === key);
-    this.indicatorTransform = `translateX(${idx * 100}%)`;
-  }
-
-  @HostListener('window:resize')
-  onResize() {
-    const idx = this.tabs.findIndex(t => t.key === this.currentTab);
-    this.indicatorTransform = `translateX(${idx * 100}%)`;
   }
 
   /* ---------- Azioni pagina ---------- */

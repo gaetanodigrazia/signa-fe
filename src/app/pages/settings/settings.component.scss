@@ -550,3 +550,60 @@
     /* rosso acceso */
     margin-left: 6px;
 }
+
+.tabs {
+    position: relative;
+    display: flex;
+    flex-wrap: nowrap;
+    /* evita wrap che sfaserebbe l’indicatore */
+    gap: 8px;
+    padding: 0 8px;
+    border-bottom: 1px solid #e5e7eb;
+    overflow-x: auto;
+    /* se serve scroll orizzontale */
+}
+
+.tab {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    padding: 10px 12px;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    color: #374151;
+
+    &.is-active {
+        color: #111827;
+        font-weight: 700;
+    }
+
+    &:hover:not(.is-active) {
+        background: #f9fafb;
+    }
+
+    .tab__icon {
+        margin-right: 6px;
+    }
+
+    .tab__dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #f59e0b;
+        display: inline-block;
+        margin-left: 6px;
+    }
+}
+
+.tabs__indicator {
+    position: absolute;
+    bottom: -1px;
+    /* appoggiata sulla linea grigia */
+    height: 3px;
+    background: #2563eb;
+    border-radius: 2px 2px 0 0;
+    transform: translateX(0);
+    transition: transform .18s cubic-bezier(.2, .8, .2, 1),
+        width .18s cubic-bezier(.2, .8, .2, 1);
+    pointer-events: none;
+}
