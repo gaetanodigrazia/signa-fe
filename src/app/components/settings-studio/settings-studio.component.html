@@ -1,0 +1,112 @@
+<div class="home settings-page">
+
+    <header class="toolbar surface card">
+        <div class="left">
+            <h2>Impostazioni — Studio</h2>
+            <p class="subtitle">Configurazioni condivise</p>
+        </div>
+        <div class="right">
+            <button class="btn btn-outline" type="button" (click)="resetToLast()">Annulla</button>
+            <button class="btn btn-success" type="button" [disabled]="!form.dirty || saving || form.invalid"
+                (click)="save()">Salva</button>
+        </div>
+    </header>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="surface card" role="status" aria-live="polite">
+        Caricamento impostazioni di studio...
+    </div>
+
+    <!-- Form -->
+    <form *ngIf="!loading" [formGroup]="form" class="panels" autocomplete="off" novalidate>
+
+        <!-- Digitale -->
+        <section class="surface card" aria-labelledby="digital-title">
+            <header class="card-header">
+                <h3 id="digital-title" class="card__title">Digitale</h3>
+            </header>
+
+            <div class="form-grid">
+                <label class="field switch">
+                    <input type="checkbox" formControlName="patientReminders" />
+                    <span>Promemoria pazienti</span>
+                </label>
+
+                <label class="field switch">
+                    <input type="checkbox" formControlName="allowPatientPortal" />
+                    <span>Portale paziente</span>
+                </label>
+
+                <label class="field">
+                    <span>Firma email</span>
+                    <textarea rows="3" formControlName="emailSignature"></textarea>
+                </label>
+            </div>
+        </section>
+
+        <!-- Agenda -->
+        <section class="surface card" aria-labelledby="agenda-title">
+            <header class="card-header">
+                <h3 id="agenda-title" class="card__title">Agenda</h3>
+            </header>
+
+            <div class="form-grid">
+                <label class="field">
+                    <span>Durata slot</span>
+                    <select formControlName="slotDuration">
+                        <option value="20">20 min</option>
+                        <option value="30">30 min</option>
+                        <option value="45">45 min</option>
+                        <option value="60">60 min</option>
+                    </select>
+                </label>
+
+                <label class="field">
+                    <span>Buffer</span>
+                    <select formControlName="slotBuffer">
+                        <option value="0">Nessuno</option>
+                        <option value="5">5 min</option>
+                        <option value="10">10 min</option>
+                        <option value="15">15 min</option>
+                    </select>
+                </label>
+
+            </div>
+        </section>
+
+        <!-- Studio & Fatturazione -->
+        <section class="surface card" aria-labelledby="billing-title">
+            <header class="card-header">
+                <h3 id="billing-title" class="card__title">Studio &amp; Fatturazione</h3>
+            </header>
+
+            <div class="form-grid">
+                <label class="field">
+                    <span>Nome studio</span>
+                    <input type="text" formControlName="clinicName" />
+                </label>
+
+                <label class="field">
+                    <span>Telefono</span>
+                    <input type="tel" formControlName="clinicPhone" />
+                </label>
+
+                <label class="field">
+                    <span>Indirizzo</span>
+                    <input type="text" formControlName="clinicAddress" />
+                </label>
+
+                <label class="field">
+                    <span>P.IVA</span>
+                    <input type="text" formControlName="vatId" />
+                </label>
+
+                <label class="field">
+                    <span>IBAN</span>
+                    <input type="text" formControlName="iban" />
+                </label>
+            </div>
+        </section>
+
+    </form>
+</div>
