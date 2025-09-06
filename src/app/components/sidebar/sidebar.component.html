@@ -37,16 +37,16 @@
     </div>
 
     <!-- Gruppo: Appuntamenti (DESKTOP) -->
-    <div class="menu-group" [class.open]="appointmentsOpen" *ngIf="isBackoffice">
-      <button class="menu-parent" (click)="toggleAppointments()" [attr.aria-expanded]="appointmentsOpen"
+    <div class="menu-group" [class.open]="settingsOpen">
+      <button class="menu-parent" (click)="toggleAppointments()" [attr.aria-expanded]="settingsOpen"
         aria-controls="appointments-submenu">
         <span class="icon">📆</span>
         <span class="text" *ngIf="!isCollapsed">Appuntamenti</span>
-        <span class="chevron" *ngIf="!isCollapsed" [class.rot]="appointmentsOpen">▾</span>
+        <span class="chevron" *ngIf="!isCollapsed" [class.rot]="settingsOpen">▾</span>
       </button>
 
       <!-- Submenu visibile solo quando la sidebar non è collassata -->
-      <div id="appointments-submenu" class="submenu" *ngIf="appointmentsOpen && !isCollapsed">
+      <div id="appointments-submenu" class="submenu" *ngIf="settingsOpen && !isCollapsed">
         <a [routerLink]="['/calendar']" [class.active]="(section$ | async) === 'calendar'" (click)="closeSubmenus()">
           Calendario
         </a>
@@ -66,10 +66,28 @@
       <span class="icon">🏥​</span>
       <span class="text" *ngIf="!isCollapsed">Studio</span>
     </a>
-    <a routerLink="/settings">
-      <span class="icon">⚙️</span>
-      <span class="text" *ngIf="!isCollapsed">Settings</span>
-    </a>
+
+    <div class="menu-group" [class.open]="appointmentsOpen">
+      <button class="menu-parent" (click)="toggleAppointments()" [attr.aria-expanded]="appointmentsOpen"
+        aria-controls="appointments-submenu">
+        <span class="icon">⚙️</span>
+        <span class="text" *ngIf="!isCollapsed">Settings</span>
+        <span class="chevron" *ngIf="!isCollapsed" [class.rot]="appointmentsOpen">▾</span>
+      </button>
+
+      <!-- Submenu visibile solo quando la sidebar non è collassata -->
+      <div id="appointments-submenu" class="submenu" *ngIf="appointmentsOpen && !isCollapsed">
+        <a [routerLink]="['/settings/profile']" [class.active]="(section$ | async) === 'calendar'"
+          (click)="closeSubmenus()">
+          Profilo
+        </a>
+
+        <a [routerLink]="['/settings/studio']" [class.active]="(section$ | async) === 'appointments'"
+          (click)="closeSubmenus()">
+          Studio
+        </a>
+      </div>
+    </div>
 
   </nav>
   <!-- Bottoni in basso (DESKTOP) -->
@@ -123,8 +141,21 @@
 
 
     <a routerLink="/users" (click)="menuOpen = false">🏥​ Studio</a>
+    <div class="menu-group" [class.open]="settingsOpenMobile">
+      <button class="menu-parent" (click)="settingsOpenMobile = !settingsOpenMobile"
+        [attr.aria-expanded]="settingsOpenMobile" aria-controls="settings-submenu-m">
+        ⚙️ Settings
+        <span class="chevron" [class.rot]="appointmentsOpenMobile">▾</span>
+      </button>
 
-    <a routerLink="/settings" (click)="menuOpen = false">⚙️ Settings</a>
+      <div id="settings-submenu-m" class="submenu" *ngIf="settingsOpenMobile">
+        <a [routerLink]="['/settings/profile']" [class.active]="(section$ | async) === 'calendar'"
+          (click)="closeMobileMenu()">Profilo</a>
+
+        <a [routerLink]="['/settings/studio']" [class.active]="(section$ | async) === 'appointments'"
+          (click)="closeMobileMenu()">Studio</a>
+      </div>
+    </div>
   </nav>
   <!-- Bottoni in basso (MOBILE) -->
   <div class="sidebar-bottom">

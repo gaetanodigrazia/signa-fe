@@ -1,0 +1,77 @@
+<div class="home settings-page">
+    <!-- Toolbar in card bianca -->
+    <header class="surface card toolbar">
+        <div class="left">
+            <h2>Impostazioni — Profilo</h2>
+            <p class="subtitle">Preferenze personali</p>
+        </div>
+        <div class="right">
+            <button class="btn btn-outline" type="button" (click)="resetToInitial()">Annulla</button>
+            <button class="btn btn-success" type="button" [disabled]="!hasChanges || form.invalid || saving"
+                (click)="save()">Salva</button>
+        </div>
+    </header>
+
+    <!-- Loading (in card bianca) -->
+    <div *ngIf="loading" class="surface card" role="status" aria-live="polite">
+        Caricamento impostazioni...
+    </div>
+
+    <!-- Form -->
+    <form *ngIf="!loading" [formGroup]="form" class="panels" autocomplete="off" novalidate>
+
+        <!-- Preferenze (card bianca) -->
+        <section class="surface card" aria-labelledby="prefs-title">
+            <header class="card-header">
+                <h3 id="prefs-title" class="card__title">Preferenze</h3>
+            </header>
+
+            <div class="form-grid">
+                <label class="field">
+                    <span>Lingua</span>
+                    <select formControlName="locale">
+                        <option value="it-IT">Italiano</option>
+                        <option value="en-GB">English (UK)</option>
+                    </select>
+                </label>
+
+                <label class="field">
+                    <span>Formato ora</span>
+                    <select formControlName="timeFormat">
+                        <option value="24h">24 ore</option>
+                        <option value="12h">AM/PM</option>
+                    </select>
+                </label>
+            </div>
+        </section>
+
+        <!-- Sicurezza (card bianca) -->
+        <section class="surface card" aria-labelledby="security-title">
+            <header class="card-header">
+                <h3 id="security-title" class="card__title">Sicurezza</h3>
+            </header>
+
+            <div class="form-grid">
+                <label class="field switch">
+                    <input type="checkbox" formControlName="enable2fa" />
+                    <span>Autenticazione a due fattori (2FA)</span>
+                </label>
+
+                <label class="field switch">
+                    <input type="checkbox" formControlName="enableAutoLogout" />
+                    <span>Logout automatico</span>
+                </label>
+
+                <div class="row-setting">
+                    <div class="row-text">
+                        <strong>Minuti inattività</strong>
+                        <small>Disconnessione automatica dopo inattività</small>
+                    </div>
+                    <input class="logout-time" type="number" min="5" max="120" step="5"
+                        formControlName="autoLogoutMinutes" [disabled]="!form.get('enableAutoLogout')?.value" />
+                </div>
+            </div>
+        </section>
+
+    </form>
+</div>

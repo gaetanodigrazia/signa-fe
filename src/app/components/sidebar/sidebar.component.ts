@@ -28,8 +28,7 @@ export class SidebarComponent implements OnInit {
   menuOpen = false;
   isCollapsed = false;
   studioRole: StudioRole;
-  isDoctor: boolean = false;
-  isBackoffice: boolean = false;
+
 
   @Output() collapseChanged = new EventEmitter<boolean>();
 
@@ -50,8 +49,6 @@ export class SidebarComponent implements OnInit {
 
       // se il ruolo sta nello user, aggiorna anche questi flag in modo reattivo
       const role = (u as any)?.role ?? this.studioRole;
-      this.isDoctor = role === 'DOCTOR';
-      this.isBackoffice = role === 'BACKOFFICE';
     });
   }
   /** Aggiorna array e Set evitando ricreazioni inutili */
@@ -65,16 +62,7 @@ export class SidebarComponent implements OnInit {
     return this.allowedSet.has(page);
   }
 
-  checkIfDoctor() {
-    if (this.studioRole === 'DOCTOR') {
-      this.isDoctor = true;
-    }
-  }
-  checkIfBackoffice() {
-    if (this.studioRole === 'BACKOFFICE') {
-      this.isBackoffice = true;
-    }
-  }
+
   ngOnInit() {
     this.onResize();
   }
@@ -154,6 +142,13 @@ export class SidebarComponent implements OnInit {
     this.appointmentsOpen = !this.appointmentsOpen;
   }
 
+  // stato submenu
+  settingsOpen = false;
+  settingsOpenMobile = false;
+
+  toggleSettings(): void {
+    this.settingsOpen = !this.settingsOpen;
+  }
   // se già hai closeSubmenus(), assicurati che chiuda anche Appuntamenti
   closeSubmenus(): void {
     this.patientsOpen = false;

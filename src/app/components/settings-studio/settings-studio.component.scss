@@ -1,0 +1,157 @@
+/* Card bianca locale (se gli stili globali non arrivano qui) */
+.surface.card {
+    background: #fff;
+    border: 1px solid var(--card-bd, #e5eaf3);
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(17, 24, 39, .06);
+    padding: 14px;
+}
+
+/* Pagina e toolbar */
+.settings-page {
+    display: grid;
+    gap: 16px;
+    padding: 16px;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.toolbar .subtitle {
+    margin: 0;
+    color: var(--muted, #6b7280);
+}
+
+/* Griglia a colonna */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.field {
+    display: grid;
+    gap: 6px;
+}
+
+.field>span {
+    font-size: .95rem;
+    color: var(--muted, #6b7280);
+    font-weight: 600;
+}
+
+/* Controlli coerenti */
+.settings-page input[type="text"],
+.settings-page input[type="tel"],
+.settings-page textarea,
+.settings-page select {
+    box-sizing: border-box;
+    width: 100%;
+    font-size: 1rem;
+    color: var(--text, #111827);
+    background: #fff;
+    border: 1px solid var(--card-bd, #cfd6e3);
+    border-radius: 12px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.settings-page input[type="text"],
+.settings-page input[type="tel"],
+.settings-page select {
+    height: 44px;
+}
+
+.settings-page textarea {
+    min-height: 96px;
+    resize: vertical;
+}
+
+.settings-page input:focus,
+.settings-page textarea:focus,
+.settings-page select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .16);
+}
+
+/* Select caret */
+.settings-page select:not([multiple]) {
+    appearance: none;
+    background-image:
+        linear-gradient(45deg, transparent 50%, #6b7280 50%),
+        linear-gradient(135deg, #6b7280 50%, transparent 50%),
+        linear-gradient(to right, transparent, transparent);
+    background-position:
+        calc(100% - 22px) 50%, calc(100% - 16px) 50%, 100% 0;
+    background-size: 6px 6px, 6px 6px, 2.5em 100%;
+    background-repeat: no-repeat;
+    padding-right: 48px;
+}
+
+/* Multiple select: comoda, no overflow */
+.settings-page select[multiple] {
+    height: auto;
+    min-height: 180px;
+}
+
+/* Checkbox allineate */
+.switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Bottoni come nel resto dell’app */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 14px;
+    font-weight: 600;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform .05s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.btn-outline {
+    background: #fff;
+    border-color: #cfd6e3;
+    color: #111827;
+}
+
+.btn-outline:hover {
+    background: #f6f8ff;
+}
+
+.btn-success {
+    background: #16a34a;
+    color: #fff;
+    border-color: #148f41;
+    box-shadow: 0 2px 6px rgba(22, 163, 74, .25);
+}
+
+.btn-success:hover {
+    background: #15803d;
+}
+
+.btn-success:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+
+
+.settings-page::after {
+    content: "";
+    display: block;
+    height: 70px;
+}

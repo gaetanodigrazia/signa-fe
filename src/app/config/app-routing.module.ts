@@ -7,10 +7,11 @@ import { PatientsComponent } from '../pages/patients/patients.component';
 import { UsersComponent } from '../pages/users/users.component';
 import { ArchivioComponent } from '../pages/archivio/archivio.component';
 import { AppointmentCalendarComponent } from '../components/appointment-calendar/appointment-calendar.component';
-import { SettingsComponent } from '../pages/settings/settings.component';
-import { CanDeactivateSettingsGuard } from './can-deactivate-settings.guard';
 import { AppuntamentiComponent } from '../pages/appuntamenti/appuntamenti.component';
 import { EventoIniziatoComponent } from '../pages/evento-iniziato/evento-iniziato.component';
+import { SettingsProfileComponent } from '../components/settings-profile/settings-profile.component';
+import { SettingsStudioComponent } from '../components/settings-studio/settings-studio.component';
+import { CanDeactivateSettingsProfileGuard } from './can-deactivate-settings-profile.guard';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -30,8 +31,11 @@ export const routes: Routes = [
     { path: 'users', component: UsersComponent, canActivate: [authGuard] },
 
     {
-        path: 'settings',
-        canActivate: [authGuard], component: SettingsComponent, canDeactivate: [CanDeactivateSettingsGuard]
+        path: 'settings', canActivate: [authGuard],
+        children: [
+            { path: 'profile', component: SettingsProfileComponent, canDeactivate: [CanDeactivateSettingsProfileGuard] },
+            { path: 'studio', component: SettingsStudioComponent },
+        ]
     },
 
 
