@@ -153,6 +153,7 @@ export class SidebarComponent implements OnInit {
   closeSubmenus(): void {
     this.patientsOpen = false;
     this.appointmentsOpen = false;
+    this.settingsOpen = false;
     // ... lascia invariato il resto se ne hai altri
   }
 
