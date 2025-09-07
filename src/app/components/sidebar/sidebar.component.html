@@ -13,10 +13,12 @@
   </button>
 
   <nav>
-    <a routerLink="/home">
+    <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
       <span class="icon">🏠</span>
       <span class="text" *ngIf="!isCollapsed">Home</span>
     </a>
+
+    <!-- Gruppo: Pazienti (DESKTOP) -->
     <div class="menu-group" [class.open]="patientsOpen">
       <button class="menu-parent" (click)="togglePatients()" [attr.aria-expanded]="patientsOpen"
         aria-controls="patients-submenu">
@@ -33,83 +35,77 @@
         <a [routerLink]="['/patients']" [queryParams]="{ status: 'inactive' }" queryParamsHandling="merge"
           [class.active]="(status$ | async) === 'inactive'" (click)="closeSubmenus()">Disattivi</a>
       </div>
-
     </div>
 
     <!-- Gruppo: Appuntamenti (DESKTOP) -->
-    <div class="menu-group" [class.open]="settingsOpen">
-      <button class="menu-parent" (click)="toggleAppointments()" [attr.aria-expanded]="settingsOpen"
-        aria-controls="appointments-submenu">
-        <span class="icon">📆</span>
-        <span class="text" *ngIf="!isCollapsed">Appuntamenti</span>
-        <span class="chevron" *ngIf="!isCollapsed" [class.rot]="settingsOpen">▾</span>
-      </button>
-
-      <!-- Submenu visibile solo quando la sidebar non è collassata -->
-      <div id="appointments-submenu" class="submenu" *ngIf="settingsOpen && !isCollapsed">
-        <a [routerLink]="['/calendar']" [class.active]="(section$ | async) === 'calendar'" (click)="closeSubmenus()">
-          Calendario
-        </a>
-
-        <a [routerLink]="['/appointments']" [class.active]="(section$ | async) === 'appointments'"
-          (click)="closeSubmenus()">
-          Lista appuntamenti
-        </a>
-      </div>
-    </div>
-
-    <a routerLink="/archive">
-      <span class="icon">🗃️​</span>
-      <span class="text" *ngIf="!isCollapsed">​Archivio</span>
-    </a>
-    <a routerLink="/users">
-      <span class="icon">🏥​</span>
-      <span class="text" *ngIf="!isCollapsed">Studio</span>
-    </a>
-
     <div class="menu-group" [class.open]="appointmentsOpen">
       <button class="menu-parent" (click)="toggleAppointments()" [attr.aria-expanded]="appointmentsOpen"
         aria-controls="appointments-submenu">
-        <span class="icon">⚙️</span>
-        <span class="text" *ngIf="!isCollapsed">Settings</span>
+        <span class="icon">📆</span>
+        <span class="text" *ngIf="!isCollapsed">Appuntamenti</span>
         <span class="chevron" *ngIf="!isCollapsed" [class.rot]="appointmentsOpen">▾</span>
       </button>
 
       <!-- Submenu visibile solo quando la sidebar non è collassata -->
       <div id="appointments-submenu" class="submenu" *ngIf="appointmentsOpen && !isCollapsed">
-        <a [routerLink]="['/settings/profile']" [class.active]="(section$ | async) === 'calendar'"
-          (click)="closeSubmenus()">
-          Profilo
-        </a>
+        <a routerLink="/calendar" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeSubmenus()">Calendario</a>
 
-        <a [routerLink]="['/settings/studio']" [class.active]="(section$ | async) === 'appointments'"
-          (click)="closeSubmenus()">
-          Studio
-        </a>
+        <a routerLink="/appointments" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeSubmenus()">Lista appuntamenti</a>
       </div>
     </div>
 
+    <a routerLink="/archive" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <span class="icon">🗃️​</span>
+      <span class="text" *ngIf="!isCollapsed">​Archivio</span>
+    </a>
+
+    <a routerLink="/users" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <span class="icon">🏥​</span>
+      <span class="text" *ngIf="!isCollapsed">Studio</span>
+    </a>
+
+    <!-- Gruppo: Settings (DESKTOP) -->
+    <div class="menu-group" [class.open]="settingsOpen">
+      <button class="menu-parent" (click)="toggleSettings()" [attr.aria-expanded]="settingsOpen"
+        aria-controls="settings-submenu">
+        <span class="icon">⚙️</span>
+        <span class="text" *ngIf="!isCollapsed">Settings</span>
+        <span class="chevron" *ngIf="!isCollapsed" [class.rot]="settingsOpen">▾</span>
+      </button>
+
+      <div id="settings-submenu" class="submenu" *ngIf="settingsOpen && !isCollapsed">
+        <a routerLink="/settings/profile" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeSubmenus()">Profilo</a>
+
+        <a routerLink="/settings/studio" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeSubmenus()">Studio</a>
+      </div>
+    </div>
   </nav>
+
   <!-- Bottoni in basso (DESKTOP) -->
   <div class="sidebar-bottom">
     <button class="logout-btn tip" (click)="logout()" title="Logout" aria-label="Logout">
       <span class="icon" aria-hidden="true">🚪</span>
       <span class="text" *ngIf="!isCollapsed">Logout</span>
     </button>
-
   </div>
-
 </aside>
-
 
 <!-- SIDEBAR MOBILE -->
 <aside *ngIf="isMobile && menuOpen" class="sidebar mobile open">
   <nav>
-    <a routerLink="/home" (click)="menuOpen = false">🏠 Home</a>
+    <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+      (click)="menuOpen = false">🏠 Home</a>
+
+    <!-- Gruppo: Pazienti (MOBILE) -->
     <div class="menu-group" [class.open]="patientsOpenMobile">
       <button class="menu-parent" (click)="patientsOpenMobile = !patientsOpenMobile"
         [attr.aria-expanded]="patientsOpenMobile" aria-controls="patients-submenu-m">
-        👥 Pazienti <span class="chevron" [class.rot]="patientsOpenMobile">▾</span>
+        👥 Pazienti
+        <span class="chevron" [class.rot]="patientsOpenMobile">▾</span>
       </button>
 
       <div id="patients-submenu-m" class="submenu" *ngIf="patientsOpenMobile">
@@ -119,8 +115,8 @@
         <a [routerLink]="['/patients']" [queryParams]="{ status: 'inactive' }" queryParamsHandling="merge"
           [class.active]="(status$ | async) === 'inactive'" (click)="closeMobileMenu()">Disattivi</a>
       </div>
-
     </div>
+
     <!-- Gruppo: Appuntamenti (MOBILE) -->
     <div class="menu-group" [class.open]="appointmentsOpenMobile">
       <button class="menu-parent" (click)="appointmentsOpenMobile = !appointmentsOpenMobile"
@@ -130,40 +126,43 @@
       </button>
 
       <div id="appointments-submenu-m" class="submenu" *ngIf="appointmentsOpenMobile">
-        <a [routerLink]="['/calendar']" [class.active]="(section$ | async) === 'calendar'"
+        <a routerLink="/calendar" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
           (click)="closeMobileMenu()">Calendario</a>
 
-        <a [routerLink]="['/appointments']" [class.active]="(section$ | async) === 'appointments'"
+        <a routerLink="/appointments" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
           (click)="closeMobileMenu()">Lista appuntamenti</a>
       </div>
     </div>
-    <a routerLink="/archive" (click)="menuOpen = false">🗃️​ Archivio</a>
 
+    <a routerLink="/archive" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+      (click)="menuOpen = false">🗃️​ Archivio</a>
 
-    <a routerLink="/users" (click)="menuOpen = false">🏥​ Studio</a>
+    <a routerLink="/users" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+      (click)="menuOpen = false">🏥​ Studio</a>
+
+    <!-- Gruppo: Settings (MOBILE) -->
     <div class="menu-group" [class.open]="settingsOpenMobile">
       <button class="menu-parent" (click)="settingsOpenMobile = !settingsOpenMobile"
         [attr.aria-expanded]="settingsOpenMobile" aria-controls="settings-submenu-m">
         ⚙️ Settings
-        <span class="chevron" [class.rot]="appointmentsOpenMobile">▾</span>
+        <span class="chevron" [class.rot]="settingsOpenMobile">▾</span>
       </button>
 
       <div id="settings-submenu-m" class="submenu" *ngIf="settingsOpenMobile">
-        <a [routerLink]="['/settings/profile']" [class.active]="(section$ | async) === 'calendar'"
+        <a routerLink="/settings/profile" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
           (click)="closeMobileMenu()">Profilo</a>
 
-        <a [routerLink]="['/settings/studio']" [class.active]="(section$ | async) === 'appointments'"
+        <a routerLink="/settings/studio" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
           (click)="closeMobileMenu()">Studio</a>
       </div>
     </div>
   </nav>
+
   <!-- Bottoni in basso (MOBILE) -->
   <div class="sidebar-bottom">
     <button class="logout-btn tip" (click)="logout()" title="Logout" aria-label="Logout">
       <span class="icon" aria-hidden="true">🚪</span>
       <span class="text" *ngIf="!isCollapsed">Logout</span>
     </button>
-
   </div>
-
 </aside>
