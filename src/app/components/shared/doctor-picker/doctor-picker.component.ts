@@ -17,7 +17,9 @@ export class DoctorPickerComponent implements OnChanges {
   @Input() placeholder = 'Seleziona dottore…';
   @Input() showAdd = false;
   @Input() disabled = false;
-  @Input() model: string | null = null;                  // <-- StudioMemberDto.id
+
+  // 🔧 Tratta SEMPRE model come user.id (non StudioMemberDto.id)
+  @Input() model: string | null = null;                  // <-- user.id
   @Output() modelChange = new EventEmitter<string | null>();
   @Output() addRequested = new EventEmitter<void>();
 
@@ -34,7 +36,11 @@ export class DoctorPickerComponent implements OnChanges {
 
   /* ==== Lifecycle ==== */
   ngOnChanges(ch: SimpleChanges): void {
-    if (ch['doctors']) this.recomputeResults(this.search);
+    if (ch['doctors']) {
+      this.recomputeResults(this.search);
+      // 🔧 quando cambia la lista, prova a riallineare l'input dal model
+      this.syncInputWithModel();
+    }
     if (ch['model']) this.syncInputWithModel();
     this.cdr.markForCheck();
   }
@@ -64,10 +70,10 @@ export class DoctorPickerComponent implements OnChanges {
   requestAdd(): void { if (!this.disabled) this.addRequested.emit(); }
 
   pick(d: StudioMemberDto): void {
-    const id = d?.user?.id ?? null;
+    const id = d?.user?.id ?? null;           // <-- user.id
     this.model = id;
     this.modelChange.emit(id);
-    this.search = this.labelOf(d);
+    this.search = this.labelOf(d);            // mostra subito il nome
     this.listOpen = false;
     this.cdr.markForCheck();
   }
@@ -79,9 +85,10 @@ export class DoctorPickerComponent implements OnChanges {
     let next = base;
     if (s) {
       next = base.filter(m => {
-        const fn = m.user?.firstName?.toLowerCase() || '';
-        const ln = m.user?.lastName?.toLowerCase() || '';
-        const em = m.user?.email?.toLowerCase() || '';
+        const u: any = m.user || {};
+        const fn = (u.firstName ?? u.firstname ?? '').toLowerCase();
+        const ln = (u.lastName ?? u.lastname ?? '').toLowerCase();
+        const em = (u.email ?? '').toLowerCase();
         return fn.includes(s) || ln.includes(s) || em.includes(s);
       });
     }
@@ -91,13 +98,18 @@ export class DoctorPickerComponent implements OnChanges {
   }
 
   private syncInputWithModel(): void {
-    const d = this.doctors?.find(x => x.id === this.model);
+    // 🔧 cerca per user.id (fallback a member.id per retro-compatibilità)
+    const d = this.doctors?.find(x => x.user?.id === this.model || x.id === this.model);
     this.search = d ? this.labelOf(d) : '';
+    this.cdr.markForCheck();
   }
 
   private labelOf(d: StudioMemberDto): string {
-    const full = [d.user?.firstName, d.user?.lastName].filter(Boolean).join(' ').trim();
-    return full || d.user?.email || '—';
+    const u: any = d.user || {};
+    const first = u.firstName ?? u.firstname ?? '';
+    const last = u.lastName ?? u.lastname ?? '';
+    const full = [first, last].filter(Boolean).join(' ').trim();
+    return full || u.email || '—';
   }
 
   private recomputeListPosition(): void {
