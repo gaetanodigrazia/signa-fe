@@ -37,7 +37,6 @@ export class AppuntamentiComponent implements OnInit, OnDestroy {
 
   private sub?: Subscription;
 
-  // riferimento al bottone "Chiudi" nella modale per focus
   @ViewChild('closeBtn') closeBtn?: ElementRef<HTMLButtonElement>;
 
   constructor(
@@ -45,12 +44,13 @@ export class AppuntamentiComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router
   ) {
-    // Initialize dates for a 1-month range
     const today = new Date();
-    this.endDate = today.toISOString().slice(0, 10);
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(today.getDate() - 30);
-    this.startDate = thirtyDaysAgo.toISOString().slice(0, 10);
+    const in7Days = new Date(today);
+    in7Days.setDate(today.getDate() + 7);
+
+
+    this.startDate = today.toISOString().slice(0, 10);
+    this.endDate = in7Days.toISOString().slice(0, 10);
   }
 
   ngOnInit(): void {
