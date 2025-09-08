@@ -1,5 +1,5 @@
 // src/app/app.component.ts
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { AuthService } from './auth/service/auth.service';
@@ -20,7 +20,6 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(public auth: AuthService) { }
 
   ngOnInit(): void {
-    // (Opzionale) avviso auto-logout se lo usi
     this.warnSub = this.auth.autoLogoutWarning$?.subscribe(msLeft => {
       console.warn(`Logout automatico tra ${Math.ceil(msLeft / 1000)}s`);
     });
@@ -33,5 +32,15 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onSidebarCollapseChange(collapsed: boolean) {
     this.sidebarCollapsed = collapsed;
+  }
+
+  @HostListener('window:unload', ['$event'])
+  unloadHandler(event) {
+    this.auth.logout();
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  beforeUnloadHandler(event) {
+    this.auth.logout();
   }
 }
