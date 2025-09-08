@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -18,6 +18,10 @@ import { ErrorModalComponent } from './components/shared/error-modal/error-modal
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { PatientPickerComponent } from './components/shared/patient-picker/patient-picker.component';
 import { DoctorPickerComponent } from './components/shared/doctor-picker/doctor-picker.component';
+import { GlobalErrorHandler } from './exception/global-error-handler';
+import { HttpLoadingInterceptor } from './interceptor/http-loading.interceptor';
+import { MatDialogModule } from '@angular/material/dialog';
+import { LoadingDialogComponent } from './loading/loading-dialog.component';
 
 
 
@@ -28,7 +32,9 @@ import { DoctorPickerComponent } from './components/shared/doctor-picker/doctor-
     AppointmentCalendarComponent,
     LoginComponent,
     PatientPickerComponent,
-    DoctorPickerComponent],
+    DoctorPickerComponent,
+    LoadingDialogComponent
+  ],
   imports: [
     ErrorModalComponent,
     BrowserModule,
@@ -41,8 +47,7 @@ import { DoctorPickerComponent } from './components/shared/doctor-picker/doctor-
       useFactory: adapterFactory,
     }),
     FormsModule,
-    HttpClientModule
-  ],
+    HttpClientModule],
   exports: [
     AppointmentCalendarComponent
   ],
@@ -50,6 +55,9 @@ import { DoctorPickerComponent } from './components/shared/doctor-picker/doctor-
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
+    { provide: HTTP_INTERCEPTORS, useClass: HttpLoadingInterceptor, multi: true },
+
   ]
 })
 export class AppModule { }
