@@ -59,6 +59,10 @@
                                 [routerLink]="['/evento-iniziato', appt.id]" [state]="{ appt: appt }" type="button">
                                 ▶️
                             </button>
+
+                            <!-- ⬇️ dentro la <td class="actions"> ... -->
+                            <button class="icon" title="Cambia stato" (click)="openStatus(appt)">🔁</button>
+
                         </td>
                     </tr>
                 </tbody>
@@ -141,14 +145,6 @@
             <label>Fine</label>
             <input type="time" [(ngModel)]="editModel.endTime" name="endTime" required>
 
-            <label>Stato</label>
-            <select [(ngModel)]="editModel.status" name="status">
-                <option value="BOOKED">Prenotato</option>
-                <option value="CONFIRMED">Confermato</option>
-                <option value="CLOSED">Concluso</option>
-                <option value="CANCELLED">Cancellato</option>
-            </select>
-
             <label>Motivo</label>
             <input type="text" [(ngModel)]="editModel.reason" name="reason" placeholder="Motivo (titolo)">
 
@@ -160,6 +156,47 @@
             <button class="btn" type="button" (click)="closeEdit()">Annulla</button>
             <button class="btn-outline btn-danger" type="button" (click)="deleteEditing()">Elimina</button>
             <button class="btn-primary" type="button" (click)="saveEdit()">Salva</button>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Modale: Cambia stato -->
+<div class="modal-overlay" *ngIf="statusVisible" (click)="closeStatus()" role="dialog" aria-modal="true"
+    aria-labelledby="status-dialog-title">
+    <div class="modal" (click)="$event.stopPropagation()" (keydown.escape)="closeStatus()" tabindex="-1">
+        <h3 id="status-dialog-title">Cambia stato appuntamento</h3>
+
+        <form class="form-grid" (submit)="$event.preventDefault(); saveStatusChange()">
+            <label>
+                <span>Nuovo stato</span>
+                <select [(ngModel)]="statusModel.status" name="newStatus" required>
+                    <option value="BOOKED">Prenotato</option>
+                    <option value="CONFIRMED">Confermato</option>
+                    <option value="CLOSED">Concluso</option>
+                    <option value="CANCELLED">Cancellato</option>
+                </select>
+            </label>
+
+            <!-- campo esito obbligatorio solo se si passa a CLOSED -->
+            <ng-container *ngIf="statusModel.status === 'CLOSED'">
+                <label style="grid-column: 1 / -1">
+                    <span>Esito (obbligatorio per “Concluso”)</span>
+                    <textarea rows="4" [(ngModel)]="statusModel.result" name="result" placeholder="Inserisci l’esito..."
+                        required></textarea>
+                </label>
+            </ng-container>
+        </form>
+
+        <div class="modal-actions">
+            <button class="btn" type="button" (click)="closeStatus()">Annulla</button>
+            <button class="btn-primary" type="button"
+                [disabled]="savingStatus || (statusModel.status==='CLOSED' && !statusModel.result?.trim())"
+                (click)="saveStatusChange()">
+                <span *ngIf="!savingStatus">Salva</span>
+                <span *ngIf="savingStatus">Salvataggio…</span>
+            </button>
         </div>
     </div>
 </div>

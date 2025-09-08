@@ -1,0 +1,98 @@
+<div class="page">
+    <div class="surface header">
+        <div>
+            <h2>Dettagli appuntamento</h2>
+            <p class="muted" *ngIf="appt as v">
+                {{ v.startAt | date:'d MMMM y' }} · {{ v.startAt | date:'HH:mm' }}–{{ v.endAt | date:'HH:mm' }}
+            </p>
+        </div>
+        <div class="actions">
+            <button class="btn" type="button" (click)="back()">← Torna</button>
+            <button class="btn-outline" type="button" routerLink="/calendar">Vai al calendario</button>
+            <button class="btn-success" type="button"
+                *ngIf="appt?.id && (appt.status==='BOOKED' || appt.status==='CONFIRMED')" (click)="startVisit()">▶️
+                Inizia visita</button>
+        </div>
+    </div>
+
+    <div class="grid">
+        <!-- Colonna dettagli -->
+        <section class="surface card">
+            <h3 class="card__title">Dati</h3>
+
+            <div *ngIf="loading" class="skeleton">Caricamento…</div>
+            <div *ngIf="error" class="error">{{ error }}</div>
+
+            <div *ngIf="!loading && appt as v" class="details">
+                <div><strong>Paziente:</strong> {{ (v.patient?.firstname || '') + ' ' + (v.patient?.lastname || '') ||
+                    '—' }}</div>
+                <div><strong>Dottore:</strong> {{ (v.doctor?.user?.firstName || '') + ' ' + (v.doctor?.user?.lastName ||
+                    '') || '—' }}</div>
+                <div><strong>Studio:</strong> {{ v.studio?.name || '—' }}</div>
+                <div><strong>Tipo:</strong> {{ v.kind || '—' }}</div>
+                <div>
+                    <strong>Stato:</strong>
+                    <span class="badge" [class.badge--booked]="v.status==='BOOKED'"
+                        [class.badge--confirmed]="v.status==='CONFIRMED'" [class.badge--closed]="v.status==='CLOSED'"
+                        [class.badge--cancelled]="v.status==='CANCELLED'">
+                        {{ v.status }}
+                    </span>
+                </div>
+                <div><strong>Motivo:</strong> {{ v.reason || '—' }}</div>
+                <div><strong>Note:</strong> {{ v.notes || '—' }}</div>
+
+                <div class="mt-8">
+                    <strong>Esito:</strong>
+                    <button class="btn-outline small" (click)="openResult()">📄 Apri esito</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Colonna azioni -->
+        <section class="surface card">
+            <h3 class="card__title">Cambia stato</h3>
+
+            <form class="form-grid" (submit)="$event.preventDefault(); saveStatus()">
+                <label>
+                    <span>Nuovo stato</span>
+                    <select [(ngModel)]="statusModel.status" name="newStatus" required>
+                        <option [ngValue]="'BOOKED'">Prenotato</option>
+                        <option [ngValue]="'CONFIRMED'">Confermato</option>
+                        <option [ngValue]="'CLOSED'">Concluso</option>
+                        <option [ngValue]="'CANCELLED'">Cancellato</option>
+                    </select>
+                </label>
+
+                <ng-container *ngIf="statusModel.status === 'CLOSED'">
+                    <label style="grid-column: 1 / -1">
+                        <span>Esito (obbligatorio per “Concluso”)</span>
+                        <textarea rows="5" [(ngModel)]="statusModel.result" name="result"
+                            placeholder="Inserisci l’esito…" required></textarea>
+                    </label>
+                </ng-container>
+
+                <div class="form-actions">
+                    <button class="btn-primary" type="button"
+                        [disabled]="saving || (statusModel.status==='CLOSED' && !statusModel.result?.trim())"
+                        (click)="saveStatus()">
+                        <span *ngIf="!saving">Salva</span>
+                        <span *ngIf="saving">Salvataggio…</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+<!-- Modale esito -->
+<div class="modal-overlay" *ngIf="resultVisible" (click)="closeResult()" role="dialog" aria-modal="true">
+    <div class="modal large" (click)="$event.stopPropagation()">
+        <h3>Esito appuntamento</h3>
+        <div class="result-text">
+            {{ appt?.result || 'Nessun esito inserito.' }}
+        </div>
+        <div class="modal-actions">
+            <button class="btn" (click)="closeResult()">Chiudi</button>
+        </div>
+    </div>
+</div>

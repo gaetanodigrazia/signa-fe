@@ -882,3 +882,50 @@ input[type="date"] {
         grid-template-columns: 1fr;
     }
 }
+
+/* ===== Danger pieno (tutto rosso, testo bianco) ===== */
+.btn.danger,
+.btn-danger,
+.btn-outline.btn-danger {
+    /* forziamo anche l’outline a pieno rosso */
+    background: #ef4444;
+    /* rosso pieno */
+    color: #fff;
+    /* testo bianco */
+    border: 1px solid #ef4444;
+    border-radius: 12px;
+    /* arrotondato come gli altri */
+    padding: 10px 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, border-color .2s, box-shadow .15s, transform .05s;
+}
+
+.btn.danger:hover,
+.btn-danger:hover,
+.btn-outline.btn-danger:hover {
+    background: #dc2626;
+    /* leggermente più scuro */
+    border-color: #dc2626;
+}
+
+.btn.danger:active,
+.btn-danger:active,
+.btn-outline.btn-danger:active {
+    transform: translateY(1px);
+}
+
+.btn.danger:focus-visible,
+.btn-danger:focus-visible,
+.btn-outline.btn-danger:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, .22);
+    /* focus ring accessibile */
+}
+
+.btn.danger[disabled],
+.btn-danger[disabled],
+.btn-outline.btn-danger[disabled] {
+    opacity: .6;
+    cursor: not-allowed;
+}

@@ -118,3 +118,7 @@ export interface StudioDto {
     name: string;
     address?: string;
 }
+
+export interface AppointmentResultDTO {
+    result: string;
+}

@@ -316,4 +316,83 @@ export class AppuntamentiComponent implements OnInit, OnDestroy {
   }
 
 
+
+
+  /** TEMPLATE CAMBIO STATO DA ESTRARRE */
+
+  // Stato modale "Cambia stato"
+  statusVisible = false;
+  savingStatus = false;
+  statusEditing: AppointmentDTO | null = null;
+  statusModel: { status: AppointmentStatus, result: string } = { status: 'BOOKED', result: '' };
+
+  openStatus(appt: AppointmentDTO): void {
+    this.statusEditing = appt;
+    this.statusModel = {
+      status: appt.status,   // precompilo con lo stato attuale
+      result: appt.result || '' // se c’è già un esito, lo mostro
+    };
+    this.statusVisible = true;
+    document.body.classList.add('body--lock');
+  }
+
+  closeStatus(): void {
+    this.statusVisible = false;
+    this.statusEditing = null;
+    this.savingStatus = false;
+    document.body.classList.remove('body--lock');
+  }
+
+  /** Salva cambio stato: se nuovo stato = CLOSED, esito obbligatorio.
+   *  Sequenza: (se CLOSED) PATCH /result -> poi PATCH /status
+   */
+  saveStatusChange(): void {
+    if (!this.statusEditing) return;
+
+    const apptId = this.statusEditing.id;
+    const newStatus = this.statusModel.status;
+    const needsResult = newStatus === 'CLOSED';
+
+    if (needsResult && !this.statusModel.result?.trim()) {
+      alert('Inserisci un esito per chiudere l’appuntamento.');
+      return;
+    }
+
+    this.savingStatus = true;
+
+    const doUpdateStatus = () => {
+      this.appointmentSvc.updateStatus(apptId, newStatus).subscribe({
+        next: () => {
+          this.savingStatus = false;
+          this.closeStatus();
+          this.load(); // ricarica lista
+        },
+        error: (err) => {
+          this.savingStatus = false;
+          console.error('Errore updateStatus', err);
+          alert('Errore nel cambio stato.');
+        }
+      });
+    };
+
+    if (needsResult) {
+      // 1) salva esito
+      const payload = this.statusModel.result.trim();
+      this.appointmentSvc.insertResult(apptId, payload).subscribe({
+        next: () => {
+          // 2) poi cambia stato a CLOSED
+          doUpdateStatus();
+        },
+        error: (err) => {
+          this.savingStatus = false;
+          console.error('Errore insertResult', err);
+          alert('Errore nel salvataggio dell’esito.');
+        }
+      });
+    } else {
+      // solo cambio stato
+      doUpdateStatus();
+    }
+  }
+
 }

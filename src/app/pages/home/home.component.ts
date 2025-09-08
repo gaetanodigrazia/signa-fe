@@ -5,11 +5,12 @@ import { AppointmentService } from 'src/app/service/appointment.service';
 import { PatientService } from 'src/app/service/patient.service';
 import { AppointmentDTO, AppointmentStatus } from 'src/app/model/appointment.model';
 import { PatientDto } from 'src/app/model/patient.model';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
@@ -233,6 +234,82 @@ export class HomeComponent implements OnInit {
   fmtStudioName(v: any): string {
     return v?.studio?.name || '—';
   }
+  // ===== Cambio stato (Home) =====
+  statusVisible = false;
+  savingStatus = false;
+  statusModel: { status: AppointmentStatus, result: string } = { status: 'BOOKED', result: '' };
 
+  /** Apre la modale di cambio stato prendendo come riferimento l'appuntamento in vista */
+  openStatusFromHome(): void {
+    if (!this.viewingAppointment) return;
+    const v = this.viewingAppointment as AppointmentDTO;
+
+    this.statusModel = {
+      status: v.status,
+      result: (v as any).result || '' // se già presente un esito, lo mostro
+    };
+
+    this.statusVisible = true;
+    document.body.classList.add('body--lock');
+  }
+
+  closeStatus(): void {
+    this.statusVisible = false;
+    this.savingStatus = false;
+    document.body.classList.remove('body--lock');
+  }
+
+  /** Salva il cambio stato dalla modale in Home:
+   *  - se si passa a CLOSED, l’esito è obbligatorio -> PATCH /result prima
+   *  - poi PATCH /{id}?status=...
+   *  - aggiorna UI e ricarica le liste Home
+   */
+  saveStatusChangeHome(): void {
+    if (!this.viewingAppointment) return;
+
+    const appt = this.viewingAppointment as AppointmentDTO;
+    const apptId = appt.id;
+    const newStatus = this.statusModel.status;
+    const needsResult = newStatus === 'CLOSED';
+
+    if (needsResult && !this.statusModel.result?.trim()) {
+      alert('Inserisci un esito per chiudere l’appuntamento.');
+      return;
+    }
+
+    this.savingStatus = true;
+
+    const updateStatus = () => {
+      this.apptSvc.updateStatus(apptId, newStatus).subscribe({
+        next: () => {
+          // Aggiorna lo stato in modale senza attendere la ricarica
+          this.viewingAppointment = { ...appt, status: newStatus, result: this.statusModel.result?.trim() || (appt as any).result };
+          this.savingStatus = false;
+          this.closeStatus();
+          // Ricarica dati della home (appuntamenti oggi + KPI)
+          this.refresh();
+        },
+        error: (err) => {
+          console.error('Errore updateStatus', err);
+          this.savingStatus = false;
+          alert('Errore nel cambio stato.');
+        }
+      });
+    };
+
+    if (needsResult) {
+      // 1) salva esito
+      this.apptSvc.insertResult(apptId, this.statusModel.result.trim()).subscribe({
+        next: () => updateStatus(),
+        error: (err) => {
+          console.error('Errore insertResult', err);
+          this.savingStatus = false;
+          alert('Errore nel salvataggio dell’esito.');
+        }
+      });
+    } else {
+      updateStatus();
+    }
+  }
 
 }

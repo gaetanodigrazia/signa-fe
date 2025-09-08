@@ -12,6 +12,7 @@ import { EventoIniziatoComponent } from '../pages/evento-iniziato/evento-iniziat
 import { SettingsProfileComponent } from '../components/settings-profile/settings-profile.component';
 import { SettingsStudioComponent } from '../components/settings-studio/settings-studio.component';
 import { CanDeactivateSettingsProfileGuard } from './can-deactivate-settings-profile.guard';
+import { AppointmentDetailsComponent } from '../components/appointment-details/appointment-details.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -27,6 +28,7 @@ export const routes: Routes = [
     { path: 'calendar', component: AppointmentCalendarComponent, canActivate: [authGuard] },
 
     { path: 'appointments', component: AppuntamentiComponent, canActivate: [authGuard] },
+    { path: 'appointments/:id', component: AppointmentDetailsComponent, canActivate: [authGuard] },
 
     { path: 'users', component: UsersComponent, canActivate: [authGuard] },
 

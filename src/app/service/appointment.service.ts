@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AppointmentDTO, AppointmentInputDTO, AppointmentStatus } from '../model/appointment.model';
+import { AppointmentDTO, AppointmentInputDTO, AppointmentResultDTO, AppointmentStatus } from '../model/appointment.model';
 import { API_BASE_URL } from '../config/api.config';
 
 @Injectable({ providedIn: 'root' })
@@ -12,6 +12,11 @@ export class AppointmentService {
     create(dto: AppointmentInputDTO): Observable<AppointmentDTO> {
         return this.http.post<AppointmentDTO>(this.baseUrl, dto);
     }
+
+    findById(appointmentId: string) {
+        return this.http.get<AppointmentDTO>(`${this.baseUrl}/${appointmentId}`);
+    }
+
 
     /**
   * Carica gli appuntamenti nel range [from, to]
@@ -59,5 +64,13 @@ export class AppointmentService {
     /** Elimina appuntamento */
     delete(appointmentId: string): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/${appointmentId}`);
+    }
+
+    insertResult(appointmentId: string, result: string | AppointmentResultDTO): Observable<void> {
+        const body: AppointmentResultDTO =
+            typeof result === 'string' ? { result } : result;
+
+        // rotta tipica per una risorsa "result" dell'appuntamento
+        return this.http.patch<void>(`${this.baseUrl}/${appointmentId}/result`, body);
     }
 }
