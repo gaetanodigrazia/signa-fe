@@ -1,0 +1,5 @@
+<!-- Overlay caricamento globale -->
+<div class="page-loading-overlay" *ngIf="loading$ | async" role="status" aria-live="polite" aria-busy="true">
+    <span class="spinner spinner--big" aria-hidden="true"></span>
+    <span class="sr-only">Caricamento…</span>
+</div>

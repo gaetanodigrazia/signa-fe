@@ -82,7 +82,10 @@
                         </span>
                     </div>
                     <div class="actions">
-                        <button class="btn-outline" type="button" (click)="openAppointment(a)">Apri</button>
+                        <button class="btn-outline" type="button" [routerLink]="['/appointments', a.id]"
+                            [state]="{ appt: a }">
+                            Apri
+                        </button>
                     </div>
                 </li>
             </ul>
@@ -121,12 +124,6 @@
             </ul>
         </article>
     </section>
-
-    <!-- Overlay -->
-    <div class="page-loading-overlay" *ngIf="loadingAll" role="status" aria-live="polite" aria-busy="true">
-        <span class="spinner spinner--big" aria-hidden="true"></span>
-        <span class="sr-only">Caricamento dashboard…</span>
-    </div>
 </div>
 
 <!-- Modale: Dettagli appuntamento -->
@@ -167,6 +164,9 @@
         <div class="modal-actions">
             <button class="btn" #closeApptBtn (click)="closeAppointment()">Chiudi</button>
             <button class="btn-outline" type="button" routerLink="/calendar">Vai al calendario</button>
+            <button class="btn-outline" type="button" (click)="openStatusFromHome()">
+                Cambia stato
+            </button>
         </div>
     </div>
 </div>
@@ -203,6 +203,45 @@
         <div class="modal-actions">
             <button class="btn" #closePatientBtn (click)="closePatient()">Chiudi</button>
             <button class="btn-outline" type="button" routerLink="/patients">Vai ai pazienti</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modale: Cambia stato (Home) -->
+<div class="modal-overlay" *ngIf="statusVisible" (click)="closeStatus()" role="dialog" aria-modal="true"
+    aria-labelledby="status-dialog-title">
+    <div class="modal" (click)="$event.stopPropagation()" (keydown.escape)="closeStatus()" tabindex="-1">
+        <h3 id="status-dialog-title">Cambia stato appuntamento</h3>
+
+        <form class="form-grid" (submit)="$event.preventDefault(); saveStatusChangeHome()">
+            <label>
+                <span>Nuovo stato</span>
+                <select [(ngModel)]="statusModel.status" name="newStatusHome" required>
+                    <option [ngValue]="'BOOKED'">Prenotato</option>
+                    <option [ngValue]="'CONFIRMED'">Confermato</option>
+                    <option [ngValue]="'CLOSED'">Concluso</option>
+                    <option [ngValue]="'CANCELLED'">Cancellato</option>
+                </select>
+            </label>
+
+            <!-- Esito obbligatorio quando si passa a CLOSED -->
+            <ng-container *ngIf="statusModel.status === 'CLOSED'">
+                <label style="grid-column: 1 / -1">
+                    <span>Esito (obbligatorio per “Concluso”)</span>
+                    <textarea rows="4" [(ngModel)]="statusModel.result" name="resultHome"
+                        placeholder="Inserisci l’esito…" required></textarea>
+                </label>
+            </ng-container>
+        </form>
+
+        <div class="modal-actions">
+            <button class="btn" type="button" (click)="closeStatus()">Annulla</button>
+            <button class="btn-primary" type="button"
+                [disabled]="savingStatus || (statusModel.status==='CLOSED' && !statusModel.result?.trim())"
+                (click)="saveStatusChangeHome()">
+                <span *ngIf="!savingStatus">Salva</span>
+                <span *ngIf="savingStatus">Salvataggio…</span>
+            </button>
         </div>
     </div>
 </div>
