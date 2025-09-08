@@ -235,16 +235,6 @@
     </div>
 </div>
 
-<!-- OVERLAY CARICAMENTO -->
-<div class="page-loading-overlay" *ngIf="loading" role="status" aria-live="polite">
-    <span class="spinner spinner--big" aria-hidden="true"></span>
-    <span class="sr-only">Caricamento…</span>
-</div>
-
-<div class="page-loading-overlay" *ngIf="loading || saving" role="status" aria-live="polite" aria-busy="true">
-    <span class="spinner spinner--big" aria-hidden="true"></span>
-    <span class="sr-only">Caricamento…</span>
-</div>
 <!-- MODALE CONFERMA DELETE -->
 <div class="modal-overlay" *ngIf="confirmVisible" (click)="confirmVisible = false">
     <div class="modal small" (click)="$event.stopPropagation()">

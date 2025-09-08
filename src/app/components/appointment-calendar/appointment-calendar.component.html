@@ -59,12 +59,6 @@
       (hourSegmentClicked)="onTimeSlotClick($event.date)" (eventClicked)="openEventDetails($event.event)">
     </mwl-calendar-day-view>
   </div>
-
-  <!-- Overlay caricamento globale (centrato e sopra il calendario) -->
-  <div class="page-loading-overlay" *ngIf="loading" role="status" aria-live="polite" aria-busy="true">
-    <span class="spinner spinner--big" aria-hidden="true"></span>
-    <span class="sr-only">Caricamento appuntamenti…</span>
-  </div>
 </div>
 
 <!-- === MODALE EVENTO (CREA / MODIFICA) === -->
