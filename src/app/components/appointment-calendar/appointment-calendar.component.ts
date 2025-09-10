@@ -83,7 +83,7 @@ export class AppointmentCalendarComponent implements OnInit {
   userListMaxHeight = 240;
 
   /* ====== Contesto ====== */
-  selectedDoctorId?: string;
+  selectedDoctorId: string | null = null;
 
   /* ====== Stato UI ====== */
   loading = false;
@@ -353,6 +353,7 @@ export class AppointmentCalendarComponent implements OnInit {
     const ev = this.selectedEvent;
     const date = ev.start ? new Date(ev.start) : new Date();
     const pid = (ev.meta as any)?.patientId ?? null;
+    this.selectedDoctorId = (ev.meta as any)?.doctorId ?? null;
 
     this.editingRef = ev;
     this.modalData = {
@@ -373,6 +374,8 @@ export class AppointmentCalendarComponent implements OnInit {
 
   openCreateModal(date: Date, patientId?: string): void {
     this.editingRef = null;
+    this.selectedDoctorId = null;
+
     this.modalData = {
       title: '',
       description: '',
