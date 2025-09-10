@@ -227,3 +227,15 @@ textarea:focus {
         opacity: 1
     }
 }
+
+.page::before {
+    content: "";
+    display: block;
+    height: 30px;
+}
+
+.page::after {
+    content: "";
+    display: block;
+    height: 70px;
+}
