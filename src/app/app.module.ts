@@ -22,6 +22,7 @@ import { GlobalErrorHandler } from './exception/global-error-handler';
 import { HttpLoadingInterceptor } from './interceptor/http-loading.interceptor';
 import { LoadingDialogComponent } from './loading/loading-dialog.component';
 import { ErrorInterceptor } from './interceptor/errore-interceptor';
+import { ALERT_OVERRIDE_PROVIDER } from './interceptor/alert-overrides';
 
 
 
@@ -59,6 +60,7 @@ import { ErrorInterceptor } from './interceptor/errore-interceptor';
     { provide: HTTP_INTERCEPTORS, useClass: HttpLoadingInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
 
+    ALERT_OVERRIDE_PROVIDER
 
   ]
 })
