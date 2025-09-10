@@ -416,3 +416,36 @@
     letter-spacing: .2px;
   }
 }
+
+@media (max-width: 991.98px) {
+  .sidebar.mobile {
+    /* puoi tenere pure 80/90/100svh qui */
+    height: min(85svh, calc(100dvh - 50px));
+    /* overflow: hidden;  <-- rimosso il blocco globale */
+    --bottom-height: 56px;
+    /* altezza stimata del blocco in basso */
+    --content-pad: 16px;
+    /* padding extra per respiro */
+  }
+
+  /* Rendi scrollabile il contenuto */
+  .sidebar.mobile nav {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* lo spazio effettivo del nav: altezza meno il footer fisso */
+    max-height: calc(100% - var(--bottom-height) - var(--content-pad));
+    padding-bottom: calc(var(--bottom-height) + var(--content-pad));
+  }
+
+  /* Mantieni il blocco di logout ancorato in basso */
+  .sidebar.mobile .sidebar-bottom {
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    bottom: max(12px, env(safe-area-inset-bottom, 0));
+    /* opzionale: assegna un’altezza per il calcolo sopra */
+    height: var(--bottom-height);
+    display: flex;
+    align-items: center;
+  }
+}
