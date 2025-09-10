@@ -19,6 +19,9 @@ export class EventoIniziatoComponent {
   loading = true;
   saving = false;
   appt!: AppointmentDTO;
+  /** esito iniziale (normalizzato) */
+  private originalResult = '';
+  canSave = false;
 
   form = this.fb.group({
     studio: [{ value: '', disabled: true }],
@@ -41,6 +44,8 @@ export class EventoIniziatoComponent {
 
     this.appt = navAppt ?? histAppt;
     // (facoltativo) debug:
+    this.form.get('result')!.valueChanges.subscribe(() => this.updateCanSave());
+
   }
 
   ngOnInit() {
@@ -72,50 +77,53 @@ export class EventoIniziatoComponent {
       endAt: appt.endAt,
       reason: appt.reason ?? '',
       notes: appt.notes ?? '',
-      result: ''
+      result: this.originalResult,
     });
-
+    this.updateCanSave();
     this.loading = false;
   }
 
+  /** aggiorna il flag che abilita/disabilita il bottone Salva */
+  private updateCanSave() {
+    const val = String(this.form.get('result')!.value ?? '').trim();
+    // Deve essere non vuoto e diverso dall’originale
+    this.canSave = val.length > 0 && val !== this.originalResult;
+  }
 
   salva() {
-    if (this.form.invalid || !this.appt) {
+    // blocca se l’esito non è cambiato o form non valido
+    if (!this.canSave || this.form.invalid || !this.appt) {
       this.form.markAllAsTouched();
       return;
     }
+
     this.saving = true;
 
-    // Costruisci il DTO esattamente come da interfaccia che mi hai passato:
+    const raw = this.form.getRawValue();
     const dto: AppointmentInputDTO = {
-      // patient è obbligatorio ed è un RefId
       patient: { id: this.appt.patient.id },
-
-      // doctor è opzionale ma il tipo è UserRef -> { user: { id } }
-      ...(this.appt.doctor?.id ? { doctor: { user: { id: this.appt.doctor.user.id } } } : {}),
-
+      ...(this.appt.doctor?.user?.id ? { doctor: { user: { id: this.appt.doctor.user.id } } } : {}),
       startAt: this.appt.startAt,
       endAt: this.appt.endAt,
-
-      // opzionali
       kind: this.appt.kind,
-      status: 'CLOSED', // se vuoi chiudere la visita al salvataggio; altrimenti togli
-      reason: this.form.getRawValue().reason || undefined,
-      notes: this.form.getRawValue().notes || undefined,
-      result: this.form.getRawValue().result || undefined, // <-- invio result
-
+      status: 'CLOSED', // se vuoi chiuderla al salvataggio
+      reason: raw.reason || undefined,
+      notes: raw.notes || undefined,
+      result: raw.result?.trim() || undefined, // <-- invia l’esito modificato
     };
 
     this.apptSvc.update(this.appt.id, dto).subscribe({
       next: () => {
         this.saving = false;
-        // vedi punto 2 per l'esito
+        // aggiorna baseline: ora l’esito corrente è l’originale
+        this.originalResult = (raw.result ?? '').trim();
+        this.updateCanSave();
         this.router.navigate(['/']);
       },
       error: () => {
         this.saving = false;
         alert('Errore nel salvataggio');
-      }
+      },
     });
   }
 

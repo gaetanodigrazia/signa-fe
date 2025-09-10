@@ -68,8 +68,8 @@
                         </div>
                         <div class="meta">
                             <span>👤 {{ (a.patient?.firstname || '') + ' ' + (a.patient?.lastname || '') }}</span>
-                            <span *ngIf="a.doctor?.user?.firstName || a.doctor?.user?.lastName">
-                                · {{ (a.doctor?.user?.firstName || '') + ' ' + (a.doctor?.user?.lastName || '') }}
+                            <span *ngIf="a.doctor?.user?.firstName || a.doctor?.user?.lastName">🩺
+                                {{ (a.doctor?.user?.firstName || '') + ' ' + (a.doctor?.user?.lastName || '') }}
                             </span>
                         </div>
                     </div>

@@ -37,9 +37,10 @@
 
             <div class="actions">
                 <div class="actions">
-                    <button type="submit" class="btn-primary" [disabled]="saving">
+                    <button type="submit" class="btn-primary" [disabled]="saving || !canSave">
                         💾 {{ saving ? 'Salvataggio...' : 'Salva' }}
                     </button>
+
                 </div>
 
             </div>
