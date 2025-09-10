@@ -20,8 +20,8 @@ import { PatientPickerComponent } from './components/shared/patient-picker/patie
 import { DoctorPickerComponent } from './components/shared/doctor-picker/doctor-picker.component';
 import { GlobalErrorHandler } from './exception/global-error-handler';
 import { HttpLoadingInterceptor } from './interceptor/http-loading.interceptor';
-import { MatDialogModule } from '@angular/material/dialog';
 import { LoadingDialogComponent } from './loading/loading-dialog.component';
+import { ErrorInterceptor } from './interceptor/errore-interceptor';
 
 
 
@@ -57,6 +57,8 @@ import { LoadingDialogComponent } from './loading/loading-dialog.component';
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     { provide: HTTP_INTERCEPTORS, useClass: HttpLoadingInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+
 
   ]
 })

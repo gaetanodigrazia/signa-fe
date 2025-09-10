@@ -1,4 +1,5 @@
-import { Component, HostListener } from '@angular/core';
+// error-modal.component.ts
+import { Component, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ErrorModalService } from 'src/app/service/error-modal.service';
 
@@ -10,11 +11,25 @@ import { ErrorModalService } from 'src/app/service/error-modal.service';
   styleUrls: ['./error-modal.component.scss']
 })
 export class ErrorModalComponent {
-  constructor(public errorModal: ErrorModalService) { }
+  @ViewChild('closeBtn') closeBtn!: ElementRef<HTMLButtonElement>;
 
-  // chiudi con ESC
-  @HostListener('document:keydown.escape')
-  onEsc() { this.errorModal.close(); }
+  constructor(public errorModal: ErrorModalService) {
+    // Focus e body scroll lock
+    this.errorModal.state$.subscribe(err => {
+      if (err) {
+        setTimeout(() => this.closeBtn?.nativeElement?.focus(), 0);
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    });
+  }
 
-  stop(e: Event) { e.stopPropagation(); }
+  close() { this.errorModal.close(); }
+  stop(ev: Event) { ev.stopPropagation(); }
+
+  @HostListener('document:keydown', ['$event'])
+  onKeydown(ev: KeyboardEvent) {
+    if (ev.key === 'Escape') this.close();
+  }
 }

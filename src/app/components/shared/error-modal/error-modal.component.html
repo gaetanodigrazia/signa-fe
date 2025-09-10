@@ -1,6 +1,7 @@
+<!-- error-modal.component.html -->
 <ng-container *ngIf="(errorModal.state$ | async) as err">
-    <div class="modal-overlay" (click)="errorModal.close()" role="presentation">
-        <div class="modal" (click)="stop($event)" role="dialog" aria-modal="true" aria-labelledby="errorTitle"
+    <div class="modal-overlay" (click)="close()" role="presentation">
+        <div class="modal" (click)="stop($event)" role="alertdialog" aria-modal="true" aria-labelledby="errorTitle"
             aria-describedby="errorBody" tabindex="-1">
             <h3 id="errorTitle">{{ err.title || 'Errore' }}</h3>
 
@@ -9,13 +10,13 @@
                     {{ err.detail || 'Non hai i permessi per eseguire questa azione.' }}
                 </p>
                 <ng-template #genericMsg>
-                    <p>{{ err.detail }}</p>
+                    <p>{{ err.detail || 'Si è verificato un errore inatteso.' }}</p>
                 </ng-template>
                 <small *ngIf="err.status">Codice errore: {{ err.status }}</small>
             </div>
 
             <div class="modal-actions">
-                <button class="btn" (click)="errorModal.close()">Chiudi</button>
+                <button #closeBtn class="btn" (click)="close()">Chiudi</button>
             </div>
         </div>
     </div>
