@@ -77,25 +77,47 @@ export class DoctorPickerComponent implements OnChanges {
     this.listOpen = false;
     this.cdr.markForCheck();
   }
-
-  /* ==== Logic ==== */
   private recomputeResults(q: string): void {
-    const s = (q || '').trim().toLowerCase();
+    const tokens = this.tokenize(q);
+
+    // Filtro base: solo dottori attivi
     const base = (this.doctors ?? []).filter(m => m.role === 'DOCTOR' && m.active !== false);
+
     let next = base;
-    if (s) {
+    if (tokens.length) {
       next = base.filter(m => {
-        const u: any = m.user || {};
-        const fn = (u.firstName ?? u.firstname ?? '').toLowerCase();
-        const ln = (u.lastName ?? u.lastname ?? '').toLowerCase();
-        const em = (u.email ?? '').toLowerCase();
-        return fn.includes(s) || ln.includes(s) || em.includes(s);
+        const hay = this.buildHaystack(m);
+        // Tutti i token devono comparire (AND), in qualsiasi ordine
+        return tokens.every(tok => hay.includes(tok));
       });
     }
+
     this.results = next.slice(0, 50);
     this.highlight = this.results.length ? 0 : -1;
     this.cdr.markForCheck();
   }
+
+
+  private normalize(v: string): string {
+    return (v || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, ''); // rimuove accenti/diacritici
+  }
+
+  private tokenize(q: string): string[] {
+    return this.normalize(q).split(/[\s,;]+/).filter(Boolean);
+  }
+
+  private buildHaystack(m: StudioMemberDto): string {
+    const u: any = m.user || {};
+    const first = u.firstName ?? u.firstname ?? '';
+    const last = u.lastName ?? u.lastname ?? '';
+    const email = u.email ?? '';
+    // Unisci i campi che vuoi ricercare
+    return this.normalize(`${first} ${last} ${email}`);
+  }
+
 
   private syncInputWithModel(): void {
     // 🔧 cerca per user.id (fallback a member.id per retro-compatibilità)

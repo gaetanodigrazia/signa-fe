@@ -204,6 +204,7 @@
             <div><strong>Nome:</strong> {{ v.user?.firstName }} {{ v.user?.lastName }}</div>
             <div><strong>Email:</strong> {{ v.user?.email }}</div>
             <div><strong>Ruolo:</strong> {{ v.role }}</div>
+            <div><strong>Telefono:</strong> {{ v.user?.phone || '—' }}</div> <!-- 👈 aggiungi questa -->
 
             <div>
                 <strong>Stato:</strong>

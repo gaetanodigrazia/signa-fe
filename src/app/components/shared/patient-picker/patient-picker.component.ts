@@ -97,26 +97,37 @@ export class PatientPickerComponent implements OnChanges {
     this.cdr.markForCheck();
   }
 
-  /* ===== Logica ===== */
+  private normalize(v: string): string {
+    return (v || '')
+      .toLowerCase()
+      .normalize('NFD')               // separa i diacritici
+      .replace(/[\u0300-\u036f]/g, ''); // rimuove i diacritici
+  }
+
+  private tokenize(q: string): string[] {
+    return this.normalize(q).split(/[\s,;]+/).filter(Boolean);
+  }
+
   private recomputeResults(q: string): void {
-    const s = (q || '').trim().toLowerCase();
+    const tokens = this.tokenize(q);
 
     const base = this.patients ?? [];
     let next = base;
 
-    if (s) {
-      next = base.filter(p =>
-        (p.firstname && p.firstname.toLowerCase().includes(s)) ||
-        (p.lastname && p.lastname.toLowerCase().includes(s)) ||
-        (p.email && p.email.toLowerCase().includes(s)) ||
-        (p.SSN && p.SSN.toLowerCase().includes(s))
-      );
+    if (tokens.length) {
+      next = base.filter(p => {
+        const hay = this.normalize(
+          `${p.firstname || ''} ${p.lastname || ''} ${p.email || ''} ${p.SSN || ''}`
+        );
+        return tokens.every(tok => hay.includes(tok)); // AND tra i termini
+      });
     }
 
     this.results = next.slice(0, 50);
     this.highlight = this.results.length ? 0 : -1;
     this.cdr.markForCheck();
   }
+
 
   private syncUserSearchWithModel(): void {
     const p = this.patients?.find(x => x.id === this.model);

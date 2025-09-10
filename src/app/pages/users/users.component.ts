@@ -133,6 +133,7 @@ export class UsersComponent implements OnInit {
         firstName: f.firstName,
         lastName: f.lastName,
         email: f.email,
+        phone: f.phone,
         password: (f as any).password ?? ''
       },
       role: (firstMembership?.role as StudioRole) ?? 'BACKOFFICE'
@@ -203,6 +204,7 @@ export class UsersComponent implements OnInit {
         firstName: f.firstName,
         lastName: f.lastName,
         email: f.email,
+        phone: f.phone,
         password: '' // se non vuoi cambiarla, stringa vuota
       };
       this.saving = true;

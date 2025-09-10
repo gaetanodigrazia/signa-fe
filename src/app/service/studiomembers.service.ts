@@ -8,6 +8,7 @@ export interface UserInputDto {
     lastName: string;
     email: string;
     password: string;
+    phone: string;
 }
 
 export type StudioRole = 'OWNER' | 'DOCTOR' | 'BACKOFFICE' | 'NURSE' | 'STAFF';
