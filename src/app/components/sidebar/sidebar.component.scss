@@ -420,7 +420,7 @@
 @media (max-width: 991.98px) {
   .sidebar.mobile {
     /* puoi tenere pure 80/90/100svh qui */
-    height: min(85svh, calc(100dvh - 50px));
+    height: min(70svh, calc(100dvh - 50px));
     /* overflow: hidden;  <-- rimosso il blocco globale */
     --bottom-height: 56px;
     /* altezza stimata del blocco in basso */
